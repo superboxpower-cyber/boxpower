@@ -2,150 +2,150 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BoxPower v1.1 - CFO Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BoxPower V17.42 - Refresh Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&display=swap');
+
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Glass & Utils */
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; }
+        .tab-content { display: none; height: 100%; overflow-y: auto; padding-bottom: 100px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-icon { transition: all 0.2s; }
-        .btn-icon:active { transform: scale(0.9); }
+        /* Scrollbar Neon */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 4px; border: 2px solid #0f172a; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #3b82f6; }
 
-        /* Animação do Form de Histórico */
-        #history-form-container { transition: all 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
-        #history-form-container.open { max-height: 200px; opacity: 1; margin-bottom: 1rem; }
-        
-        /* Correção para Dropdown no Web (Fundo escuro nas opções) */
-        select option { background-color: #0f172a; color: #e2e8f0; }
-
-        /* --- ESTILOS DO RELATÓRIO --- */
-        .report-container { 
-            overflow-x: auto; 
-            position: relative; 
-            max-width: 100vw;
-            border-radius: 0 0 1rem 1rem;
-        }
-        
+        /* Tables */
+        .report-container { overflow-x: auto; position: relative; max-width: 100vw; border-radius: 0 0 1rem 1rem; }
         .report-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        .report-table th, .report-table td { 
-            padding: 10px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); 
-            border-right: 1px solid rgba(255,255,255,0.02); white-space: nowrap; 
-        }
-        .sticky-col { 
-            position: sticky; left: 0; z-index: 10; background: #1e293b; 
-            border-right: 2px solid rgba(255,255,255,0.1); min-width: 160px; max-width: 160px; 
-            text-align: left !important; font-weight: bold;
-        }
+        .report-table th, .report-table td { padding: 10px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.02); white-space: nowrap; }
+        .sticky-col { position: sticky; left: 0; z-index: 10; background: #1e293b; border-right: 2px solid rgba(255,255,255,0.1); min-width: 140px; max-width: 140px; text-align: left !important; font-weight: bold; }
         th.sticky-col { z-index: 20; background: #0f172a; }
         .sub-header { font-size: 0.65rem; color: #64748b; font-weight: normal; background: rgba(15, 23, 42, 0.8); }
         .report-table th { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; }
         .report-table td { font-size: 0.8rem; }
 
-        @keyframes gentle-pulse {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.05); filter: brightness(1.1); }
+        /* Chat Widget */
+        #chat-widget { position: fixed; bottom: 80px; right: 20px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; pointer-events: none; }
+        #chat-widget > * { pointer-events: auto; }
+        #chat-window { 
+            width: 320px; height: 450px; background: #1e293b; border: 1px solid #334155; 
+            border-radius: 20px; display: none; flex-direction: column; overflow: hidden; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); margin-bottom: 10px;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .logo-animate { animation: gentle-pulse 4s ease-in-out infinite; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        #chat-messages { flex: 1; overflow-y: auto; padding: 15px; space-y: 10px; font-size: 0.8rem; scroll-behavior: smooth; }
+        
+        .msg-user { align-self: flex-end; background: #2563eb; color: white; padding: 10px 14px; border-radius: 12px 12px 0 12px; max-width: 85%; margin-left: auto; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .msg-bot { align-self: flex-start; background: #334155; color: #e2e8f0; padding: 10px 14px; border-radius: 12px 12px 12px 0; max-width: 90%; margin-right: auto; margin-bottom: 8px; border: 1px solid #475569; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 6px; }
+        .msg-success { border-left: 3px solid #10b981; }
+        .msg-error { border-left: 3px solid #ef4444; }
+
+        /* Botões Interativos */
+        .chat-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .chat-btn { background: #0f172a; border: 1px solid #475569; color: #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; items-center; gap: 6px; }
+        .chat-btn:active { transform: scale(0.95); }
+        .chat-btn:hover { background: #334155; border-color: #64748b; color: white; }
+        .chat-btn-danger { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
+        .chat-btn-success { background: #064e3b; border-color: #10b981; color: #6ee7b7; }
+        
+        select option { background-color: #0f172a; color: #e2e8f0; }
+        
+        /* Animações */
+        #history-form-container { transition: all 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
+        #history-form-container.open { max-height: 200px; opacity: 1; margin-bottom: 1rem; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-24">
+<body>
 
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 transition-opacity duration-300">
+    <div id="login-screen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950 transition-opacity duration-300">
         <div class="glass p-8 rounded-3xl w-80 text-center shadow-2xl border-t border-blue-500/30">
             <div class="flex justify-center mb-6">
                 <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" 
                      onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" 
                      alt="BoxPower Logo" 
-                     class="w-32 h-32 object-contain drop-shadow-2xl logo-animate rounded-2xl">
+                     class="w-32 h-32 object-contain drop-shadow-2xl rounded-2xl">
             </div>
-            <h1 class="text-2xl font-bold mb-2">BoxPower</h1>
+            <h1 class="text-2xl font-bold mb-2 text-white">BoxPower</h1>
             <p class="text-slate-400 text-sm mb-6">Acesso Administrativo</p>
             <input type="password" id="pin-input" maxlength="4" placeholder="••••" 
                 class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-blue-500 transition-all mb-4 text-white">
             <button id="btn-login" onclick="performLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg">ENTRAR</button>
         </div>
     </div>
-<div id="main-content" class="hidden opacity-0 transition-opacity duration-500">
+
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-500 flex flex-col h-full">
         
-        <header class="p-6 flex justify-between items-center bg-slate-900/90 sticky top-0 z-20 backdrop-blur-sm border-b border-slate-800">
+        <header class="p-6 flex justify-between items-center bg-slate-900/90 sticky top-0 z-20 backdrop-blur-sm border-b border-slate-800 shrink-0">
             <div>
                 <h2 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Gestão Financeira</h2>
                 <div class="flex items-baseline gap-2">
-                    <h1 class="text-3xl font-black tracking-tighter text-white drop-shadow-lg">BoxPower</h1>
-                    <span class="text-[10px] text-slate-500 font-mono border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800">v1.1</span>
+                    <h1 class="text-2xl font-black tracking-tighter text-white drop-shadow-lg">BoxPower</h1>
+                    <span class="text-[10px] text-emerald-500 font-mono border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800">v17.42</span>
                 </div>
             </div>
-            <button onclick="window.location.reload()" class="w-10 h-10 bg-red-500/10 text-red-500 border border-red-500/30 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-lg shadow-red-900/20">
-                <i class="fas fa-times text-lg"></i>
-            </button>
+            <div class="flex gap-3">
+                <button onclick="refreshApp()" title="Atualizar Dados" class="w-10 h-10 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all active:scale-95 shadow-lg">
+                    <i id="refresh-icon" class="fas fa-sync-alt text-sm"></i>
+                </button>
+                <button onclick="window.location.reload()" title="Sair" class="w-10 h-10 bg-red-500/10 text-red-500 border border-red-500/30 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-lg">
+                    <i class="fas fa-power-off text-sm"></i>
+                </button>
+            </div>
         </header>
 
-        <div id="connection-status" class="hidden bg-yellow-500/20 text-yellow-200 text-xs text-center p-2 mb-2 mx-4 rounded-lg border border-yellow-500/50">
-            ⏳ Conectando ao banco...
-        </div>
+        <div id="connection-status" class="hidden bg-yellow-500/20 text-yellow-200 text-xs text-center p-2 mb-2 mx-4 rounded-lg border border-yellow-500/50">⏳ Conectando...</div>
+        <div id="error-alert" class="hidden bg-red-900/80 text-red-200 text-xs p-4 mb-2 mx-4 rounded-lg border border-red-500 shadow-xl font-mono break-all"></div>
 
         <div id="tab-home" class="tab-content active p-4 space-y-4">
-            
             <div class="glass p-2 rounded-xl flex items-center gap-3 border border-slate-700 bg-slate-800">
                 <i class="fas fa-calendar-alt text-emerald-500 ml-2"></i>
-                <select id="dashboard-filter-month" onchange="calculateDashboard()" 
-                    class="w-full bg-transparent text-sm font-bold text-white outline-none">
-                    </select>
+                <select id="dashboard-filter-month" onchange="calculateDashboard()" class="w-full bg-transparent text-sm font-bold text-white outline-none"></select>
             </div>
-
             <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase">Receita Real (Mês)</p>
-                    <h3 id="stat-paid-amount" class="text-2xl font-bold text-emerald-400">R$ 0</h3>
+                <div class="glass p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-l-4 border-l-emerald-500">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase">Receita Real</p>
+                    <h3 id="stat-paid-amount" class="text-xl font-bold text-emerald-400">R$ 0,00</h3>
+                    <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden"><div id="revenue-progress" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div></div>
                 </div>
-                <div class="glass p-4 rounded-2xl">
-                    <p class="text-slate-400 text-[10px] font-bold uppercase">Receita Prevista</p>
-                    <h3 id="stat-projected" class="text-2xl font-bold text-blue-400">R$ 0</h3>
-                    <p class="text-[9px] text-slate-500 mt-1">Soma dos ativos</p>
+                <div class="glass p-4 rounded-2xl border-l-4 border-l-blue-500">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase">Prevista</p>
+                    <h3 id="stat-projected" class="text-xl font-bold text-blue-400">R$ 0,00</h3>
+                    <p class="text-[9px] text-slate-500 mt-1">Meta do Mês</p>
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[9px] uppercase">Assinantes</p>
-                        <h4 id="stat-total-clients" class="text-xl font-bold">0</h4>
-                    </div>
-                    <i class="fas fa-users text-slate-600"></i>
+                <div class="glass p-3 rounded-xl border border-red-500/30 bg-red-900/10">
+                    <p class="text-red-400 text-[9px] uppercase font-bold"><i class="fas fa-clock mr-1"></i> Pendente</p>
+                    <h4 id="stat-pending-money" class="text-lg font-bold text-white">R$ 0,00</h4>
                 </div>
-                <div class="glass p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[9px] uppercase">Ticket Médio</p>
-                        <h4 id="stat-ticket" class="text-xl font-bold text-yellow-500">R$ 0</h4>
-                    </div>
-                    <i class="fas fa-receipt text-slate-600"></i>
+                <div class="glass p-3 rounded-xl border border-yellow-500/30 bg-yellow-900/10">
+                    <p class="text-yellow-400 text-[9px] uppercase font-bold"><i class="fas fa-coins mr-1"></i> Lucro Líquido</p>
+                    <h4 id="stat-profit" class="text-lg font-bold text-white">R$ 0,00</h4>
                 </div>
             </div>
-
             <div class="glass rounded-3xl overflow-hidden border border-slate-700/50 mt-2">
                 <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
-                    <h3 class="font-bold flex items-center gap-2 text-[10px] uppercase tracking-wider text-slate-300">
-                        <i class="fas fa-exclamation-circle text-red-500"></i> Controle de Inadimplência do Mês
-                    </h3>
+                    <h3 class="font-bold flex items-center gap-2 text-[10px] uppercase tracking-wider text-slate-300"><i class="fas fa-exclamation-circle text-red-500"></i> Fila de Cobrança</h3>
                     <span id="badge-count" class="bg-blue-600 text-white text-sm font-bold px-2.5 py-0.5 rounded-lg shadow-lg">0</span>
                 </div>
-                <div id="billing-queue" class="divide-y divide-slate-800 max-h-80 overflow-y-auto bg-slate-900/30">
-                    <p class="p-8 text-center text-slate-500 text-sm italic">Carregando...</p>
-                </div>
+                <div id="billing-queue" class="divide-y divide-slate-800 max-h-80 overflow-y-auto bg-slate-900/30"></div>
             </div>
         </div>
-<div id="tab-clients" class="tab-content p-4 space-y-4">
+
+        <div id="tab-clients" class="tab-content p-4 space-y-4">
             <div class="flex gap-2">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-500"></i>
-                    <input type="text" id="search-client" oninput="filterClients()" placeholder="Buscar..." class="w-full bg-slate-800 rounded-xl py-3 pl-11 pr-4 outline-none border border-slate-700 focus:border-blue-500 text-white">
-                </div>
+                <div class="relative flex-1"><i class="fas fa-search absolute left-4 top-3.5 text-slate-500"></i><input type="text" id="search-client" oninput="filterClients()" placeholder="Buscar..." class="w-full bg-slate-800 rounded-xl py-3 pl-11 pr-4 outline-none border border-slate-700 focus:border-blue-500 text-white"></div>
                 <button onclick="openModal()" class="bg-blue-600 w-12 rounded-xl text-white shadow-lg"><i class="fas fa-plus"></i></button>
             </div>
             <div id="clients-list" class="space-y-3 pb-20"></div>
@@ -153,35 +153,17 @@
 
         <div id="tab-reports" class="tab-content p-4">
             <div class="glass rounded-2xl overflow-hidden border border-slate-700">
-                <div class="p-4 border-b border-slate-700 bg-slate-800/50 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-sm"><i class="fas fa-table text-emerald-500 mr-2"></i>Controle Financeiro</h3>
-                    </div>
-                    <div class="flex gap-2">
-                        <div class="relative w-1/2">
-                            <i class="fas fa-calendar absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-                            <select id="report-filter-month" onchange="renderReportTable()" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-8 pr-2 outline-none focus:border-emerald-500 font-mono"></select>
-                        </div>
-                        <div class="relative w-1/2">
-                            <i class="fas fa-filter absolute left-3 top-2.5 text-slate-500 text-xs"></i>
-                            <select id="report-filter-product" onchange="renderReportTable()" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-8 pr-2 outline-none focus:border-emerald-500">
-                                <option value="all">Planos: Todos</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="p-4 border-b border-slate-700 bg-slate-800/50 flex gap-2">
+                    <select id="report-filter-month" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"></select>
+                    <select id="report-filter-product" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"><option value="all">Planos: Todos</option></select>
                 </div>
-                <div class="report-container">
-                    <table class="report-table">
-                        <thead id="report-header"></thead>
-                        <tbody id="report-body"></tbody>
-                    </table>
-                </div>
+                <div class="report-container"><table class="report-table w-full"><thead id="report-header"></thead><tbody id="report-body"></tbody></table></div>
             </div>
         </div>
 
         <div id="tab-config" class="tab-content p-4">
-            <h3 class="font-bold mb-4 text-slate-300">Gerenciar Planos</h3>
-            <div id="products-list" class="space-y-2"></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-300">Planos</h3><button onclick="openProductModal()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-500"><i class="fas fa-plus mr-1"></i> Novo</button></div>
+            <div id="products-list" class="space-y-2 pb-20"></div>
         </div>
 
         <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-700 flex justify-around p-3 z-40 bg-slate-900/90 backdrop-blur-md">
@@ -190,6 +172,28 @@
             <button onclick="showTab('tab-clients')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-clients"><i class="fas fa-users text-xl mb-1"></i><span class="text-[10px]">Clientes</span></button>
             <button onclick="showTab('tab-config')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-config"><i class="fas fa-tags text-xl mb-1"></i><span class="text-[10px]">Planos</span></button>
         </nav>
+
+        <div id="chat-widget">
+            <div id="chat-window">
+                <div class="bg-slate-900 p-3 border-b border-slate-700 flex justify-between items-center shrink-0">
+                    <h4 class="text-xs font-bold text-emerald-400 flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> BoxPower AI</h4>
+                    <button onclick="toggleChat()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="chat-messages" class="bg-slate-800/50">
+                    <div class="msg-bot">
+                        🤖 <b>Olá! Sou seu Assistente Financeiro.</b><br>
+                        Gerencio cadastros e pagamentos com inteligência artificial.<br>
+                        Entendo contextos, datas e valores, mesmo com erros de digitação.<br>
+                        <i>Ex: "Cadastre Ana BoxPower 89,90 dia 15"</i>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2 shrink-0">
+                    <input type="text" id="chat-input" placeholder="Digite..." class="flex-1 bg-slate-800 rounded-lg px-3 py-2 text-xs text-white border border-slate-700 outline-none focus:border-emerald-500 transition-all" onkeypress="handleChatKey(event)">
+                    <button onclick="sendChat()" class="bg-emerald-600 w-10 h-8 rounded-lg text-white hover:bg-emerald-500 shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="bg-blue-600 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-white hover:bg-blue-500 transition-all active:scale-90 border-2 border-blue-400 z-50"><i class="fas fa-comment-dots text-2xl"></i></button>
+        </div>
 
         <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
@@ -203,56 +207,49 @@
                     </div>
                     <div class="flex gap-2">
                         <select id="modal-product" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></select>
-                        <select id="modal-status" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white">
-                            <option value="true" class="text-green-400">Ativo</option>
-                            <option value="false" class="text-red-400">Inativo</option>
-                        </select>
+                        <select id="modal-status" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select>
                     </div>
                 </div>
-
                 <div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4>
-                        <button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors">
-                            <i class="fas fa-plus mr-1 text-blue-400"></i> Lançar
-                        </button>
-                    </div>
-                    
-                    <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2">
-                        <input type="hidden" id="hist-id">
-                        <div class="flex gap-2 mb-2">
-                            <div class="w-1/2">
-                                <label class="text-[9px] text-slate-500 uppercase font-bold">Data</label>
-                                <input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white">
-                            </div>
-                            <div class="w-1/2">
-                                <label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label>
-                                <input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400">
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button>
-                            <button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button>
-                        </div>
-                    </div>
-
+                    <div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Lançar</button></div>
+                    <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2"><input type="hidden" id="hist-id"><div class="flex gap-2 mb-2"><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div></div><div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button></div></div>
                     <div id="history-list" class="bg-slate-800/50 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-700/50"></div>
                 </div>
+                <div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button></div>
+            </div>
+        </div>
 
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button>
-                    <button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button>
-                </div>
+        <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-700 p-6 shadow-2xl">
+                <h3 id="product-modal-title" class="text-lg font-bold mb-4">Gerenciar Plano</h3>
+                <input type="hidden" id="prod-id">
+                <div class="space-y-3"><div><label class="text-[10px] text-slate-500 uppercase font-bold">Nome do Plano</label><input type="text" id="prod-name" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div><label class="text-[10px] text-slate-500 uppercase font-bold">Preço (R$)</label><input type="number" id="prod-price" step="0.01" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-bold text-emerald-400"></div></div>
+                <div class="flex gap-3 mt-6"><button onclick="document.getElementById('product-modal').classList.add('hidden')" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveProduct()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold">Salvar</button></div>
             </div>
         </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initSystem()" defer></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initSystem()" defer></script>
     <script>
         const SUPABASE_URL = "https://epwmoicgvuprzkcpxjoy.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
         
-        let sb = null, allClients = [], allProducts = [], historyData = [], isSystemReady = false;
+        let sb = null, allClients = [], allProducts = [], historyData = [], isSystemReady = false, chatState = null;
 
+        const formatCurrency = (val) => {
+            if (val === undefined || val === null || isNaN(val)) return 'R$ 0,00';
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        };
+
+        function showError(msg) {
+            const errDiv = document.getElementById('error-alert');
+            const conn = document.getElementById('connection-status');
+            if(conn) conn.classList.add('hidden');
+            if(errDiv) { errDiv.innerText = `⚠️ ${msg}`; errDiv.classList.remove('hidden'); }
+            console.error(msg);
+        }
+
+        // --- AUTH & SYSTEM ---
         function performLogin() {
             if(document.getElementById('pin-input').value === "1234") {
                 document.getElementById('login-screen').style.display = 'none';
@@ -272,375 +269,278 @@
             }
         }
 
+        // --- NEW: REFRESH BUTTON LOGIC ---
+        async function refreshApp() {
+            const icon = document.getElementById('refresh-icon');
+            if(icon) icon.classList.add('fa-spin'); // Adiciona animação de giro
+            await loadAllData();
+            if(icon) setTimeout(() => icon.classList.remove('fa-spin'), 1000); // Remove após 1s
+        }
+
         async function loadAllData() {
-            await Promise.all([fetchProducts(), fetchClients(), fetchFullHistory()]);
-            populateMonthFilter(); 
-            populateDashboardFilter(); 
-            calculateDashboard();
-            renderReportTable();
+            try {
+                await Promise.all([fetchProducts(), fetchClients(), fetchFullHistory()]);
+                const errDiv = document.getElementById('error-alert');
+                if(errDiv) errDiv.classList.add('hidden');
+                populateMonthFilter(); populateDashboardFilter(); calculateDashboard(); renderReportTable();
+            } catch (error) { showError("Falha ao carregar dados: " + error.message); }
         }
 
         async function fetchProducts() {
             if(!sb) return;
-            const { data } = await sb.from('products').select('*');
+            const { data, error } = await sb.from('products').select('*').order('name');
+            if(error) throw error;
             allProducts = data || [];
-            
-            const selModal = document.getElementById('modal-product');
-            if(selModal) selModal.innerHTML = '<option value="">Selecione...</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (R$ ${p.price})</option>`).join('');
-            
-            const list = document.getElementById('products-list');
-            if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between"><span class="text-sm">${p.name}</span><span class="text-blue-400 font-bold">R$ ${p.price}</span></div>`).join('');
+            updateProductUI();
+        }
 
-            const selReport = document.getElementById('report-filter-product');
-            if(selReport) {
-                selReport.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            }
+        function updateProductUI() {
+            const s = document.getElementById('modal-product');
+            if(s) s.innerHTML = '<option value="">Selecione...</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (${formatCurrency(p.price)})</option>`).join('');
+            const r = document.getElementById('report-filter-product');
+            if(r) { const v = r.value; r.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join(''); r.value = v; }
+            const l = document.getElementById('products-list');
+            if(l) l.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center group"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><div class="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity"><button onclick="editProduct('${p.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-blue-400"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct('${p.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`).join('');
         }
 
         async function fetchClients() {
             if(!sb) return;
-            const { data } = await sb.from('clients').select('*, products(*)').order('name');
+            let { data, error } = await sb.from('clients').select('*, products(*)').order('name');
+            if(error) { const f = await sb.from('clients').select('*').order('name'); if(f.error) throw f.error; data = f.data; }
             allClients = data || [];
             renderClients(allClients);
         }
 
         async function fetchFullHistory() {
             if(!sb) return;
-            const { data } = await sb.from('payment_history').select('*');
+            const { data, error } = await sb.from('payment_history').select('*');
+            if(error) throw error;
             historyData = data || [];
         }
 
-        // --- DASHBOARD COM BUSCA POR MÊS ---
         function populateDashboardFilter() {
-            const sel = document.getElementById('dashboard-filter-month');
-            if(!sel) return;
-            const now = new Date();
-            let opts = '';
+            const s = document.getElementById('dashboard-filter-month'); if(!s) return;
+            const now = new Date(); let opts = '';
             for(let i=-6; i<=6; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
                 const val = d.toISOString().slice(0, 7); 
-                const mName = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-                const isSelected = i === 0 ? 'selected' : '';
-                const label = mName.charAt(0).toUpperCase() + mName.slice(1);
-                // Style inline para garantir visualização no mobile e web
-                opts += `<option value="${val}" ${isSelected} class="bg-slate-900 text-slate-200">${label}</option>`;
+                const label = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+                opts += `<option value="${val}" ${i===0?'selected':''} class="bg-slate-900">${label}</option>`;
             }
-            sel.innerHTML = opts;
+            s.innerHTML = opts;
         }
 
         function calculateDashboard() {
-            const filterVal = document.getElementById('dashboard-filter-month').value;
-            let targetDate = new Date(); 
+            const v = document.getElementById('dashboard-filter-month').value;
+            let t = new Date(); if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
+            const active = allClients.filter(c => c.active);
+            const f = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
+            const l = new Date(t.getFullYear(), t.getMonth()+1, 0, 23, 59, 59).toISOString();
+            const rev = historyData.filter(h => h.payment_date >= f && h.payment_date <= l).reduce((a,c) => a + (Number(c.amount)||0), 0);
+            const proj = active.reduce((a,c) => a + (c.products?.price||0), 0);
             
-            if(filterVal) {
-                const [y, m] = filterVal.split('-');
-                targetDate = new Date(parseInt(y), parseInt(m)-1, 1);
-            }
-
-            const activeClients = allClients.filter(c => c.active);
+            if(document.getElementById('stat-paid-amount')) document.getElementById('stat-paid-amount').innerText = formatCurrency(rev);
+            if(document.getElementById('stat-projected')) document.getElementById('stat-projected').innerText = formatCurrency(proj);
+            if(document.getElementById('stat-total-clients')) document.getElementById('stat-total-clients').innerText = active.length;
             
-            const firstDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).toISOString();
-            const lastDay = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59).toISOString();
-            
-            const revenueMonth = historyData
-                .filter(h => h.payment_date >= firstDay && h.payment_date <= lastDay)
-                .reduce((acc, curr) => acc + (curr.amount || 0), 0);
-            
-            const projected = activeClients.reduce((acc, curr) => acc + (curr.products?.price || 0), 0);
-            const avgTicket = activeClients.length ? (projected / activeClients.length) : 0;
-
-            document.getElementById('stat-paid-amount').innerText = `R$ ${revenueMonth.toFixed(2)}`;
-            document.getElementById('stat-projected').innerText = `R$ ${projected.toFixed(2)}`;
-            document.getElementById('stat-total-clients').innerText = activeClients.length;
-            document.getElementById('stat-ticket').innerText = `R$ ${avgTicket.toFixed(2)}`;
-
             const now = new Date();
-            const isCurrentMonth = (targetDate.getMonth() === now.getMonth()) && (targetDate.getFullYear() === now.getFullYear());
-            const isPastMonth = targetDate < new Date(now.getFullYear(), now.getMonth(), 1);
-            const today = now.getDate();
-
-            const pending = activeClients.filter(c => {
-                const hasPaid = historyData.some(h => h.client_id === c.id && h.payment_date >= firstDay && h.payment_date <= lastDay);
-                if(hasPaid) return false;
-
-                if(isPastMonth) return true;
-                if(isCurrentMonth) return c.due_day <= today;
-                
-                return false;
-            });
-
-            pending.sort((a,b) => (a.due_day || 0) - (b.due_day || 0));
-
-            const qList = document.getElementById('billing-queue');
-            document.getElementById('badge-count').innerText = pending.length;
+            const isPast = t < new Date(now.getFullYear(), now.getMonth(), 1);
+            const isCurr = (t.getMonth() === now.getMonth() && t.getFullYear() === now.getFullYear());
             
-            if(pending.length === 0) {
-                const msg = isPastMonth ? "Nenhuma pendência neste mês!" : "Tudo pago até hoje!";
-                qList.innerHTML = `<div class="p-8 text-center text-slate-500">${msg}</div>`;
-            } else {
-                qList.innerHTML = pending.map(c => {
-                    // Limpeza do WhatsApp (Item 1)
-                    const cleanPhone = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-                    
-                    return `
-                    <div class="p-4 flex justify-between items-center hover:bg-slate-800 transition">
-                        <div>
-                            <h4 class="font-bold text-sm text-white">${c.name}</h4>
-                            <p class="text-[10px] text-slate-400 mt-0.5">
-                                Dia ${c.due_day} • R$ ${c.products?.price || 0} • <span class="text-blue-400">${c.products?.name || 'S/ Plano'}</span>
-                            </p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="markAsPaid('${c.id}', ${c.products?.price || 0})" class="bg-emerald-500/10 text-emerald-500 w-8 h-8 rounded flex items-center justify-center hover:bg-emerald-500 hover:text-white transition"><i class="fas fa-check"></i></button>
-                            <a href="https://wa.me/${cleanPhone}" target="_blank" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-blue-500 transition"><i class="fab fa-whatsapp"></i></a>
-                        </div>
-                    </div>`;
+            const pend = active.filter(c => {
+                const pd = historyData.some(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l);
+                if(pd) return false;
+                if(isPast) return true;
+                if(isCurr) return c.due_day <= now.getDate();
+                return false;
+            }).sort((a,b) => (a.due_day||0) - (b.due_day||0));
+            
+            if(document.getElementById('stat-pending-money')) document.getElementById('stat-pending-money').innerText = formatCurrency(pend.reduce((a,c) => a + (c.products?.price||0), 0));
+            if(document.getElementById('badge-count')) document.getElementById('badge-count').innerText = pend.length;
+            
+            const qList = document.getElementById('billing-queue');
+            if(qList) {
+                if(pend.length === 0) qList.innerHTML = `<div class="p-8 text-center text-slate-500">${isPast ? "Nenhuma pendência!" : "Tudo em dia!"}</div>`;
+                else qList.innerHTML = pend.map(c => {
+                    // BOTÃO DE WHATSAPP RESTAURADO AQUI
+                    const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
+                    return `<div class="p-4 flex justify-between items-center hover:bg-slate-800 transition"><div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400 mt-0.5">Dia ${c.due_day} • ${formatCurrency(c.products?.price)}</p></div><div class="flex gap-2"><button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded flex items-center justify-center hover:text-white transition"><i class="fas fa-hand-holding-usd"></i></button><a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-emerald-500 transition"><i class="fab fa-whatsapp"></i></a></div></div>`;
                 }).join('');
             }
         }
-// --- RELATÓRIOS ---
+
         function populateMonthFilter() {
-            const sel = document.getElementById('report-filter-month');
-            if(!sel) return;
-            const now = new Date();
-            let opts = '';
+            const s = document.getElementById('report-filter-month'); if(!s) return;
+            const now = new Date(); let opts = '';
             for(let i=-6; i<=6; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
                 const val = d.toISOString().slice(0, 7); 
-                const mName = d.toLocaleDateString('pt-BR', {month:'short'}).toUpperCase().replace('.','');
-                const yShort = d.getFullYear().toString().substr(2);
-                const isSelected = i === 0 ? 'selected' : '';
-                // Classe de fundo escuro para options (Item 3)
-                opts += `<option value="${val}" ${isSelected} class="bg-slate-900 text-slate-200">${mName}/${yShort}</option>`;
+                const label = `${d.toLocaleDateString('pt-BR', {month:'short'})}/${d.getFullYear().toString().slice(2)}`;
+                opts += `<option value="${val}" ${i===0?'selected':''}>${label}</option>`;
             }
-            sel.innerHTML = opts;
+            s.innerHTML = opts;
         }
 
         function renderReportTable() {
-            const filterMonth = document.getElementById('report-filter-month').value;
-            if(!filterMonth) return;
-            const [year, month] = filterMonth.split('-');
-            const targetDate = new Date(parseInt(year), parseInt(month)-1, 1);
+            const v = document.getElementById('report-filter-month').value; if(!v) return;
+            const [y, m] = v.split('-'); const d = new Date(parseInt(y), parseInt(m)-1, 1);
+            const f = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+            const l = new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59).toISOString();
+            const fp = document.getElementById('report-filter-product').value;
+            let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && c.product_id !== fp) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0));
+            let tot = 0; lst.forEach(c => { const h = historyData.find(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l); if(h) tot += Number(h.amount); });
             
-            const isoStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).toISOString();
-            const isoEnd = new Date(targetDate.getFullYear(), targetDate.getMonth()+1, 0, 23, 59, 59).toISOString();
-            const mName = targetDate.toLocaleDateString('pt-BR', {month:'short'}).toUpperCase().replace('.','');
-            const yShort = targetDate.getFullYear().toString().substr(2);
-            const displayLabel = `${mName}/${yShort}`;
-
-            const filterProd = document.getElementById('report-filter-product').value;
-            let filteredClients = allClients.filter(c => {
-                if(!c.active) return false;
-                if(filterProd !== 'all' && c.product_id !== filterProd) return false;
-                return true;
-            });
-            filteredClients.sort((a, b) => (a.due_day || 0) - (b.due_day || 0));
-
-            let monthTotal = 0;
-            filteredClients.forEach(c => {
-                const h = historyData.find(x => x.client_id === c.id && x.payment_date >= isoStart && x.payment_date <= isoEnd);
-                if(h) monthTotal += (Number(h.amount) || 0);
-            });
-
-            let headerHTML = `
-                <tr>
-                    <th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTE / VENC <span class="text-emerald-400 ml-1">(${filteredClients.length})</span></th>
-                    <th colspan="4" class="text-emerald-400 bg-slate-900/90 border-l border-slate-700 font-bold tracking-widest text-[10px]">${displayLabel} <span class="text-white opacity-60 font-mono ml-2">| R$ ${monthTotal.toFixed(0)}</span></th>
-                </tr>
-                <tr>
-                    <th class="sticky-col bg-slate-900 border-r border-slate-700"></th>
-                    <th class="sub-header text-blue-300 border-l border-slate-700">Dia</th>
-                    <th class="sub-header text-blue-300">Valor</th>
-                    <th class="sub-header text-emerald-300 border-l border-slate-800">Pgto</th>
-                    <th class="sub-header text-emerald-300">Pago</th>
-                </tr>`;
-            document.getElementById('report-header').innerHTML = headerHTML;
-
-            let bodyHTML = '';
-            filteredClients.forEach(c => {
-                const paid = historyData.find(h => h.client_id === c.id && h.payment_date >= isoStart && h.payment_date <= isoEnd);
-                const prodPrice = c.products?.price || 0;
-                let rowHTML = `<tr>
-                    <td onclick="editClient('${c.id}')" class="sticky-col text-xs truncate border-r border-slate-700 cursor-pointer hover:text-blue-400 transition-colors"><span class="bg-slate-700 text-white px-1.5 rounded text-[10px] mr-2 font-mono">${c.due_day || '??'}</span>${c.name}</td>
-                    <td class="text-slate-500 text-[9px] border-l border-slate-800 font-mono">${c.due_day || '-'}</td>
-                    <td class="text-slate-500 text-[9px]">R$${prodPrice}</td>`;
-                
-                let payDay = '-';
-                if(paid && paid.payment_date) payDay = new Date(paid.payment_date).getDate();
-                const colorDate = paid ? 'text-emerald-400 font-bold' : 'text-slate-700';
-                
-                rowHTML += `<td class="${colorDate} text-[9px] border-l border-slate-800/50">${payDay}</td>`;
-                if(paid) rowHTML += `<td class="text-emerald-400 font-bold text-[9px] bg-emerald-500/5">R$${paid.amount}</td>`;
-                else rowHTML += `<td class="text-slate-700 text-[9px]">-</td>`;
-                rowHTML += '</tr>';
-                bodyHTML += rowHTML;
-            });
-            if(filteredClients.length === 0) bodyHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Nenhum cliente ativo encontrado.</td></tr>`;
-            document.getElementById('report-body').innerHTML = bodyHTML;
+            document.getElementById('report-header').innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Pgto</th><th class="sub-header text-emerald-300">Pago</th></tr>`;
+            document.getElementById('report-body').innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { const p = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l); return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="editClient('${c.id}')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(c.products?.price)}</td><td class="${p?'text-emerald-400 font-bold':'text-slate-700'} text-[9px] border-l border-slate-800">${p?new Date(p.payment_date).getDate():'-'}</td><td class="${p?'text-emerald-400 font-bold bg-emerald-500/5':'text-slate-700'} text-[9px]">${p?formatCurrency(p.amount):'-'}</td></tr>`; }).join('');
         }
 
-        // --- SISTEMA DE GESTÃO DO CLIENTE E HISTÓRICO ---
-        async function markAsPaid(id, val) {
-            if(confirm(`Confirmar R$ ${val}?`)) {
-                const now = new Date().toISOString();
-                await sb.from('clients').update({last_payment: now, active: true}).eq('id', id);
-                await sb.from('payment_history').insert([{client_id: id, amount: val, payment_date: now}]);
-                loadAllData();
-            }
+        // CRUD
+        function openProductModal() { document.getElementById('prod-id').value=''; document.getElementById('prod-name').value=''; document.getElementById('prod-price').value=''; document.getElementById('product-modal').classList.remove('hidden'); }
+        async function saveProduct(){ const id=document.getElementById('prod-id').value, d={name:document.getElementById('prod-name').value, price:document.getElementById('prod-price').value}; if(!d.name)return; if(id)await sb.from('products').update(d).eq('id',id); else await sb.from('products').insert([d]); document.getElementById('product-modal').classList.add('hidden'); await fetchProducts(); calculateDashboard(); }
+        function editProduct(id){ const p=allProducts.find(x=>x.id===id); if(!p)return; document.getElementById('prod-id').value=p.id; document.getElementById('prod-name').value=p.name; document.getElementById('prod-price').value=p.price; document.getElementById('product-modal').classList.remove('hidden'); }
+        async function deleteProduct(id){ if(confirm('Apagar plano?')) { await sb.from('products').delete().eq('id',id); fetchProducts(); } }
+        function renderClients(l) { const t=document.getElementById('search-client').value.toLowerCase(); document.getElementById('clients-list').innerHTML=l.filter(c=>c.name.toLowerCase().includes(t)).map(c=>`<div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active?'border-l-emerald-500':'border-l-red-500'}"><div onclick="editClient('${c.id}')" class="flex-1"><h4 class="font-bold text-sm text-white">${c.name}</h4><div class="flex gap-2 text-[10px] text-slate-400 mt-1"><span class="bg-slate-800 px-2 py-0.5 rounded">Dia ${c.due_day}</span><span>• ${c.products?.name||'S/ Plano'}</span></div></div><div class="flex gap-2"><button onclick="deleteClient('${c.id}')" class="text-slate-600 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button><button onclick="editClient('${c.id}')" class="bg-slate-800 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen"></i></button></div></div>`).join(''); }
+        function filterClients(){ renderClients(allClients); }
+        function openModal(){ document.getElementById('modal-client-id').value=''; document.getElementById('modal-name').value=''; document.getElementById('modal-due').value=''; document.getElementById('modal-whatsapp').value=''; document.getElementById('modal-status').value='true'; document.getElementById('history-section').classList.add('hidden'); document.getElementById('client-modal').classList.remove('hidden'); }
+        function closeModal(){ document.getElementById('client-modal').classList.add('hidden'); }
+        function showTab(id){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('text-blue-500');n.classList.add('text-slate-500')}); document.getElementById(id).classList.add('active'); document.querySelector(`button[data-tab="${id}"]`)?.classList.replace('text-slate-500','text-blue-500'); }
+        async function editClient(id){ const c=allClients.find(x=>x.id===id); if(!c)return; document.getElementById('modal-client-id').value=c.id; document.getElementById('modal-name').value=c.name; document.getElementById('modal-due').value=c.due_day; document.getElementById('modal-whatsapp').value=c.whatsapp; document.getElementById('modal-product').value=c.product_id; document.getElementById('modal-status').value=c.active; document.getElementById('history-section').classList.remove('hidden'); renderHistoryList(id); document.getElementById('client-modal').classList.remove('hidden'); }
+        async function saveClient(){ const id=document.getElementById('modal-client-id').value, d={name:document.getElementById('modal-name').value, due_day:parseInt(document.getElementById('modal-due').value), whatsapp:document.getElementById('modal-whatsapp').value, product_id:document.getElementById('modal-product').value||null, active:document.getElementById('modal-status').value==='true'}; if(id)await sb.from('clients').update(d).eq('id',id); else await sb.from('clients').insert([d]); closeModal(); loadAllData(); }
+        async function deleteClient(id){ if(confirm('Excluir?')) { await sb.from('payment_history').delete().eq('client_id',id); await sb.from('clients').delete().eq('id',id); loadAllData(); } }
+        function renderHistoryList(cid){ const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); document.getElementById('history-list').innerHTML=h.map(i=>`<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span><span class="text-emerald-400 font-bold">${formatCurrency(i.amount)}</span> <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-red-200">x</button></div>`).join(''); }
+        function openHistoryForm(){ document.getElementById('history-form-container').classList.add('open'); document.getElementById('hist-date').value=new Date().toISOString().split('T')[0]; }
+        function closeHistoryForm(){ document.getElementById('history-form-container').classList.remove('open'); }
+        async function saveHistory(){ const cid=document.getElementById('modal-client-id').value, d={client_id:cid, amount:document.getElementById('hist-amount').value, payment_date:document.getElementById('hist-date').value+'T12:00:00Z', method:'manual'}; await sb.from('payment_history').insert([d]); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); closeHistoryForm(); }
+        async function deleteHistory(hid,cid){ if(confirm('Apagar?')){ await sb.from('payment_history').delete().eq('id',hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); } }
+
+        // --- CÉREBRO V17.42 (AUTO-CORRECT + SAFEGUARDS) ---
+        function toggleChat(){ const w=document.getElementById('chat-window'); w.style.display=(w.style.display==='flex'?'none':'flex'); if(w.style.display==='flex')document.getElementById('chat-input').focus(); }
+        function handleChatKey(e){ if(e.key==='Enter') sendChat(); }
+        window.sendChat = function(txt = null) { 
+            const input = document.getElementById('chat-input');
+            const text = txt || input.value.trim();
+            if(!text) return;
+            addMsg('user', text);
+            input.value = ''; input.focus();
+            processCommand(text);
         }
-
-        function renderClients(list) {
-            const container = document.getElementById('clients-list');
-            const term = document.getElementById('search-client').value.toLowerCase();
-            const filtered = list.filter(c => c.name.toLowerCase().includes(term));
-            container.innerHTML = filtered.map(c => `
-                <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}">
-                    <div onclick="editClient('${c.id}')" class="cursor-pointer flex-1"><h4 class="font-bold text-sm text-white">${c.name}</h4><div class="flex gap-2 text-[10px] text-slate-400 mt-1"><span class="bg-slate-800 px-2 py-0.5 rounded">Dia ${c.due_day}</span><span>• ${c.products?.name || 'S/ Plano'}</span></div></div>
-                    <div class="flex gap-2"><button onclick="deleteClient('${c.id}')" class="text-slate-600 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button><button onclick="editClient('${c.id}')" class="bg-slate-800 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen"></i></button></div>
-                </div>`).join('');
+        function addMsg(type, html) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = type === 'user' ? 'msg-user' : 'msg-bot';
+            if(html.includes('✅')) div.classList.add('msg-success');
+            if(html.includes('❌') || html.includes('⚠️')) div.classList.add('msg-error');
+            div.innerHTML = html;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            setTimeout(() => container.scrollTop = container.scrollHeight, 100);
         }
-        function filterClients() { renderClients(allClients); }
+        function similarity(s1, s2) { var l=s1, s=s2; if(s1.length<s2.length){l=s2;s=s1;} var len=l.length; if(len==0)return 1.0; return (len-editDistance(l,s))/parseFloat(len); }
+        function editDistance(s1, s2) { s1=s1.toLowerCase(); s2=s2.toLowerCase(); var costs=new Array(); for(var i=0;i<=s1.length;i++){ var last=i; for(var j=0;j<=s2.length;j++){ if(i==0)costs[j]=j; else if(j>0){ var n=costs[j-1]; if(s1.charAt(i-1)!=s2.charAt(j-1))n=Math.min(Math.min(n,last),costs[j])+1; costs[j-1]=last; last=n; } } if(i>0)costs[s2.length]=last; } return costs[s2.length]; }
 
-        function openModal() {
-            document.getElementById('modal-client-id').value = '';
-            document.getElementById('modal-name').value = '';
-            document.getElementById('modal-due').value = '';
-            document.getElementById('modal-whatsapp').value = '';
-            document.getElementById('modal-product').value = '';
-            document.getElementById('modal-status').value = 'true';
-            document.getElementById('modal-title').innerText = 'Novo Cliente';
-            document.getElementById('history-section').classList.add('hidden');
-            document.getElementById('client-modal').classList.remove('hidden');
-            closeHistoryForm();
-        }
-        function closeModal() { document.getElementById('client-modal').classList.add('hidden'); }
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('text-blue-500'); n.classList.add('text-slate-500'); });
-            document.getElementById(tabId).classList.add('active');
-            const activeBtn = document.querySelector(`button[data-tab="${tabId}"]`);
-            if(activeBtn) { activeBtn.classList.remove('text-slate-500'); activeBtn.classList.add('text-blue-500'); }
-        }
+        async function processCommand(text) {
+            const lower = text.toLowerCase();
 
-        async function editClient(id) {
-            const c = allClients.find(x => x.id === id);
-            if(!c) return;
-            document.getElementById('modal-client-id').value = c.id;
-            document.getElementById('modal-name').value = c.name;
-            document.getElementById('modal-due').value = c.due_day;
-            document.getElementById('modal-whatsapp').value = c.whatsapp;
-            document.getElementById('modal-product').value = c.product_id;
-            document.getElementById('modal-status').value = c.active;
-            document.getElementById('modal-title').innerText = 'Editar Cliente';
-            document.getElementById('history-section').classList.remove('hidden');
-            closeHistoryForm();
-            renderHistoryList(id);
-            document.getElementById('client-modal').classList.remove('hidden');
-        }
-
-        async function saveClient() {
-            const id = document.getElementById('modal-client-id').value;
-            const data = {
-                name: document.getElementById('modal-name').value,
-                due_day: parseInt(document.getElementById('modal-due').value),
-                whatsapp: document.getElementById('modal-whatsapp').value,
-                product_id: document.getElementById('modal-product').value || null,
-                active: document.getElementById('modal-status').value === 'true'
-            };
-            if(id) await sb.from('clients').update(data).eq('id', id);
-            else await sb.from('clients').insert([data]);
-            closeModal();
-            loadAllData();
-        }
-
-        async function deleteClient(id) {
-            if(confirm('Tem certeza? Isso apaga o histórico também.')) {
-                await sb.from('payment_history').delete().eq('client_id', id);
-                await sb.from('clients').delete().eq('id', id);
-                loadAllData();
-            }
-        }
-
-        // --- GESTÃO DE HISTÓRICO ---
-        function renderHistoryList(clientId) {
-            const hList = document.getElementById('history-list');
-            const cHist = historyData.filter(h => h.client_id === clientId).sort((a,b) => new Date(b.payment_date) - new Date(a.payment_date));
-            
-            hList.innerHTML = cHist.map(h => {
-                const d = new Date(h.payment_date);
-                const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                const year = d.getFullYear().toString().slice(2);
-                const displayDate = `${month}/${year}`;
-                
-                return `
-                <div class="flex justify-between items-center border-b border-slate-700/50 pb-2 mb-2 last:border-0 hover:bg-slate-800 p-1 rounded transition-colors group">
-                    <div class="flex gap-3">
-                        <span class="text-slate-400 w-12 text-right font-mono">${displayDate}</span>
-                        <span class="text-emerald-400 font-bold">R$ ${h.amount}</span>
-                    </div>
-                    <div class="flex gap-2 opacity-100 sm:opacity-50 sm:group-hover:opacity-100 transition-opacity">
-                        <button onclick="openHistoryForm('${h.id}', '${h.amount}', '${h.payment_date}')" class="text-slate-500 hover:text-blue-400"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteHistory('${h.id}', '${clientId}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function openHistoryForm(id = '', amount = '', date = '') {
-            document.getElementById('history-form-container').classList.add('open');
-            document.getElementById('hist-id').value = id;
-            document.getElementById('hist-amount').value = amount;
-            document.getElementById('hist-date').value = date ? date.split('T')[0] : new Date().toISOString().split('T')[0];
-        }
-
-        function closeHistoryForm() {
-            document.getElementById('history-form-container').classList.remove('open');
-            document.getElementById('hist-id').value = '';
-        }
-
-        async function saveHistory() {
-            const cid = document.getElementById('modal-client-id').value;
-            const hid = document.getElementById('hist-id').value;
-            const val = document.getElementById('hist-amount').value;
-            const dt = document.getElementById('hist-date').value;
-
-            if(!cid || !val || !dt) return alert("Preencha data e valor");
-
-            const inputDate = new Date(dt + 'T12:00:00'); 
-            const targetMonth = inputDate.getMonth();
-            const targetYear = inputDate.getFullYear();
-
-            // Validação de Duplicidade (Trava)
-            const exists = historyData.find(h => {
-                if(hid && h.id === hid) return false;
-                if(h.client_id !== cid) return false;
-                const hDate = new Date(h.payment_date);
-                return hDate.getMonth() === targetMonth && hDate.getFullYear() === targetYear;
-            });
-
-            if(exists) {
-                alert(`ERRO: Já existe um pagamento neste mês (${targetMonth+1}/${targetYear}).\nEdite o existente ou exclua antes.`);
-                return;
+            // 1. CONFIRMAÇÃO
+            if (chatState) {
+                if (['sim','s','confirmar','ok'].includes(lower)) {
+                    if (chatState.type === 'add') {
+                        const { error } = await sb.from('clients').insert([chatState.payload]);
+                        if(!error) { 
+                            await fetchClients(); calculateDashboard(); renderReportTable();
+                            addMsg('bot', `✅ Cliente <b>${chatState.payload.name}</b> cadastrado!`); 
+                        } else addMsg('bot', `❌ Erro: ${error.message}`);
+                    }
+                    else if (chatState.type === 'pay') {
+                        const { error } = await sb.from('payment_history').insert([chatState.payload]);
+                        if(!error) {
+                            await fetchFullHistory(); calculateDashboard(); renderReportTable();
+                            addMsg('bot', `✅ Pagamento registrado.`);
+                        }
+                    }
+                    else if (chatState.type === 'del') {
+                        await sb.from('payment_history').delete().eq('client_id', chatState.id);
+                        await sb.from('clients').delete().eq('id', chatState.id);
+                        await loadAllData();
+                        addMsg('bot', `✅ Cliente removido.`);
+                    }
+                } else { addMsg('bot', '🚫 Cancelado.'); }
+                chatState = null; return;
             }
 
-            const payload = { client_id: cid, amount: val, payment_date: dt + 'T12:00:00Z', method: 'manual' };
-            if(hid) await sb.from('payment_history').update(payload).eq('id', hid);
-            else await sb.from('payment_history').insert([payload]);
+            // 2. INTENÇÃO
+            let intent = 'UNKNOWN';
+            if (lower.match(/(novo|cria|add|cadastr|insir|inclu|adicion|bota)/)) intent = 'ADD';
+            else if (lower.match(/(pagou|recebi|pg|lança)/)) intent = 'PAY';
+            else if (lower.match(/(exclua|apague|delete)/)) intent = 'DEL';
 
-            await fetchFullHistory();
-            renderHistoryList(cid);
-            renderReportTable(); // Atualiza fundo
-            calculateDashboard(); // Atualiza KPIs
-            closeHistoryForm();
-        }
+            if (intent === 'UNKNOWN') { addMsg('bot', "🤔 Tente: 'Cadastre Ana BoxPower 90' ou 'João pagou 50'."); return; }
 
-        async function deleteHistory(hid, cid) {
-            if(confirm('Excluir este pagamento?')) {
-                await sb.from('payment_history').delete().eq('id', hid);
-                await fetchFullHistory();
-                renderHistoryList(cid);
-                renderReportTable();
-                calculateDashboard();
+            // 3. FLUXOS (AUTO-CORRECT)
+            if (intent === 'ADD') {
+                let day = null, price = null, product = null, productID = null;
+                
+                // REGEX FLEXÍVEL PARA DATA (vc, vcmt, dt, dia)
+                const dayMatch = text.match(/(?:venc|vcm|vc|dt|dia)[a-z]*\W*(\d+)/i);
+                if (dayMatch) day = parseInt(dayMatch[1]);
+                let cleanText = text.replace(/(?:venc|vcm|vc|dt|dia)[a-z]*\W*(\d+)/gi, " ");
+
+                const priceMatch = cleanText.match(/(?:R\$|pagando|valor)?\s*(\d+[.,]\d{2}|\d+)/i);
+                if (priceMatch) { price = parseFloat(priceMatch[1].replace(',', '.')); cleanText = cleanText.replace(priceMatch[0], " "); }
+
+                for (let p of allProducts) {
+                    if (lower.includes(p.name.toLowerCase())) {
+                        product = p.name; productID = p.id;
+                        const regexProd = new RegExp(p.name, "gi"); cleanText = cleanText.replace(regexProd, " "); break;
+                    }
+                }
+                if (!product) { 
+                    if(text.includes(',')) {
+                        const parts = text.split(',');
+                        if(parts[1] && !/\d/.test(parts[1])) { product = parts[1].trim(); cleanText = cleanText.replace(parts[1], " "); }
+                    }
+                    if(!product) { const m = cleanText.match(/(?:produto|plano)\s+(\w+)/i); if (m) { product = m[1]; cleanText = cleanText.replace(m[0], " "); } }
+                }
+
+                let name = cleanText.replace(/^(cadastre|cadastrei|novo|cria|adiciona|inclua|insira)\s+/i, "").replace(/[.,-]/g, " ").trim();
+                name = name.replace(/\s+\b(com|o|a|de|e|pagando)\b\s+/gi, " ");
+                if(product) name = name.replace(new RegExp(product, "gi"), "");
+                name = name.split(/\s+/).filter(w => w.length > 0).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+                if (!name || name.length < 2) return addMsg('bot', "⚠️ Não entendi o nome.");
+                if (!day) return addMsg('bot', "⚠️ Falta o vencimento (Ex: dia 15).");
+
+                chatState = { type: 'add', payload: { name: name, due_day: day, active: true, whatsapp: '00000000', product_id: productID } };
+                
+                addMsg('bot', `<div class="bg-slate-900 p-2 rounded border border-slate-700 mb-2 text-xs"><div class="font-bold text-emerald-400 mb-1 border-b border-slate-700">REVISÃO</div><div class="grid grid-cols-2 gap-1"><div>👤 ${name}</div><div>📦 ${product||'-'}</div><div>📅 Dia ${day}</div><div>💰 ${price?'R$ '+price:'-'}</div></div></div><span>Confirma?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn chat-btn-danger" onclick="sendChat('Cancelar')">❌ Não</button></div>`);
+            }
+            else { 
+                const commandWords = ['pagou','recebi','exclua','apague','delete','hoje','vencimento','vence','dia'];
+                const searchWords = lower.split(' ').filter(w => w.length > 2 && !commandWords.some(cw => w.includes(cw)) && isNaN(w));
+                let matches = [];
+                if (searchWords.length > 0) {
+                    matches = allClients.filter(c => searchWords.every(word => c.name.toLowerCase().includes(word)));
+                    if (matches.length === 0) {
+                        for (let w of searchWords) { const similar = allClients.filter(c => similarity(w, c.name) > 0.60); matches = [...matches, ...similar]; }
+                        matches = [...new Set(matches)];
+                    }
+                }
+                if (matches.length === 0) return addMsg('bot', "❌ Ninguém encontrado.");
+                if (matches.length > 1) {
+                    const amt = text.match(/(\d+([.,]\d{1,2})?)/); const val = amt ? parseFloat(amt[0].replace(',', '.')) : 0;
+                    let btns = matches.map(c => `<button class="chat-btn" onclick="sendChat('${intent==='DEL'?'Exclua':'Pagamento'} ${c.name} ${val||''}')"><i class="fas fa-user"></i> ${c.name}</button>`).join('');
+                    return addMsg('bot', `<span>🔍 Achei <b>${matches.length}</b>:</span><div class="chat-options">${btns}</div>`);
+                }
+                const client = matches[0];
+                if (intent === 'DEL') {
+                    chatState = { type: 'del', id: client.id, name: client.name };
+                    addMsg('bot', `<span>⚠️ Excluir <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-danger" onclick="sendChat('Sim')">🗑️ Excluir</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
+                } else {
+                    const amt = text.match(/(\d+([.,]\d{1,2})?)/); const val = amt ? parseFloat(amt[0].replace(',', '.')) : 0;
+                    if(!val) return addMsg('bot', "💰 Qual o valor?");
+                    chatState = { type: 'pay', payload: { client_id: client.id, amount: val, payment_date: new Date().toISOString(), method: 'bot' }, clientName: client.name };
+                    addMsg('bot', `<span>Lançar R$ ${val} para <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
+                }
             }
         }
     </script>
