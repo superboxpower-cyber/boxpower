@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoxPower v1.1 - CFO Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .btn-icon { transition: all 0.2s; }
+        .btn-icon:active { transform: scale(0.9); }
+
+        /* Animação do Form de Histórico */
+        #history-form-container { transition: all 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
+        #history-form-container.open { max-height: 200px; opacity: 1; margin-bottom: 1rem; }
+        
+        /* Correção para Dropdown no Web (Fundo escuro nas opções) */
+        select option { background-color: #0f172a; color: #e2e8f0; }
+
+        /* --- ESTILOS DO RELATÓRIO --- */
+        .report-container { 
+            overflow-x: auto; 
+            position: relative; 
+            max-width: 100vw;
+            border-radius: 0 0 1rem 1rem;
+        }
+        
+        .report-table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        .report-table th, .report-table td { 
+            padding: 10px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            border-right: 1px solid rgba(255,255,255,0.02); white-space: nowrap; 
+        }
+        .sticky-col { 
+            position: sticky; left: 0; z-index: 10; background: #1e293b; 
+            border-right: 2px solid rgba(255,255,255,0.1); min-width: 160px; max-width: 160px; 
+            text-align: left !important; font-weight: bold;
+        }
+        th.sticky-col { z-index: 20; background: #0f172a; }
+        .sub-header { font-size: 0.65rem; color: #64748b; font-weight: normal; background: rgba(15, 23, 42, 0.8); }
+        .report-table th { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; }
+        .report-table td { font-size: 0.8rem; }
+
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.1); }
+        }
+        .logo-animate { animation: gentle-pulse 4s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-24">
+
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 transition-opacity duration-300">
+        <div class="glass p-8 rounded-3xl w-80 text-center shadow-2xl border-t border-blue-500/30">
+            <div class="flex justify-center mb-6">
+                <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" 
+                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" 
+                     alt="BoxPower Logo" 
+                     class="w-32 h-32 object-contain drop-shadow-2xl logo-animate rounded-2xl">
+            </div>
+            <h1 class="text-2xl font-bold mb-2">BoxPower</h1>
+            <p class="text-slate-400 text-sm mb-6">Acesso Administrativo</p>
+            <input type="password" id="pin-input" maxlength="4" placeholder="••••" 
+                class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-blue-500 transition-all mb-4 text-white">
+            <button id="btn-login" onclick="performLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg">ENTRAR</button>
+        </div>
+    </div>
+<div id="main-content" class="hidden opacity-0 transition-opacity duration-500">
+        
+        <header class="p-6 flex justify-between items-center bg-slate-900/90 sticky top-0 z-20 backdrop-blur-sm border-b border-slate-800">
+            <div>
+                <h2 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Gestão Financeira</h2>
+                <div class="flex items-baseline gap-2">
+                    <h1 class="text-3xl font-black tracking-tighter text-white drop-shadow-lg">BoxPower</h1>
+                    <span class="text-[10px] text-slate-500 font-mono border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800">v1.1</span>
+                </div>
+            </div>
+            <button onclick="window.location.reload()" class="w-10 h-10 bg-red-500/10 text-red-500 border border-red-500/30 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-lg shadow-red-900/20">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </header>
+
+        <div id="connection-status" class="hidden bg-yellow-500/20 text-yellow-200 text-xs text-center p-2 mb-2 mx-4 rounded-lg border border-yellow-500/50">
+            ⏳ Conectando ao banco...
+        </div>
+
+        <div id="tab-home" class="tab-content active p-4 space-y-4">
+            
+            <div class="glass p-2 rounded-xl flex items-center gap-3 border border-slate-700 bg-slate-800">
+                <i class="fas fa-calendar-alt text-emerald-500 ml-2"></i>
+                <select id="dashboard-filter-month" onchange="calculateDashboard()" 
+                    class="w-full bg-transparent text-sm font-bold text-white outline-none">
+                    </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase">Receita Real (Mês)</p>
+                    <h3 id="stat-paid-amount" class="text-2xl font-bold text-emerald-400">R$ 0</h3>
+                </div>
+                <div class="glass p-4 rounded-2xl">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase">Receita Prevista</p>
+                    <h3 id="stat-projected" class="text-2xl font-bold text-blue-400">R$ 0</h3>
+                    <p class="text-[9px] text-slate-500 mt-1">Soma dos ativos</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass p-3 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[9px] uppercase">Assinantes</p>
+                        <h4 id="stat-total-clients" class="text-xl font-bold">0</h4>
+                    </div>
+                    <i class="fas fa-users text-slate-600"></i>
+                </div>
+                <div class="glass p-3 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[9px] uppercase">Ticket Médio</p>
+                        <h4 id="stat-ticket" class="text-xl font-bold text-yellow-500">R$ 0</h4>
+                    </div>
+                    <i class="fas fa-receipt text-slate-600"></i>
+                </div>
+            </div>
+
+            <div class="glass rounded-3xl overflow-hidden border border-slate-700/50 mt-2">
+                <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                    <h3 class="font-bold flex items-center gap-2 text-[10px] uppercase tracking-wider text-slate-300">
+                        <i class="fas fa-exclamation-circle text-red-500"></i> Controle de Inadimplência do Mês
+                    </h3>
+                    <span id="badge-count" class="bg-blue-600 text-white text-sm font-bold px-2.5 py-0.5 rounded-lg shadow-lg">0</span>
+                </div>
+                <div id="billing-queue" class="divide-y divide-slate-800 max-h-80 overflow-y-auto bg-slate-900/30">
+                    <p class="p-8 text-center text-slate-500 text-sm italic">Carregando...</p>
+                </div>
+            </div>
+        </div>
+<div id="tab-clients" class="tab-content p-4 space-y-4">
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-500"></i>
+                    <input type="text" id="search-client" oninput="filterClients()" placeholder="Buscar..." class="w-full bg-slate-800 rounded-xl py-3 pl-11 pr-4 outline-none border border-slate-700 focus:border-blue-500 text-white">
+                </div>
+                <button onclick="openModal()" class="bg-blue-600 w-12 rounded-xl text-white shadow-lg"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="clients-list" class="space-y-3 pb-20"></div>
+        </div>
+
+        <div id="tab-reports" class="tab-content p-4">
+            <div class="glass rounded-2xl overflow-hidden border border-slate-700">
+                <div class="p-4 border-b border-slate-700 bg-slate-800/50 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm"><i class="fas fa-table text-emerald-500 mr-2"></i>Controle Financeiro</h3>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="relative w-1/2">
+                            <i class="fas fa-calendar absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+                            <select id="report-filter-month" onchange="renderReportTable()" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-8 pr-2 outline-none focus:border-emerald-500 font-mono"></select>
+                        </div>
+                        <div class="relative w-1/2">
+                            <i class="fas fa-filter absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+                            <select id="report-filter-product" onchange="renderReportTable()" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-8 pr-2 outline-none focus:border-emerald-500">
+                                <option value="all">Planos: Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-container">
+                    <table class="report-table">
+                        <thead id="report-header"></thead>
+                        <tbody id="report-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-config" class="tab-content p-4">
+            <h3 class="font-bold mb-4 text-slate-300">Gerenciar Planos</h3>
+            <div id="products-list" class="space-y-2"></div>
+        </div>
+
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-700 flex justify-around p-3 z-40 bg-slate-900/90 backdrop-blur-md">
+            <button onclick="showTab('tab-home')" class="nav-item text-blue-500 flex flex-col items-center" data-tab="tab-home"><i class="fas fa-home text-xl mb-1"></i><span class="text-[10px]">Início</span></button>
+            <button onclick="showTab('tab-reports')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-reports"><i class="fas fa-chart-bar text-xl mb-1"></i><span class="text-[10px]">Relatórios</span></button>
+            <button onclick="showTab('tab-clients')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-clients"><i class="fas fa-users text-xl mb-1"></i><span class="text-[10px]">Clientes</span></button>
+            <button onclick="showTab('tab-config')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-config"><i class="fas fa-tags text-xl mb-1"></i><span class="text-[10px]">Planos</span></button>
+        </nav>
+
+        <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+                <h3 id="modal-title" class="text-xl font-bold mb-4">Cliente</h3>
+                <input type="hidden" id="modal-client-id">
+                <div class="space-y-3">
+                    <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                    <div class="flex gap-2">
+                        <input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                        <input type="text" id="modal-whatsapp" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="modal-product" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></select>
+                        <select id="modal-status" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white">
+                            <option value="true" class="text-green-400">Ativo</option>
+                            <option value="false" class="text-red-400">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4>
+                        <button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors">
+                            <i class="fas fa-plus mr-1 text-blue-400"></i> Lançar
+                        </button>
+                    </div>
+                    
+                    <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2">
+                        <input type="hidden" id="hist-id">
+                        <div class="flex gap-2 mb-2">
+                            <div class="w-1/2">
+                                <label class="text-[9px] text-slate-500 uppercase font-bold">Data</label>
+                                <input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label>
+                                <input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400">
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button>
+                            <button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button>
+                        </div>
+                    </div>
+
+                    <div id="history-list" class="bg-slate-800/50 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-700/50"></div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button>
+                    <button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initSystem()" defer></script>
+    <script>
+        const SUPABASE_URL = "https://epwmoicgvuprzkcpxjoy.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
+        
+        let sb = null, allClients = [], allProducts = [], historyData = [], isSystemReady = false;
+
+        function performLogin() {
+            if(document.getElementById('pin-input').value === "1234") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+                setTimeout(() => document.getElementById('main-content').style.opacity = "1", 50);
+                if(isSystemReady) loadAllData();
+                else document.getElementById('connection-status').classList.remove('hidden');
+            } else alert("PIN Incorreto");
+        }
+
+        function initSystem() {
+            if(window.supabase) {
+                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                isSystemReady = true;
+                document.getElementById('connection-status').classList.add('hidden');
+                if(document.getElementById('login-screen').style.display === 'none') loadAllData();
+            }
+        }
+
+        async function loadAllData() {
+            await Promise.all([fetchProducts(), fetchClients(), fetchFullHistory()]);
+            populateMonthFilter(); 
+            populateDashboardFilter(); 
+            calculateDashboard();
+            renderReportTable();
+        }
+
+        async function fetchProducts() {
+            if(!sb) return;
+            const { data } = await sb.from('products').select('*');
+            allProducts = data || [];
+            
+            const selModal = document.getElementById('modal-product');
+            if(selModal) selModal.innerHTML = '<option value="">Selecione...</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (R$ ${p.price})</option>`).join('');
+            
+            const list = document.getElementById('products-list');
+            if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between"><span class="text-sm">${p.name}</span><span class="text-blue-400 font-bold">R$ ${p.price}</span></div>`).join('');
+
+            const selReport = document.getElementById('report-filter-product');
+            if(selReport) {
+                selReport.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            }
+        }
+
+        async function fetchClients() {
+            if(!sb) return;
+            const { data } = await sb.from('clients').select('*, products(*)').order('name');
+            allClients = data || [];
+            renderClients(allClients);
+        }
+
+        async function fetchFullHistory() {
+            if(!sb) return;
+            const { data } = await sb.from('payment_history').select('*');
+            historyData = data || [];
+        }
+
+        // --- DASHBOARD COM BUSCA POR MÊS ---
+        function populateDashboardFilter() {
+            const sel = document.getElementById('dashboard-filter-month');
+            if(!sel) return;
+            const now = new Date();
+            let opts = '';
+            for(let i=-6; i<=6; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+                const val = d.toISOString().slice(0, 7); 
+                const mName = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+                const isSelected = i === 0 ? 'selected' : '';
+                const label = mName.charAt(0).toUpperCase() + mName.slice(1);
+                // Style inline para garantir visualização no mobile e web
+                opts += `<option value="${val}" ${isSelected} class="bg-slate-900 text-slate-200">${label}</option>`;
+            }
+            sel.innerHTML = opts;
+        }
+
+        function calculateDashboard() {
+            const filterVal = document.getElementById('dashboard-filter-month').value;
+            let targetDate = new Date(); 
+            
+            if(filterVal) {
+                const [y, m] = filterVal.split('-');
+                targetDate = new Date(parseInt(y), parseInt(m)-1, 1);
+            }
+
+            const activeClients = allClients.filter(c => c.active);
+            
+            const firstDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).toISOString();
+            const lastDay = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59).toISOString();
+            
+            const revenueMonth = historyData
+                .filter(h => h.payment_date >= firstDay && h.payment_date <= lastDay)
+                .reduce((acc, curr) => acc + (curr.amount || 0), 0);
+            
+            const projected = activeClients.reduce((acc, curr) => acc + (curr.products?.price || 0), 0);
+            const avgTicket = activeClients.length ? (projected / activeClients.length) : 0;
+
+            document.getElementById('stat-paid-amount').innerText = `R$ ${revenueMonth.toFixed(2)}`;
+            document.getElementById('stat-projected').innerText = `R$ ${projected.toFixed(2)}`;
+            document.getElementById('stat-total-clients').innerText = activeClients.length;
+            document.getElementById('stat-ticket').innerText = `R$ ${avgTicket.toFixed(2)}`;
+
+            const now = new Date();
+            const isCurrentMonth = (targetDate.getMonth() === now.getMonth()) && (targetDate.getFullYear() === now.getFullYear());
+            const isPastMonth = targetDate < new Date(now.getFullYear(), now.getMonth(), 1);
+            const today = now.getDate();
+
+            const pending = activeClients.filter(c => {
+                const hasPaid = historyData.some(h => h.client_id === c.id && h.payment_date >= firstDay && h.payment_date <= lastDay);
+                if(hasPaid) return false;
+
+                if(isPastMonth) return true;
+                if(isCurrentMonth) return c.due_day <= today;
+                
+                return false;
+            });
+
+            pending.sort((a,b) => (a.due_day || 0) - (b.due_day || 0));
+
+            const qList = document.getElementById('billing-queue');
+            document.getElementById('badge-count').innerText = pending.length;
+            
+            if(pending.length === 0) {
+                const msg = isPastMonth ? "Nenhuma pendência neste mês!" : "Tudo pago até hoje!";
+                qList.innerHTML = `<div class="p-8 text-center text-slate-500">${msg}</div>`;
+            } else {
+                qList.innerHTML = pending.map(c => {
+                    // Limpeza do WhatsApp (Item 1)
+                    const cleanPhone = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
+                    
+                    return `
+                    <div class="p-4 flex justify-between items-center hover:bg-slate-800 transition">
+                        <div>
+                            <h4 class="font-bold text-sm text-white">${c.name}</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">
+                                Dia ${c.due_day} • R$ ${c.products?.price || 0} • <span class="text-blue-400">${c.products?.name || 'S/ Plano'}</span>
+                            </p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="markAsPaid('${c.id}', ${c.products?.price || 0})" class="bg-emerald-500/10 text-emerald-500 w-8 h-8 rounded flex items-center justify-center hover:bg-emerald-500 hover:text-white transition"><i class="fas fa-check"></i></button>
+                            <a href="https://wa.me/${cleanPhone}" target="_blank" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-blue-500 transition"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+// --- RELATÓRIOS ---
+        function populateMonthFilter() {
+            const sel = document.getElementById('report-filter-month');
+            if(!sel) return;
+            const now = new Date();
+            let opts = '';
+            for(let i=-6; i<=6; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+                const val = d.toISOString().slice(0, 7); 
+                const mName = d.toLocaleDateString('pt-BR', {month:'short'}).toUpperCase().replace('.','');
+                const yShort = d.getFullYear().toString().substr(2);
+                const isSelected = i === 0 ? 'selected' : '';
+                // Classe de fundo escuro para options (Item 3)
+                opts += `<option value="${val}" ${isSelected} class="bg-slate-900 text-slate-200">${mName}/${yShort}</option>`;
+            }
+            sel.innerHTML = opts;
+        }
+
+        function renderReportTable() {
+            const filterMonth = document.getElementById('report-filter-month').value;
+            if(!filterMonth) return;
+            const [year, month] = filterMonth.split('-');
+            const targetDate = new Date(parseInt(year), parseInt(month)-1, 1);
+            
+            const isoStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).toISOString();
+            const isoEnd = new Date(targetDate.getFullYear(), targetDate.getMonth()+1, 0, 23, 59, 59).toISOString();
+            const mName = targetDate.toLocaleDateString('pt-BR', {month:'short'}).toUpperCase().replace('.','');
+            const yShort = targetDate.getFullYear().toString().substr(2);
+            const displayLabel = `${mName}/${yShort}`;
+
+            const filterProd = document.getElementById('report-filter-product').value;
+            let filteredClients = allClients.filter(c => {
+                if(!c.active) return false;
+                if(filterProd !== 'all' && c.product_id !== filterProd) return false;
+                return true;
+            });
+            filteredClients.sort((a, b) => (a.due_day || 0) - (b.due_day || 0));
+
+            let monthTotal = 0;
+            filteredClients.forEach(c => {
+                const h = historyData.find(x => x.client_id === c.id && x.payment_date >= isoStart && x.payment_date <= isoEnd);
+                if(h) monthTotal += (Number(h.amount) || 0);
+            });
+
+            let headerHTML = `
+                <tr>
+                    <th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTE / VENC <span class="text-emerald-400 ml-1">(${filteredClients.length})</span></th>
+                    <th colspan="4" class="text-emerald-400 bg-slate-900/90 border-l border-slate-700 font-bold tracking-widest text-[10px]">${displayLabel} <span class="text-white opacity-60 font-mono ml-2">| R$ ${monthTotal.toFixed(0)}</span></th>
+                </tr>
+                <tr>
+                    <th class="sticky-col bg-slate-900 border-r border-slate-700"></th>
+                    <th class="sub-header text-blue-300 border-l border-slate-700">Dia</th>
+                    <th class="sub-header text-blue-300">Valor</th>
+                    <th class="sub-header text-emerald-300 border-l border-slate-800">Pgto</th>
+                    <th class="sub-header text-emerald-300">Pago</th>
+                </tr>`;
+            document.getElementById('report-header').innerHTML = headerHTML;
+
+            let bodyHTML = '';
+            filteredClients.forEach(c => {
+                const paid = historyData.find(h => h.client_id === c.id && h.payment_date >= isoStart && h.payment_date <= isoEnd);
+                const prodPrice = c.products?.price || 0;
+                let rowHTML = `<tr>
+                    <td onclick="editClient('${c.id}')" class="sticky-col text-xs truncate border-r border-slate-700 cursor-pointer hover:text-blue-400 transition-colors"><span class="bg-slate-700 text-white px-1.5 rounded text-[10px] mr-2 font-mono">${c.due_day || '??'}</span>${c.name}</td>
+                    <td class="text-slate-500 text-[9px] border-l border-slate-800 font-mono">${c.due_day || '-'}</td>
+                    <td class="text-slate-500 text-[9px]">R$${prodPrice}</td>`;
+                
+                let payDay = '-';
+                if(paid && paid.payment_date) payDay = new Date(paid.payment_date).getDate();
+                const colorDate = paid ? 'text-emerald-400 font-bold' : 'text-slate-700';
+                
+                rowHTML += `<td class="${colorDate} text-[9px] border-l border-slate-800/50">${payDay}</td>`;
+                if(paid) rowHTML += `<td class="text-emerald-400 font-bold text-[9px] bg-emerald-500/5">R$${paid.amount}</td>`;
+                else rowHTML += `<td class="text-slate-700 text-[9px]">-</td>`;
+                rowHTML += '</tr>';
+                bodyHTML += rowHTML;
+            });
+            if(filteredClients.length === 0) bodyHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Nenhum cliente ativo encontrado.</td></tr>`;
+            document.getElementById('report-body').innerHTML = bodyHTML;
+        }
+
+        // --- SISTEMA DE GESTÃO DO CLIENTE E HISTÓRICO ---
+        async function markAsPaid(id, val) {
+            if(confirm(`Confirmar R$ ${val}?`)) {
+                const now = new Date().toISOString();
+                await sb.from('clients').update({last_payment: now, active: true}).eq('id', id);
+                await sb.from('payment_history').insert([{client_id: id, amount: val, payment_date: now}]);
+                loadAllData();
+            }
+        }
+
+        function renderClients(list) {
+            const container = document.getElementById('clients-list');
+            const term = document.getElementById('search-client').value.toLowerCase();
+            const filtered = list.filter(c => c.name.toLowerCase().includes(term));
+            container.innerHTML = filtered.map(c => `
+                <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}">
+                    <div onclick="editClient('${c.id}')" class="cursor-pointer flex-1"><h4 class="font-bold text-sm text-white">${c.name}</h4><div class="flex gap-2 text-[10px] text-slate-400 mt-1"><span class="bg-slate-800 px-2 py-0.5 rounded">Dia ${c.due_day}</span><span>• ${c.products?.name || 'S/ Plano'}</span></div></div>
+                    <div class="flex gap-2"><button onclick="deleteClient('${c.id}')" class="text-slate-600 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button><button onclick="editClient('${c.id}')" class="bg-slate-800 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen"></i></button></div>
+                </div>`).join('');
+        }
+        function filterClients() { renderClients(allClients); }
+
+        function openModal() {
+            document.getElementById('modal-client-id').value = '';
+            document.getElementById('modal-name').value = '';
+            document.getElementById('modal-due').value = '';
+            document.getElementById('modal-whatsapp').value = '';
+            document.getElementById('modal-product').value = '';
+            document.getElementById('modal-status').value = 'true';
+            document.getElementById('modal-title').innerText = 'Novo Cliente';
+            document.getElementById('history-section').classList.add('hidden');
+            document.getElementById('client-modal').classList.remove('hidden');
+            closeHistoryForm();
+        }
+        function closeModal() { document.getElementById('client-modal').classList.add('hidden'); }
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('text-blue-500'); n.classList.add('text-slate-500'); });
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.querySelector(`button[data-tab="${tabId}"]`);
+            if(activeBtn) { activeBtn.classList.remove('text-slate-500'); activeBtn.classList.add('text-blue-500'); }
+        }
+
+        async function editClient(id) {
+            const c = allClients.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('modal-client-id').value = c.id;
+            document.getElementById('modal-name').value = c.name;
+            document.getElementById('modal-due').value = c.due_day;
+            document.getElementById('modal-whatsapp').value = c.whatsapp;
+            document.getElementById('modal-product').value = c.product_id;
+            document.getElementById('modal-status').value = c.active;
+            document.getElementById('modal-title').innerText = 'Editar Cliente';
+            document.getElementById('history-section').classList.remove('hidden');
+            closeHistoryForm();
+            renderHistoryList(id);
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
+
+        async function saveClient() {
+            const id = document.getElementById('modal-client-id').value;
+            const data = {
+                name: document.getElementById('modal-name').value,
+                due_day: parseInt(document.getElementById('modal-due').value),
+                whatsapp: document.getElementById('modal-whatsapp').value,
+                product_id: document.getElementById('modal-product').value || null,
+                active: document.getElementById('modal-status').value === 'true'
+            };
+            if(id) await sb.from('clients').update(data).eq('id', id);
+            else await sb.from('clients').insert([data]);
+            closeModal();
+            loadAllData();
+        }
+
+        async function deleteClient(id) {
+            if(confirm('Tem certeza? Isso apaga o histórico também.')) {
+                await sb.from('payment_history').delete().eq('client_id', id);
+                await sb.from('clients').delete().eq('id', id);
+                loadAllData();
+            }
+        }
+
+        // --- GESTÃO DE HISTÓRICO ---
+        function renderHistoryList(clientId) {
+            const hList = document.getElementById('history-list');
+            const cHist = historyData.filter(h => h.client_id === clientId).sort((a,b) => new Date(b.payment_date) - new Date(a.payment_date));
+            
+            hList.innerHTML = cHist.map(h => {
+                const d = new Date(h.payment_date);
+                const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                const year = d.getFullYear().toString().slice(2);
+                const displayDate = `${month}/${year}`;
+                
+                return `
+                <div class="flex justify-between items-center border-b border-slate-700/50 pb-2 mb-2 last:border-0 hover:bg-slate-800 p-1 rounded transition-colors group">
+                    <div class="flex gap-3">
+                        <span class="text-slate-400 w-12 text-right font-mono">${displayDate}</span>
+                        <span class="text-emerald-400 font-bold">R$ ${h.amount}</span>
+                    </div>
+                    <div class="flex gap-2 opacity-100 sm:opacity-50 sm:group-hover:opacity-100 transition-opacity">
+                        <button onclick="openHistoryForm('${h.id}', '${h.amount}', '${h.payment_date}')" class="text-slate-500 hover:text-blue-400"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteHistory('${h.id}', '${clientId}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openHistoryForm(id = '', amount = '', date = '') {
+            document.getElementById('history-form-container').classList.add('open');
+            document.getElementById('hist-id').value = id;
+            document.getElementById('hist-amount').value = amount;
+            document.getElementById('hist-date').value = date ? date.split('T')[0] : new Date().toISOString().split('T')[0];
+        }
+
+        function closeHistoryForm() {
+            document.getElementById('history-form-container').classList.remove('open');
+            document.getElementById('hist-id').value = '';
+        }
+
+        async function saveHistory() {
+            const cid = document.getElementById('modal-client-id').value;
+            const hid = document.getElementById('hist-id').value;
+            const val = document.getElementById('hist-amount').value;
+            const dt = document.getElementById('hist-date').value;
+
+            if(!cid || !val || !dt) return alert("Preencha data e valor");
+
+            const inputDate = new Date(dt + 'T12:00:00'); 
+            const targetMonth = inputDate.getMonth();
+            const targetYear = inputDate.getFullYear();
+
+            // Validação de Duplicidade (Trava)
+            const exists = historyData.find(h => {
+                if(hid && h.id === hid) return false;
+                if(h.client_id !== cid) return false;
+                const hDate = new Date(h.payment_date);
+                return hDate.getMonth() === targetMonth && hDate.getFullYear() === targetYear;
+            });
+
+            if(exists) {
+                alert(`ERRO: Já existe um pagamento neste mês (${targetMonth+1}/${targetYear}).\nEdite o existente ou exclua antes.`);
+                return;
+            }
+
+            const payload = { client_id: cid, amount: val, payment_date: dt + 'T12:00:00Z', method: 'manual' };
+            if(hid) await sb.from('payment_history').update(payload).eq('id', hid);
+            else await sb.from('payment_history').insert([payload]);
+
+            await fetchFullHistory();
+            renderHistoryList(cid);
+            renderReportTable(); // Atualiza fundo
+            calculateDashboard(); // Atualiza KPIs
+            closeHistoryForm();
+        }
+
+        async function deleteHistory(hid, cid) {
+            if(confirm('Excluir este pagamento?')) {
+                await sb.from('payment_history').delete().eq('id', hid);
+                await fetchFullHistory();
+                renderHistoryList(cid);
+                renderReportTable();
+                calculateDashboard();
+            }
+        }
+    </script>
+</body>
+</html>
