@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BoxPower V17.42 - Refresh Update</title>
+    <title>BoxPower V17.90 - Refinado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -64,9 +64,38 @@
         /* Animações */
         #history-form-container { transition: all 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
         #history-form-container.open { max-height: 200px; opacity: 1; margin-bottom: 1rem; }
+
+        /* --- NOTIFICAÇÕES FLUTUANTES (TOAST) --- */
+        #notification-area { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-card { background: rgba(6, 78, 59, 0.95); backdrop-filter: blur(8px); border: 1px solid #34d399; color: white; padding: 16px; rounded: 12px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); pointer-events: auto; animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 12px; }
+        .toast-card.fade-out { opacity: 0; transform: translateY(-20px); transition: all 0.5s; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* --- CENTRAL DE NOTIFICAÇÕES (SINO) --- */
+        .notif-btn { position: relative; }
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 9px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; opacity: 0; transition: opacity 0.3s; }
+        .notif-badge.visible { opacity: 1; }
+
+        #notif-panel { 
+            position: absolute; top: 70px; right: 20px; width: 320px; max-height: 400px; 
+            background: #1e293b; border: 1px solid #334155; border-radius: 16px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); z-index: 60; 
+            display: none; flex-direction: column; overflow: hidden;
+            animation: slideDown 0.2s ease-out;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .notif-header { padding: 12px; background: #0f172a; border-bottom: 1px solid #334155; font-size: 11px; font-weight: bold; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; }
+        .notif-list { overflow-y: auto; max-height: 350px; }
+        .notif-item { padding: 12px; border-bottom: 1px solid #334155; display: flex; gap: 10px; transition: background 0.2s; }
+        .notif-item:hover { background: #334155; }
+        .notif-icon { width: 32px; height: 32px; background: rgba(16, 185, 129, 0.2); color: #34d399; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; shrink: 0; }
+
     </style>
 </head>
 <body>
+
+    <div id="notification-area"></div>
 
     <div id="login-screen" class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950 transition-opacity duration-300">
         <div class="glass p-8 rounded-3xl w-80 text-center shadow-2xl border-t border-blue-500/30">
@@ -91,10 +120,25 @@
                 <h2 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Gestão Financeira</h2>
                 <div class="flex items-baseline gap-2">
                     <h1 class="text-2xl font-black tracking-tighter text-white drop-shadow-lg">BoxPower</h1>
-                    <span class="text-[10px] text-emerald-500 font-mono border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800">v17.42</span>
+                    <span class="text-[10px] text-emerald-500 font-mono border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800">v17.90</span>
                 </div>
             </div>
             <div class="flex gap-3">
+                <div class="relative">
+                    <button onclick="toggleNotifPanel()" class="notif-btn w-10 h-10 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-700 hover:text-white transition-all shadow-lg">
+                        <i class="fas fa-bell"></i>
+                        <span id="notif-badge" class="notif-badge">0</span>
+                    </button>
+                    <div id="notif-panel">
+                        <div class="notif-header">
+                            <span>PAGAMENTOS DE HOJE</span>
+                            <button onclick="toggleNotifPanel()" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div id="notif-list" class="notif-list">
+                            </div>
+                    </div>
+                </div>
+
                 <button onclick="refreshApp()" title="Atualizar Dados" class="w-10 h-10 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all active:scale-95 shadow-lg">
                     <i id="refresh-icon" class="fas fa-sync-alt text-sm"></i>
                 </button>
@@ -182,9 +226,7 @@
                 <div id="chat-messages" class="bg-slate-800/50">
                     <div class="msg-bot">
                         🤖 <b>Olá! Sou seu Assistente Financeiro.</b><br>
-                        Gerencio cadastros e pagamentos com inteligência artificial.<br>
-                        Entendo contextos, datas e valores, mesmo com erros de digitação.<br>
-                        <i>Ex: "Cadastre Ana BoxPower 89,90 dia 15"</i>
+                        Tente: <i>"Cobrar Ana"</i>, <i>"Cadastre João dia 15"</i> ou <i>"Maria pagou 90"</i>.
                     </div>
                 </div>
                 <div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2 shrink-0">
@@ -203,11 +245,14 @@
                     <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
                     <div class="flex gap-2">
                         <input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
-                        <input type="text" id="modal-whatsapp" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                        <input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
                     </div>
                     <div class="flex gap-2">
-                        <select id="modal-product" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></select>
-                        <select id="modal-status" class="w-1/2 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select>
+                        <select id="modal-product" onchange="productChanged()" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></select>
+                        <input type="number" id="modal-price" step="0.01" placeholder="R$" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400">
+                    </div>
+                    <div class="flex gap-2">
+                         <select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select>
                     </div>
                 </div>
                 <div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden">
@@ -265,16 +310,38 @@
                 sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 isSystemReady = true;
                 document.getElementById('connection-status').classList.add('hidden');
-                if(document.getElementById('login-screen').style.display === 'none') loadAllData();
+                
+                if(document.getElementById('login-screen').style.display === 'none') {
+                    loadAllData();
+                }
+
+                // --- REALTIME: NOTIFICAÇÕES (Ao Vivo) ---
+                sb.channel('db-changes')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'payment_history' },
+                    (payload) => {
+                        const isNewApproved = (payload.eventType === 'INSERT' && payload.new.status === 'approved');
+                        const isUpdatedApproved = (payload.eventType === 'UPDATE' && payload.new.status === 'approved' && payload.old.status !== 'approved');
+
+                        if (isNewApproved || isUpdatedApproved) {
+                            const client = allClients.find(c => c.id === payload.new.client_id);
+                            const clientName = client ? client.name : 'Cliente/Pagamento';
+                            const valor = formatCurrency(payload.new.amount);
+                            showNotification(clientName, valor);
+                            refreshApp(); 
+                        }
+                    }
+                )
+                .subscribe();
             }
         }
 
-        // --- NEW: REFRESH BUTTON LOGIC ---
         async function refreshApp() {
             const icon = document.getElementById('refresh-icon');
-            if(icon) icon.classList.add('fa-spin'); // Adiciona animação de giro
+            if(icon) icon.classList.add('fa-spin'); 
             await loadAllData();
-            if(icon) setTimeout(() => icon.classList.remove('fa-spin'), 1000); // Remove após 1s
+            if(icon) setTimeout(() => icon.classList.remove('fa-spin'), 1000); 
         }
 
         async function loadAllData() {
@@ -283,6 +350,7 @@
                 const errDiv = document.getElementById('error-alert');
                 if(errDiv) errDiv.classList.add('hidden');
                 populateMonthFilter(); populateDashboardFilter(); calculateDashboard(); renderReportTable();
+                updateNotificationBadge();
             } catch (error) { showError("Falha ao carregar dados: " + error.message); }
         }
 
@@ -296,15 +364,19 @@
 
         function updateProductUI() {
             const s = document.getElementById('modal-product');
-            if(s) s.innerHTML = '<option value="">Selecione...</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (${formatCurrency(p.price)})</option>`).join('');
+            // AGORA O DROPDOWN SÓ MOSTRA O NOME (O PREÇO VAI PRO CAMPO AO LADO)
+            if(s) s.innerHTML = '<option value="">Produto</option>' + allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            
             const r = document.getElementById('report-filter-product');
             if(r) { const v = r.value; r.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join(''); r.value = v; }
+            
             const l = document.getElementById('products-list');
             if(l) l.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center group"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><div class="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity"><button onclick="editProduct('${p.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-blue-400"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct('${p.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`).join('');
         }
 
         async function fetchClients() {
             if(!sb) return;
+            // Busca tambem o 'agreed_price'
             let { data, error } = await sb.from('clients').select('*, products(*)').order('name');
             if(error) { const f = await sb.from('clients').select('*').order('name'); if(f.error) throw f.error; data = f.data; }
             allClients = data || [];
@@ -330,41 +402,66 @@
             s.innerHTML = opts;
         }
 
+        // --- LÓGICA DO DASHBOARD COM PREÇO COMBINADO (V17.90) ---
         function calculateDashboard() {
             const v = document.getElementById('dashboard-filter-month').value;
             let t = new Date(); if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
             const active = allClients.filter(c => c.active);
             const f = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
             const l = new Date(t.getFullYear(), t.getMonth()+1, 0, 23, 59, 59).toISOString();
-            const rev = historyData.filter(h => h.payment_date >= f && h.payment_date <= l).reduce((a,c) => a + (Number(c.amount)||0), 0);
-            const proj = active.reduce((a,c) => a + (c.products?.price||0), 0);
+            
+            const rev = historyData.filter(h => 
+                h.payment_date >= f && 
+                h.payment_date <= l && 
+                (h.status === 'approved' || !h.status)
+            ).reduce((a,c) => a + (Number(c.amount)||0), 0);
+
+            // Usa 'agreed_price' se existir, senão usa o preço do produto
+            const proj = active.reduce((a,c) => a + (c.agreed_price || c.products?.price || 0), 0);
             
             if(document.getElementById('stat-paid-amount')) document.getElementById('stat-paid-amount').innerText = formatCurrency(rev);
             if(document.getElementById('stat-projected')) document.getElementById('stat-projected').innerText = formatCurrency(proj);
-            if(document.getElementById('stat-total-clients')) document.getElementById('stat-total-clients').innerText = active.length;
             
             const now = new Date();
             const isPast = t < new Date(now.getFullYear(), now.getMonth(), 1);
             const isCurr = (t.getMonth() === now.getMonth() && t.getFullYear() === now.getFullYear());
             
             const pend = active.filter(c => {
-                const pd = historyData.some(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l);
-                if(pd) return false;
+                const totalPaid = historyData
+                    .filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status))
+                    .reduce((sum, h) => sum + (Number(h.amount)||0), 0);
+                
+                const price = c.agreed_price || c.products?.price || 0;
+                
+                if(totalPaid >= price && price > 0) return false;
                 if(isPast) return true;
                 if(isCurr) return c.due_day <= now.getDate();
                 return false;
             }).sort((a,b) => (a.due_day||0) - (b.due_day||0));
             
-            if(document.getElementById('stat-pending-money')) document.getElementById('stat-pending-money').innerText = formatCurrency(pend.reduce((a,c) => a + (c.products?.price||0), 0));
+            const pendValue = pend.reduce((acc, c) => {
+                 const totalPaid = historyData
+                    .filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status))
+                    .reduce((sum, h) => sum + (Number(h.amount)||0), 0);
+                 const price = c.agreed_price || c.products?.price || 0;
+                 return acc + Math.max(0, price - totalPaid);
+            }, 0);
+
+            if(document.getElementById('stat-pending-money')) document.getElementById('stat-pending-money').innerText = formatCurrency(pendValue);
             if(document.getElementById('badge-count')) document.getElementById('badge-count').innerText = pend.length;
             
             const qList = document.getElementById('billing-queue');
             if(qList) {
                 if(pend.length === 0) qList.innerHTML = `<div class="p-8 text-center text-slate-500">${isPast ? "Nenhuma pendência!" : "Tudo em dia!"}</div>`;
                 else qList.innerHTML = pend.map(c => {
-                    // BOTÃO DE WHATSAPP RESTAURADO AQUI
                     const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
-                    return `<div class="p-4 flex justify-between items-center hover:bg-slate-800 transition"><div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400 mt-0.5">Dia ${c.due_day} • ${formatCurrency(c.products?.price)}</p></div><div class="flex gap-2"><button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded flex items-center justify-center hover:text-white transition"><i class="fas fa-hand-holding-usd"></i></button><a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-emerald-500 transition"><i class="fab fa-whatsapp"></i></a></div></div>`;
+                    const totalPaid = historyData
+                        .filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status))
+                        .reduce((sum, h) => sum + (Number(h.amount)||0), 0);
+                    const price = c.agreed_price || c.products?.price || 0;
+                    const remaining = Math.max(0, price - totalPaid);
+                    
+                    return `<div class="p-4 flex justify-between items-center hover:bg-slate-800 transition"><div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400 mt-0.5">Dia ${c.due_day} • Resta ${formatCurrency(remaining)}</p></div><div class="flex gap-2"><button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded flex items-center justify-center hover:text-white transition"><i class="fas fa-hand-holding-usd"></i></button><a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-emerald-500 transition"><i class="fab fa-whatsapp"></i></a></div></div>`;
                 }).join('');
             }
         }
@@ -375,23 +472,47 @@
             for(let i=-6; i<=6; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
                 const val = d.toISOString().slice(0, 7); 
-                const label = `${d.toLocaleDateString('pt-BR', {month:'short'})}/${d.getFullYear().toString().slice(2)}`;
+                const label = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
                 opts += `<option value="${val}" ${i===0?'selected':''}>${label}</option>`;
             }
             s.innerHTML = opts;
         }
 
+        // --- RELATÓRIO COM PREÇO COMBINADO ---
         function renderReportTable() {
             const v = document.getElementById('report-filter-month').value; if(!v) return;
             const [y, m] = v.split('-'); const d = new Date(parseInt(y), parseInt(m)-1, 1);
             const f = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
             const l = new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59).toISOString();
             const fp = document.getElementById('report-filter-product').value;
-            let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && c.product_id !== fp) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0));
-            let tot = 0; lst.forEach(c => { const h = historyData.find(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l); if(h) tot += Number(h.amount); });
             
-            document.getElementById('report-header').innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Pgto</th><th class="sub-header text-emerald-300">Pago</th></tr>`;
-            document.getElementById('report-body').innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { const p = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l); return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="editClient('${c.id}')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(c.products?.price)}</td><td class="${p?'text-emerald-400 font-bold':'text-slate-700'} text-[9px] border-l border-slate-800">${p?new Date(p.payment_date).getDate():'-'}</td><td class="${p?'text-emerald-400 font-bold bg-emerald-500/5':'text-slate-700'} text-[9px]">${p?formatCurrency(p.amount):'-'}</td></tr>`; }).join('');
+            let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && c.product_id !== fp) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0));
+            
+            let tot = 0; 
+            lst.forEach(c => { 
+                const sum = historyData
+                    .filter(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l && (x.status === 'approved' || !x.status))
+                    .reduce((acc, x) => acc + (Number(x.amount)||0), 0);
+                tot += sum; 
+            });
+            
+            document.getElementById('report-header').innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Dia</th><th class="sub-header text-emerald-300">Pago</th></tr>`;
+            
+            document.getElementById('report-body').innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { 
+                const totalPaid = historyData
+                    .filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status))
+                    .reduce((sum, h) => sum + (Number(h.amount)||0), 0);
+                
+                const pending = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && h.status === 'pending');
+                const price = c.agreed_price || c.products?.price || 0;
+
+                let statusColor = 'text-slate-700'; 
+                if(totalPaid >= price && price > 0) statusColor = 'text-emerald-400 font-bold bg-emerald-500/5'; 
+                else if(totalPaid > 0) statusColor = 'text-yellow-400 font-bold'; 
+                else if(pending) statusColor = 'text-blue-400 animate-pulse'; 
+
+                return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="editClient('${c.id}')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(price)}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">-</td><td class="${statusColor} text-[9px]">${totalPaid > 0 ? formatCurrency(totalPaid) : (pending ? '⏳' : '-')}</td></tr>`; 
+            }).join('');
         }
 
         // CRUD
@@ -401,19 +522,84 @@
         async function deleteProduct(id){ if(confirm('Apagar plano?')) { await sb.from('products').delete().eq('id',id); fetchProducts(); } }
         function renderClients(l) { const t=document.getElementById('search-client').value.toLowerCase(); document.getElementById('clients-list').innerHTML=l.filter(c=>c.name.toLowerCase().includes(t)).map(c=>`<div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active?'border-l-emerald-500':'border-l-red-500'}"><div onclick="editClient('${c.id}')" class="flex-1"><h4 class="font-bold text-sm text-white">${c.name}</h4><div class="flex gap-2 text-[10px] text-slate-400 mt-1"><span class="bg-slate-800 px-2 py-0.5 rounded">Dia ${c.due_day}</span><span>• ${c.products?.name||'S/ Plano'}</span></div></div><div class="flex gap-2"><button onclick="deleteClient('${c.id}')" class="text-slate-600 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button><button onclick="editClient('${c.id}')" class="bg-slate-800 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen"></i></button></div></div>`).join(''); }
         function filterClients(){ renderClients(allClients); }
-        function openModal(){ document.getElementById('modal-client-id').value=''; document.getElementById('modal-name').value=''; document.getElementById('modal-due').value=''; document.getElementById('modal-whatsapp').value=''; document.getElementById('modal-status').value='true'; document.getElementById('history-section').classList.add('hidden'); document.getElementById('client-modal').classList.remove('hidden'); }
+        function openModal(){ document.getElementById('modal-client-id').value=''; document.getElementById('modal-name').value=''; document.getElementById('modal-due').value=''; document.getElementById('modal-whatsapp').value=''; document.getElementById('modal-price').value=''; document.getElementById('modal-status').value='true'; document.getElementById('history-section').classList.add('hidden'); document.getElementById('client-modal').classList.remove('hidden'); }
         function closeModal(){ document.getElementById('client-modal').classList.add('hidden'); }
         function showTab(id){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('text-blue-500');n.classList.add('text-slate-500')}); document.getElementById(id).classList.add('active'); document.querySelector(`button[data-tab="${id}"]`)?.classList.replace('text-slate-500','text-blue-500'); }
-        async function editClient(id){ const c=allClients.find(x=>x.id===id); if(!c)return; document.getElementById('modal-client-id').value=c.id; document.getElementById('modal-name').value=c.name; document.getElementById('modal-due').value=c.due_day; document.getElementById('modal-whatsapp').value=c.whatsapp; document.getElementById('modal-product').value=c.product_id; document.getElementById('modal-status').value=c.active; document.getElementById('history-section').classList.remove('hidden'); renderHistoryList(id); document.getElementById('client-modal').classList.remove('hidden'); }
-        async function saveClient(){ const id=document.getElementById('modal-client-id').value, d={name:document.getElementById('modal-name').value, due_day:parseInt(document.getElementById('modal-due').value), whatsapp:document.getElementById('modal-whatsapp').value, product_id:document.getElementById('modal-product').value||null, active:document.getElementById('modal-status').value==='true'}; if(id)await sb.from('clients').update(d).eq('id',id); else await sb.from('clients').insert([d]); closeModal(); loadAllData(); }
-        async function deleteClient(id){ if(confirm('Excluir?')) { await sb.from('payment_history').delete().eq('client_id',id); await sb.from('clients').delete().eq('id',id); loadAllData(); } }
-        function renderHistoryList(cid){ const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); document.getElementById('history-list').innerHTML=h.map(i=>`<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span><span class="text-emerald-400 font-bold">${formatCurrency(i.amount)}</span> <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-red-200">x</button></div>`).join(''); }
+        
+        // --- FUNÇÕES DE UI NOVAS ---
+        // Máscara de Telefone
+        function maskPhone(input) {
+            let val = input.value.replace(/\D/g,'');
+            if(val.length > 11) val = val.slice(0, 11);
+            if(val.length > 6) val = val.replace(/(\d{2})(\d{5})(\d{4})/,"($1) $2-$3");
+            else if(val.length > 2) val = val.replace(/(\d{2})(\d+)/,"($1) $2");
+            input.value = val;
+        }
+
+        // Quando troca o produto, sugere o preço (se o campo preço estiver vazio ou igual ao anterior)
+        function productChanged() {
+            const pid = document.getElementById('modal-product').value;
+            const priceInput = document.getElementById('modal-price');
+            const prod = allProducts.find(p => p.id === pid);
+            if (prod) priceInput.value = prod.price;
+        }
+
+        async function editClient(id){ 
+            const c=allClients.find(x=>x.id===id); if(!c)return; 
+            document.getElementById('modal-client-id').value=c.id; 
+            document.getElementById('modal-name').value=c.name; 
+            document.getElementById('modal-due').value=c.due_day; 
+            document.getElementById('modal-whatsapp').value=c.whatsapp; 
+            document.getElementById('modal-product').value=c.product_id; 
+            // Carrega o preço combinado ou o do produto
+            document.getElementById('modal-price').value = c.agreed_price || (c.products ? c.products.price : '');
+            document.getElementById('modal-status').value=c.active; 
+            document.getElementById('history-section').classList.remove('hidden'); 
+            renderHistoryList(id); 
+            document.getElementById('client-modal').classList.remove('hidden'); 
+        }
+
+        async function saveClient(){ 
+            const id=document.getElementById('modal-client-id').value;
+            const d={
+                name:document.getElementById('modal-name').value, 
+                due_day:parseInt(document.getElementById('modal-due').value), 
+                whatsapp:document.getElementById('modal-whatsapp').value, 
+                product_id:document.getElementById('modal-product').value||null, 
+                agreed_price: document.getElementById('modal-price').value || null, // Salva o preço combinado
+                active:document.getElementById('modal-status').value==='true'
+            }; 
+            if(id)await sb.from('clients').update(d).eq('id',id); 
+            else await sb.from('clients').insert([d]); 
+            closeModal(); loadAllData(); 
+        }
+
+        async function deleteClient(id){ if(confirm('Excluir?')) { try { await sb.from('payment_history').delete().eq('client_id',id); await sb.from('clients').delete().eq('id',id); loadAllData(); } catch(e){ alert("Erro ao excluir (Bloqueado pelo RLS?)"); } } }
+        
+        function renderHistoryList(cid){ 
+            const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); 
+            document.getElementById('history-list').innerHTML=h.map(i=> {
+                const isPending = i.status === 'pending';
+                const approveBtn = isPending ? `<button onclick="forceApprove('${i.id}','${cid}')" title="Forçar Aprovação" class="text-emerald-400 hover:text-emerald-200 mr-2"><i class="fas fa-check-circle"></i></button>` : '';
+                return `<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')} ${isPending ? '(⏳)' : ''}</span><div>${approveBtn}<span class="${isPending ? 'text-yellow-400' : 'text-emerald-400'} font-bold mr-2">${formatCurrency(i.amount)}</span> <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-red-200">x</button></div></div>`;
+            }).join(''); 
+        }
+
+        async function forceApprove(hid, cid) {
+            if(confirm("Confirmar que o cliente pagou manualmente?")) {
+                await sb.from('payment_history').update({ status: 'approved' }).eq('id', hid);
+                await fetchFullHistory();
+                renderHistoryList(cid);
+                calculateDashboard();
+            }
+        }
+
         function openHistoryForm(){ document.getElementById('history-form-container').classList.add('open'); document.getElementById('hist-date').value=new Date().toISOString().split('T')[0]; }
         function closeHistoryForm(){ document.getElementById('history-form-container').classList.remove('open'); }
-        async function saveHistory(){ const cid=document.getElementById('modal-client-id').value, d={client_id:cid, amount:document.getElementById('hist-amount').value, payment_date:document.getElementById('hist-date').value+'T12:00:00Z', method:'manual'}; await sb.from('payment_history').insert([d]); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); closeHistoryForm(); }
-        async function deleteHistory(hid,cid){ if(confirm('Apagar?')){ await sb.from('payment_history').delete().eq('id',hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); } }
+        async function saveHistory(){ const cid=document.getElementById('modal-client-id').value, d={client_id:cid, amount:document.getElementById('hist-amount').value, payment_date:document.getElementById('hist-date').value+'T12:00:00Z', method:'manual', status: 'approved'}; await sb.from('payment_history').insert([d]); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); closeHistoryForm(); }
+        async function deleteHistory(hid,cid){ if(confirm('Apagar?')){ try { await sb.from('payment_history').delete().eq('id',hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); } catch(e) { alert("Erro: Exclusão bloqueada por segurança (RLS)."); } } }
 
-        // --- CÉREBRO V17.42 (AUTO-CORRECT + SAFEGUARDS) ---
+        // --- CÉREBRO V17.90 ---
         function toggleChat(){ const w=document.getElementById('chat-window'); w.style.display=(w.style.display==='flex'?'none':'flex'); if(w.style.display==='flex')document.getElementById('chat-input').focus(); }
         function handleChatKey(e){ if(e.key==='Enter') sendChat(); }
         window.sendChat = function(txt = null) { 
@@ -435,13 +621,92 @@
             container.scrollTop = container.scrollHeight;
             setTimeout(() => container.scrollTop = container.scrollHeight, 100);
         }
-        function similarity(s1, s2) { var l=s1, s=s2; if(s1.length<s2.length){l=s2;s=s1;} var len=l.length; if(len==0)return 1.0; return (len-editDistance(l,s))/parseFloat(len); }
-        function editDistance(s1, s2) { s1=s1.toLowerCase(); s2=s2.toLowerCase(); var costs=new Array(); for(var i=0;i<=s1.length;i++){ var last=i; for(var j=0;j<=s2.length;j++){ if(i==0)costs[j]=j; else if(j>0){ var n=costs[j-1]; if(s1.charAt(i-1)!=s2.charAt(j-1))n=Math.min(Math.min(n,last),costs[j])+1; costs[j-1]=last; last=n; } } if(i>0)costs[s2.length]=last; } return costs[s2.length]; }
+
+        function normalizeText(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        // --- INTEGRAÇÃO WHATSAPP AUX ---
+        function getWhatsappLink(phone, clientName, code, amount) {
+            if(!phone) return '#';
+            const cleanPhone = phone.replace(/\D/g,'');
+            const text = `Olá ${clientName}! Segue a chave Pix para pagamento de R$ ${amount.toFixed(2)} do BoxPower.%0A%0ACopie e cole o código abaixo no seu banco:%0A%0A${code}`;
+            return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${text}`;
+        }
+
+        // --- INTEGRAÇÃO PIX V17.90 (ANTI-LIMBO / CONEXÃO SEGURA) ---
+        async function generatePixPayment(clientObj, amount) {
+            addMsg('bot', `⏳ Iniciando Pix de <b>R$ ${amount}</b>...`);
+            
+            try {
+                const { data: dbData, error: dbErr } = await sb.from('payment_history').insert([{
+                    client_id: clientObj.id,
+                    amount: amount,
+                    payment_date: new Date().toISOString(),
+                    method: 'pix_mercadopago',
+                    status: 'creating' 
+                }]).select().single();
+
+                if (dbErr) throw new Error("Falha ao criar registro no banco.");
+
+                const { data: apiData, error: apiErr } = await sb.functions.invoke('super-responder', {
+                    body: { 
+                        amount: amount, 
+                        description: `BoxPower - ${clientObj.name}`,
+                        payer_email: 'financeiro@boxpower.app' 
+                    }
+                });
+
+                if (apiErr || (apiData && apiData.error)) {
+                    await sb.from('payment_history').update({ status: 'error' }).eq('id', dbData.id);
+                    throw new Error(apiData?.error || apiErr?.message || "Erro na API MP");
+                }
+
+                await sb.from('payment_history').update({
+                    mp_id: apiData.id.toString(),
+                    status: 'pending'
+                }).eq('id', dbData.id);
+                
+                await fetchFullHistory();
+                renderReportTable(); 
+
+                const wppLink = getWhatsappLink(clientObj.whatsapp, clientObj.name, apiData.qr_code, amount);
+
+                const chatHtml = `
+                    <div class="flex flex-col gap-2 bg-slate-900 p-3 rounded-xl border border-emerald-500/30">
+                        <span class="text-xs font-bold text-emerald-400 text-center uppercase tracking-widest mb-1">✅ Pix Gerado</span>
+                        <img src="data:image/png;base64,${apiData.qr_code_base64}" class="w-48 h-48 rounded-lg mx-auto border-4 border-white mix-blend-screen" style="image-rendering: pixelated;">
+                        <textarea id="pix-copy-${apiData.id}" class="hidden">${apiData.qr_code}</textarea>
+                        
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <button onclick="copyPix('${apiData.id}')" class="bg-slate-700 text-white py-2 rounded-lg font-bold text-[10px] hover:bg-slate-600 transition flex items-center justify-center gap-2">
+                                <i class="fas fa-copy"></i> Copiar Código
+                            </button>
+                            <a href="${wppLink}" target="_blank" class="bg-emerald-600 text-white py-2 rounded-lg font-bold text-[10px] hover:bg-emerald-500 transition flex items-center justify-center gap-2">
+                                <i class="fab fa-whatsapp"></i> Enviar Zap
+                            </a>
+                        </div>
+                    </div>
+                `;
+                addMsg('bot', chatHtml);
+
+            } catch (err) {
+                addMsg('bot', `❌ Falha: ${err.message}`);
+                console.error(err);
+            }
+        }
+
+        window.copyPix = function(id) {
+            const text = document.getElementById(`pix-copy-${id}`).value;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Código Pix copiado!");
+            });
+        }
 
         async function processCommand(text) {
-            const lower = text.toLowerCase();
+            const originalText = text;
+            const lower = normalizeText(text);
 
-            // 1. CONFIRMAÇÃO
             if (chatState) {
                 if (['sim','s','confirmar','ok'].includes(lower)) {
                     if (chatState.type === 'add') {
@@ -459,89 +724,144 @@
                         }
                     }
                     else if (chatState.type === 'del') {
-                        await sb.from('payment_history').delete().eq('client_id', chatState.id);
-                        await sb.from('clients').delete().eq('id', chatState.id);
-                        await loadAllData();
-                        addMsg('bot', `✅ Cliente removido.`);
+                        try {
+                            await sb.from('payment_history').delete().eq('client_id', chatState.id);
+                            await sb.from('clients').delete().eq('id', chatState.id);
+                            await loadAllData();
+                            addMsg('bot', `✅ Cliente removido.`);
+                        } catch(e) { addMsg('bot', `❌ Erro ao excluir (RLS).`); }
+                    }
+                    else if (chatState.type === 'gen_pix') {
+                        generatePixPayment(chatState.payload.client, chatState.payload.amount);
+                        chatState = null;
+                        return;
                     }
                 } else { addMsg('bot', '🚫 Cancelado.'); }
                 chatState = null; return;
             }
 
-            // 2. INTENÇÃO
             let intent = 'UNKNOWN';
             if (lower.match(/(novo|cria|add|cadastr|insir|inclu|adicion|bota)/)) intent = 'ADD';
             else if (lower.match(/(pagou|recebi|pg|lança)/)) intent = 'PAY';
             else if (lower.match(/(exclua|apague|delete)/)) intent = 'DEL';
+            else if (lower.match(/(cobre|cobrar|gere|gera|pix|fatura)/)) intent = 'CHARGE';
 
-            if (intent === 'UNKNOWN') { addMsg('bot', "🤔 Tente: 'Cadastre Ana BoxPower 90' ou 'João pagou 50'."); return; }
+            if (intent === 'UNKNOWN') { addMsg('bot', "🤔 Tente: 'Cobrar Túlio', 'Cadastre Ana 90' ou 'João pagou'."); return; }
 
-            // 3. FLUXOS (AUTO-CORRECT)
             if (intent === 'ADD') {
                 let day = null, price = null, product = null, productID = null;
-                
-                // REGEX FLEXÍVEL PARA DATA (vc, vcmt, dt, dia)
                 const dayMatch = text.match(/(?:venc|vcm|vc|dt|dia)[a-z]*\W*(\d+)/i);
                 if (dayMatch) day = parseInt(dayMatch[1]);
                 let cleanText = text.replace(/(?:venc|vcm|vc|dt|dia)[a-z]*\W*(\d+)/gi, " ");
-
                 const priceMatch = cleanText.match(/(?:R\$|pagando|valor)?\s*(\d+[.,]\d{2}|\d+)/i);
                 if (priceMatch) { price = parseFloat(priceMatch[1].replace(',', '.')); cleanText = cleanText.replace(priceMatch[0], " "); }
-
-                for (let p of allProducts) {
-                    if (lower.includes(p.name.toLowerCase())) {
-                        product = p.name; productID = p.id;
-                        const regexProd = new RegExp(p.name, "gi"); cleanText = cleanText.replace(regexProd, " "); break;
-                    }
-                }
-                if (!product) { 
-                    if(text.includes(',')) {
-                        const parts = text.split(',');
-                        if(parts[1] && !/\d/.test(parts[1])) { product = parts[1].trim(); cleanText = cleanText.replace(parts[1], " "); }
-                    }
-                    if(!product) { const m = cleanText.match(/(?:produto|plano)\s+(\w+)/i); if (m) { product = m[1]; cleanText = cleanText.replace(m[0], " "); } }
-                }
-
+                for (let p of allProducts) { if (lower.includes(normalizeText(p.name))) { product = p.name; productID = p.id; const regexProd = new RegExp(p.name, "gi"); cleanText = cleanText.replace(regexProd, " "); break; } }
                 let name = cleanText.replace(/^(cadastre|cadastrei|novo|cria|adiciona|inclua|insira)\s+/i, "").replace(/[.,-]/g, " ").trim();
                 name = name.replace(/\s+\b(com|o|a|de|e|pagando)\b\s+/gi, " ");
                 if(product) name = name.replace(new RegExp(product, "gi"), "");
-                name = name.split(/\s+/).filter(w => w.length > 0).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-
                 if (!name || name.length < 2) return addMsg('bot', "⚠️ Não entendi o nome.");
                 if (!day) return addMsg('bot', "⚠️ Falta o vencimento (Ex: dia 15).");
-
                 chatState = { type: 'add', payload: { name: name, due_day: day, active: true, whatsapp: '00000000', product_id: productID } };
-                
-                addMsg('bot', `<div class="bg-slate-900 p-2 rounded border border-slate-700 mb-2 text-xs"><div class="font-bold text-emerald-400 mb-1 border-b border-slate-700">REVISÃO</div><div class="grid grid-cols-2 gap-1"><div>👤 ${name}</div><div>📦 ${product||'-'}</div><div>📅 Dia ${day}</div><div>💰 ${price?'R$ '+price:'-'}</div></div></div><span>Confirma?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn chat-btn-danger" onclick="sendChat('Cancelar')">❌ Não</button></div>`);
+                addMsg('bot', `<span>Cadastrar <b>${name}</b> (Dia ${day})?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn chat-btn-danger" onclick="sendChat('Não')">❌ Não</button></div>`);
             }
             else { 
-                const commandWords = ['pagou','recebi','exclua','apague','delete','hoje','vencimento','vence','dia'];
-                const searchWords = lower.split(' ').filter(w => w.length > 2 && !commandWords.some(cw => w.includes(cw)) && isNaN(w));
+                const commandWords = ['pagou','recebi','exclua','apague','delete','hoje','vencimento','vence','dia','cobre','cobrar','pix','gera','gerar'];
+                const searchWords = lower.split(' ').filter(w => w.length > 2 && !commandWords.some(cw => w.includes(cw)) && isNaN(w.replace(',','.')));
                 let matches = [];
-                if (searchWords.length > 0) {
-                    matches = allClients.filter(c => searchWords.every(word => c.name.toLowerCase().includes(word)));
-                    if (matches.length === 0) {
-                        for (let w of searchWords) { const similar = allClients.filter(c => similarity(w, c.name) > 0.60); matches = [...matches, ...similar]; }
-                        matches = [...new Set(matches)];
-                    }
-                }
-                if (matches.length === 0) return addMsg('bot', "❌ Ninguém encontrado.");
+                if (searchWords.length > 0) matches = allClients.filter(c => searchWords.every(word => normalizeText(c.name).includes(word)));
+                if (matches.length === 0) return addMsg('bot', "❌ Ninguém encontrado com esse nome.");
                 if (matches.length > 1) {
-                    const amt = text.match(/(\d+([.,]\d{1,2})?)/); const val = amt ? parseFloat(amt[0].replace(',', '.')) : 0;
-                    let btns = matches.map(c => `<button class="chat-btn" onclick="sendChat('${intent==='DEL'?'Exclua':'Pagamento'} ${c.name} ${val||''}')"><i class="fas fa-user"></i> ${c.name}</button>`).join('');
-                    return addMsg('bot', `<span>🔍 Achei <b>${matches.length}</b>:</span><div class="chat-options">${btns}</div>`);
+                    let btns = matches.map(c => `<button class="chat-btn" onclick="sendChat('${originalText.split(' ')[0]} ${c.name}')"><i class="fas fa-user"></i> ${c.name}</button>`).join('');
+                    return addMsg('bot', `<span>🔍 Achei <b>${matches.length}</b> clientes. Qual deles?</span><div class="chat-options">${btns}</div>`);
                 }
                 const client = matches[0];
                 if (intent === 'DEL') {
                     chatState = { type: 'del', id: client.id, name: client.name };
                     addMsg('bot', `<span>⚠️ Excluir <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-danger" onclick="sendChat('Sim')">🗑️ Excluir</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
-                } else {
+                } 
+                else if (intent === 'PAY') {
                     const amt = text.match(/(\d+([.,]\d{1,2})?)/); const val = amt ? parseFloat(amt[0].replace(',', '.')) : 0;
-                    if(!val) return addMsg('bot', "💰 Qual o valor?");
-                    chatState = { type: 'pay', payload: { client_id: client.id, amount: val, payment_date: new Date().toISOString(), method: 'bot' }, clientName: client.name };
-                    addMsg('bot', `<span>Lançar R$ ${val} para <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
+                    if(!val) return addMsg('bot', "💰 Qual o valor pago?");
+                    chatState = { type: 'pay', payload: { client_id: client.id, amount: val, payment_date: new Date().toISOString(), method: 'bot', status: 'approved' }, clientName: client.name };
+                    addMsg('bot', `<span>Lançar Pagamento de R$ ${val} para <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Sim</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
+                }
+                else if (intent === 'CHARGE') {
+                     const amt = text.match(/(\d+([.,]\d{1,2})?)/); 
+                     let val = amt ? parseFloat(amt[0].replace(',', '.')) : 0;
+                     if (!val) {
+                         const now = new Date();
+                         const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+                         const endMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString();
+                         
+                         const totalPaid = historyData
+                             .filter(h => h.client_id === client.id && h.payment_date >= startMonth && h.payment_date <= endMonth && (h.status === 'approved' || !h.status))
+                             .reduce((sum, h) => sum + (Number(h.amount)||0), 0);
+                         
+                         // Usa agreed_price ou product.price
+                         const price = client.agreed_price || client.products?.price || 0;
+                         if (totalPaid < price && price > 0) {
+                             val = price - totalPaid;
+                         }
+                     }
+                     if (!val) return addMsg('bot', `💰 O cliente parece estar quitado. Qual valor cobrar?`);
+                     val = Math.round(val * 100) / 100;
+                     chatState = { type: 'gen_pix', payload: { client: client, amount: val } };
+                     addMsg('bot', `<span>Gerar Pix de <b>R$ ${val.toFixed(2)}</b> para <b>${client.name}</b>?</span><div class="chat-options"><button class="chat-btn chat-btn-success" onclick="sendChat('Sim')">✅ Gerar Pix</button><button class="chat-btn" onclick="sendChat('Não')">Cancelar</button></div>`);
                 }
             }
+        }
+
+        function showNotification(name, amount) {
+            const area = document.getElementById('notification-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast-card';
+            toast.innerHTML = `
+                <div class="bg-emerald-500 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                    <i class="fas fa-check text-white font-bold"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-emerald-300">Pagamento Recebido!</h4>
+                    <p class="text-xs text-white">${name} pagou <span class="font-mono font-bold">${amount}</span></p>
+                </div>
+            `;
+            area.appendChild(toast);
+            try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(()=>{}); } catch(e){}
+            setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 500); }, 5000);
+        }
+
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            if (panel.style.display === 'flex') { panel.style.display = 'none'; } else { renderNotifications(); panel.style.display = 'flex'; document.getElementById('notif-badge').classList.remove('visible'); }
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const today = new Date();
+            const recentPayments = historyData
+                .filter(h => {
+                    if (h.status !== 'approved' && (h.status || h.method === 'pix_mercadopago')) return false;
+                    const pDate = new Date(h.payment_date);
+                    return pDate.getDate() === today.getDate() && pDate.getMonth() === today.getMonth() && pDate.getFullYear() === today.getFullYear();
+                })
+                .sort((a,b) => new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime());
+
+            if (recentPayments.length === 0) { list.innerHTML = '<div class="p-6 text-center text-slate-500 text-xs">Nenhum pagamento hoje.</div>'; return; }
+
+            list.innerHTML = recentPayments.map(pay => {
+                const client = allClients.find(c => c.id === pay.client_id);
+                const clientName = client ? client.name : 'Cliente Excluído';
+                const dueDay = client ? client.due_day : '?';
+                let prodName = 'S/ Plano'; if (client && client.product_id) { const prod = allProducts.find(p => p.id === client.product_id); if (prod) prodName = prod.name; }
+                const pDate = new Date(pay.payment_date);
+                return `<div class="notif-item"><div class="notif-icon"><i class="fas fa-dollar-sign"></i></div><div class="flex-1"><div class="flex justify-between items-start"><h4 class="text-xs font-bold text-white">${clientName}</h4><span class="text-[10px] font-mono text-emerald-400 font-bold">${formatCurrency(pay.amount)}</span></div><p class="text-[10px] text-slate-400 mt-0.5">${prodName}</p><div class="flex justify-between mt-1 border-t border-slate-700/50 pt-1"><span class="text-[9px] text-slate-500">Venc. Dia ${dueDay}</span><span class="text-[9px] text-blue-400">Hoje às ${pDate.toLocaleTimeString().slice(0,5)}</span></div></div></div>`;
+            }).join('');
+        }
+
+        function updateNotificationBadge() {
+            const today = new Date().toISOString().slice(0, 10);
+            const count = historyData.filter(h => h.status === 'approved' && h.payment_date.startsWith(today)).length;
+            const badge = document.getElementById('notif-badge');
+            if (count > 0) { badge.innerText = count; badge.classList.add('visible'); } else { badge.classList.remove('visible'); }
         }
     </script>
 </body>
