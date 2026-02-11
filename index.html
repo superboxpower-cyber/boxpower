@@ -177,7 +177,7 @@
 
         <div id="logs-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 shadow-2xl h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-white">Auditoria (30 dias)</h3><button onclick="document.getElementById('logs-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div><div id="logs-list" class="flex-1 overflow-y-auto space-y-2 pr-2"><p class="text-center text-slate-500 text-xs">Carregando logs...</p></div></div></div>
 
-        <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto"><h3 id="modal-title" class="text-xl font-bold mb-4">Cliente</h3><input type="hidden" id="modal-client-id"><div class="space-y-3"><input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><div class="flex gap-2"><input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div class="flex gap-2"><select id="modal-product" onchange="productChanged()" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></select><input type="text" id="modal-price" oninput="mascaraMoeda(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400"></div><div class="flex gap-2"><select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select></div></div><div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden"><div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Lançar</button></div><div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2"><input type="hidden" id="hist-id"><div class="flex gap-2 mb-2"><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div></div><div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button></div></div><div id="history-list" class="bg-slate-800/50 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-700/50"></div></div><div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button></div></div></div>
+        <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto"><h3 id="modal-title" class="text-xl font-bold mb-4">Cliente</h3><input type="hidden" id="modal-client-id"><div class="space-y-3"><input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><div class="flex gap-2"><input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div class="flex items-center justify-between"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Produto(s)</span><button type="button" onclick="addProductSlot()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Produto</button></div><div id="modal-products-container" class="space-y-2"></div><div class="flex gap-2"><select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select></div></div><div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden"><div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Lançar</button></div><div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2"><input type="hidden" id="hist-id"><div class="flex gap-2 mb-2"><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div></div><div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button></div></div><div id="history-list" class="bg-slate-800/50 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-700/50"></div></div><div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button></div></div></div>
         <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-700 p-6 shadow-2xl"><h3 id="product-modal-title" class="text-lg font-bold mb-4">Gerenciar Plano</h3><input type="hidden" id="prod-id"><div class="space-y-3"><div><label class="text-[10px] text-slate-500 uppercase font-bold">Nome do Plano</label><input type="text" id="prod-name" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div><label class="text-[10px] text-slate-500 uppercase font-bold">Preço (R$)</label><input type="number" id="prod-price" step="0.01" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-bold text-emerald-400"></div></div><div class="flex gap-3 mt-6"><button onclick="document.getElementById('product-modal').classList.add('hidden')" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveProduct()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold">Salvar</button></div></div></div>
     </div>
 
@@ -278,6 +278,11 @@
                 await calculateDashboard(); 
                 renderReportTable();
                 updateNotificationBadge();
+                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
+                try {
+                    const badge = document.getElementById('notif-badge');
+                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
+                } catch(e) {}
                 updateClientStatsUI();
                 renderExpensesList();
             } catch (error) { showError("Erro parcial: " + error.message); }
@@ -318,6 +323,24 @@
             if(!panel) return;
             const isOpen = panel.style.display === 'flex';
             panel.style.display = isOpen ? 'none' : 'flex';
+
+            // marcou como visualizado ao abrir
+            if(!isOpen) {
+                try {
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const dayStr = `${yyyy}-${mm}-${dd}`;
+                    localStorage.setItem('bp_notif_seen_' + dayStr, '1');
+                } catch(e) {}
+                updateNotificationBadge();
+                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
+                try {
+                    const badge = document.getElementById('notif-badge');
+                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
+                } catch(e) {}
+            }
         }
 
         function updateNotificationBadge() {
@@ -339,11 +362,16 @@
                     return d === dayStr && okStatus;
                 });
 
-                const count = todaysApproved.length;
+                const countRaw = todaysApproved.length;
+                let count = countRaw;
+                try {
+                    const seen = localStorage.getItem('bp_notif_seen_' + dayStr) === '1';
+                    if(seen) count = 0;
+                } catch(e) {}
                 badge.textContent = String(count);
                 badge.classList.toggle('visible', count > 0);
 
-                if(count === 0) {
+                if(countRaw === 0) {
                     list.innerHTML = `<div class="p-6 text-center text-slate-500">Nenhum pagamento hoje.</div>`;
                     return;
                 }
@@ -427,17 +455,17 @@
             wrap.innerHTML = filtered.map(c => {
                 const prodName = c.products?.name || 'Sem Plano';
                 const price = c.agreed_price || c.products?.price || 0;
-                const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
+                const wpp = c.whatsapp ? normalizeWhatsAppForDB(c.whatsapp).replace(/\D/g,'') : '';
                 const statusPill = c.active
                     ? `<span class="text-[9px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded-lg font-bold">ATIVO</span>`
                     : `<span class="text-[9px] bg-red-500/10 text-red-300 border border-red-500/20 px-2 py-0.5 rounded-lg font-bold">INATIVO</span>`;
 
                 return `
-                    <div class="glass p-3 rounded-2xl border border-slate-700/60 hover:border-slate-600 transition">
+                    <div class="glass p-3 rounded-2xl border border-slate-700/60 hover:border-slate-600 transition cursor-pointer" onclick="editClient(\'${c.id}\')">
                         <div class="flex justify-between items-start gap-3">
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2">
-                                    <h4 class="font-bold text-white truncate">${c.name || '-'}</h4>
+                                    <h4 class="font-bold text-white truncate cursor-pointer hover:text-blue-200" onclick="event.stopPropagation(); editClient(\'${c.id}\')">${c.name || '-'}</h4>
                                     ${statusPill}
                                 </div>
                                 <div class="text-[10px] text-slate-400 mt-1 font-mono flex flex-wrap gap-x-3 gap-y-1">
@@ -445,14 +473,14 @@
                                     <span><i class="fas fa-tag text-slate-500 mr-1"></i>${prodName}</span>
                                     <span><i class="fas fa-coins text-slate-500 mr-1"></i>${formatCurrency(price)}</span>
                                 </div>
-                                ${c.whatsapp ? `<div class="text-[10px] text-slate-500 mt-1"><i class="fab fa-whatsapp mr-1"></i>${c.whatsapp}</div>` : ``}
+                                ${c.whatsapp ? `<div class="text-[10px] text-slate-500 mt-1"><i class="fab fa-whatsapp mr-1"></i>${formatPhoneBR(stripDDI55Digits(c.whatsapp))}</div>` : ``}
                             </div>
                             <div class="flex gap-2 shrink-0">
-                                <button onclick="editClient('${c.id}')" class="bg-slate-800/80 border border-slate-700 text-blue-400 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-700 hover:text-white transition shadow-lg" title="Editar">
+                                <button onclick="event.stopPropagation(); editClient(\'${c.id}\')" class="bg-slate-800/80 border border-slate-700 text-blue-400 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-700 hover:text-white transition shadow-lg" title="Editar">
                                     <i class="fas fa-pen text-xs"></i>
                                 </button>
-                                ${wpp ? `<a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" class="bg-emerald-600 text-white w-9 h-9 rounded-xl flex items-center justify-center hover:bg-emerald-500 transition shadow-lg" title="WhatsApp"><i class="fab fa-whatsapp text-sm"></i></a>` : ``}
-                                <button onclick="deleteClient('${c.id}', '${(c.name||'').replace(/'/g, "\\'")}')" class="bg-red-900/40 border border-red-500/20 text-red-300 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg" title="Excluir">
+                                ${wpp ? `<a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-600 text-white w-9 h-9 rounded-xl flex items-center justify-center hover:bg-emerald-500 transition shadow-lg" title="WhatsApp"><i class="fab fa-whatsapp text-sm"></i></a>` : ``}
+                                <button onclick="event.stopPropagation(); deleteClient('${c.id}', '${(c.name||'').replace(/'/g, "\\'")}')" class="bg-red-900/40 border border-red-500/20 text-red-300 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg" title="Excluir">
                                     <i class="fas fa-trash text-xs"></i>
                                 </button>
                             </div>
@@ -535,14 +563,29 @@ if(error) {
         }
 
         function updateProductUI() {
-            const s = document.getElementById('modal-product');
-            if(s) s.innerHTML = '<option value="">Produto</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+            // Atualiza selects de produtos (modal multi-produtos)
+            const optionsHtml = '<option value="">Produto</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+            const container = document.getElementById('modal-products-container');
+            if(container){
+                container.querySelectorAll('select[data-role="product-select"]').forEach(sel=>{
+                    const prev = sel.value;
+                    sel.innerHTML = optionsHtml;
+                    sel.value = prev;
+                });
+            }
+
             const r = document.getElementById('report-filter-product');
-            if(r) { const v = r.value; r.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join(''); r.value = v; }
+            if(r) {
+                const v = r.value;
+                r.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+                r.value = v;
+            }
             const cf = document.getElementById('client-filter-plan');
-            if(cf) { const v = cf.value; cf.innerHTML = '<option value="all">Todos os Planos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join(''); cf.value = v; }
-            const l = document.getElementById('products-list');
-            if(l) l.innerHTML = allProducts.map((p, index) => `<div class="glass p-3 rounded-xl flex justify-between items-center group"><div><span class="block text-sm font-bold text-white">${padId(index + 1)} - ${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><div class="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity"><button onclick="editProduct('${p.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-blue-400"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct('${p.id}', '${p.name}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`).join('');
+            if(cf) {
+                const v = cf.value;
+                cf.innerHTML = '<option value="all">Todos os Planos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+                cf.value = v;
+            }
         }
 
         function populateMonthFilter() {
@@ -642,7 +685,7 @@ if(error) {
                 qList.innerHTML = `<div class="p-8 text-center text-slate-500">${searchTerm ? "Não encontrado." : "Tudo em dia!"}</div>`;
             } else {
                 qList.innerHTML = displayList.map(c => {
-                    const wpp = c.whatsapp ? c.whatsapp.replace(/\D/g,'') : '';
+                    const wpp = c.whatsapp ? normalizeWhatsAppForDB(c.whatsapp).replace(/\D/g,'') : '';
                     const totalPaid = historyData.filter(h => h.client_id === c.id).reduce((sum, h) => sum + (Number(h.amount)||0), 0); 
                     const price = c.agreed_price || c.products?.price || 0;
                     const prodName = c.products?.name || 'S/ Plano';
@@ -653,9 +696,9 @@ if(error) {
                             <p class="text-[10px] text-slate-400 mt-0.5 font-mono"><span class="text-yellow-500">Dia ${c.due_day}</span> • ${prodName}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg flex items-center justify-center hover:text-white transition shadow-lg"><i class="fas fa-pen text-xs"></i></button>
-                            <a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-emerald-500 transition shadow-lg"><i class="fab fa-whatsapp text-sm"></i></a>
-                            <button onclick="deleteClient('${c.id}', '${c.name}')" class="bg-red-900/50 border border-red-500/30 text-red-400 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg"><i class="fas fa-trash text-xs"></i></button>
+                            <button onclick="event.stopPropagation(); editClient(\'${c.id}\')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg flex items-center justify-center hover:text-white transition shadow-lg"><i class="fas fa-pen text-xs"></i></button>
+                            <a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-emerald-500 transition shadow-lg"><i class="fab fa-whatsapp text-sm"></i></a>
+                            <button onclick="event.stopPropagation(); deleteClient('${c.id}', '${c.name}')" class="bg-red-900/50 border border-red-500/30 text-red-400 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg"><i class="fas fa-trash text-xs"></i></button>
                         </div>
                     </div>`;
                 }).join('');
@@ -665,27 +708,336 @@ if(error) {
         function filterPendingQueue() { renderPendingQueue(); }
         function toggleInactiveFilter() { showInactiveOnly = !showInactiveOnly; filterClients(); }
         function filterClients(){ renderClients(allClients); }
-        function openModal(){ document.getElementById('modal-client-id').value=''; document.getElementById('modal-name').value=''; document.getElementById('modal-due').value=''; document.getElementById('modal-whatsapp').value=''; document.getElementById('modal-price').value=''; document.getElementById('modal-status').value='true'; document.getElementById('history-section').classList.add('hidden'); document.getElementById('client-modal').classList.remove('hidden'); }
+        function openModal(){
+            document.getElementById('modal-client-id').value='';
+            document.getElementById('modal-name').value='';
+            document.getElementById('modal-due').value='';
+            document.getElementById('modal-whatsapp').value='';
+            document.getElementById('modal-status').value='true';
+            document.getElementById('history-section').classList.add('hidden');
+
+            // produtos (multi)
+            _resetProductSlots();
+            addProductSlot({product_id:'', agreed_price:null});
+            updateProductUI();
+
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
         function closeModal(){ document.getElementById('client-modal').classList.add('hidden'); }
         function showTab(id){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('text-blue-500');n.classList.add('text-slate-500')}); document.getElementById(id).classList.add('active'); document.querySelector(`button[data-tab="${id}"]`)?.classList.replace('text-slate-500','text-blue-500'); 
             if(id === 'tab-expenses') renderExpensesList(); 
             if(id === 'tab-home') calculateDashboard(); 
         }
-        function maskPhone(input) { let v = input.value.replace(/\D/g,''); if(v.length > 11) v = v.slice(0, 11); if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3'); else if(v.length > 5) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3'); else if(v.length > 2) v = v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2'); else v = v.replace(/^(\d*)/, '($1'); input.value = v; }
+        
+        // WhatsApp helpers: mantém +55 no Supabase, mas oculta no UI
+        function stripDDI55Digits(v){
+            const d = String(v||'').replace(/\D/g,'');
+            if(d.startsWith('55') && d.length > 11) return d.slice(2);
+            return d;
+        }
+        function normalizeWhatsAppForDB(v){
+            const d = String(v||'').replace(/\D/g,'');
+            if(!d) return '';
+            if(d.startsWith('55') && d.length >= 12) return d;
+            if(d.length === 11) return '55' + d;
+            return d;
+        }
+        function formatPhoneBR(digits){
+            let v = String(digits||'').replace(/\D/g,'');
+            if(!v) return '';
+            if(v.length > 11) v = v.slice(-11);
+            if(v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            if(v.length > 5) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            if(v.length > 2) return v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            return v.replace(/^(\d*)/, '($1');
+        }
+
+function maskPhone(input) {
+            let digits = stripDDI55Digits(input.value);
+            let v = String(digits||'').replace(/\D/g,'');
+            if(v.length > 11) v = v.slice(0, 11);
+            if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            else if(v.length > 5) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            else if(v.length > 2) v = v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            else v = v.replace(/^(\d*)/, '($1');
+            input.value = v;
+        }
         function mascaraMoeda(i) { let v = i.value.replace(/\D/g,''); v = (v/100).toFixed(2) + ''; v = v.replace('.', ','); v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,"); v = v.replace(/(\d)(\d{3}),/g, "$1.$2,"); i.value = 'R$ ' + v; }
-        function productChanged() { const pid = document.getElementById('modal-product').value; const priceInput = document.getElementById('modal-price'); const prod = allProducts.find(p => p.id === pid); if (prod) { priceInput.value = prod.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}); } }
-        async function editClient(id){ const c=allClients.find(x=>x.id===id); if(!c)return; document.getElementById('modal-client-id').value=c.id; document.getElementById('modal-name').value=c.name; document.getElementById('modal-due').value=c.due_day; const wppInput = document.getElementById('modal-whatsapp'); wppInput.value = c.whatsapp; maskPhone(wppInput); document.getElementById('modal-product').value=c.product_id; let pVal = c.agreed_price || (c.products ? c.products.price : 0); document.getElementById('modal-price').value = pVal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}); document.getElementById('modal-status').value=c.active; document.getElementById('history-section').classList.remove('hidden'); renderHistoryList(id); document.getElementById('client-modal').classList.remove('hidden'); }
-        async function saveClient(){ const id=document.getElementById('modal-client-id').value; let priceRaw = document.getElementById('modal-price').value.replace(/[^\d,]/g, '').replace(',', '.'); let agreed_price = priceRaw ? parseFloat(priceRaw) : null; 
-            let dueDay = parseInt(document.getElementById('modal-due').value); if (isNaN(dueDay)) dueDay = 0; 
-            const d={ name:document.getElementById('modal-name').value, due_day: dueDay, whatsapp:document.getElementById('modal-whatsapp').value, product_id:document.getElementById('modal-product').value||null, agreed_price: agreed_price, active:document.getElementById('modal-status').value==='true' }; if(id) { await sb.from('clients').update(d).eq('id',id); logAction('Editar Cliente', d.name); } else { await sb.from('clients').insert([d]); logAction('Novo Cliente', d.name); } closeModal(); loadAllData(); }
+        
+        const MAX_PRODUCT_SLOTS = 4;
+
+        function getClientProductIds(c){
+            const ids = [];
+            try {
+                const a = c?.product_id;
+                const b = c?.product_id_2;
+                const d = c?.product_id_3;
+                const e = c?.product_id_4;
+                [a,b,d,e].forEach(x=>{ if(x) ids.push(x); });
+            } catch(e){}
+            return ids;
+        }
+
+        function _productOptionsHtml(){
+            return '<option value="">Produto</option>' + (allProducts||[]).map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+        }
+
+        function _setCurrencyInput(el, value){
+            try{
+                if(value===null || value===undefined || value===''){ el.value=''; return; }
+                const n = Number(value);
+                if(!Number.isFinite(n)){ el.value=''; return; }
+                el.value = n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            }catch(e){ el.value=''; }
+        }
+
+        function _parseCurrencyInput(el){
+            try{
+                const raw = String(el.value||'').replace(/[^\d,]/g,'').replace(',', '.');
+                if(!raw) return null;
+                const n = parseFloat(raw);
+                return Number.isFinite(n) ? n : null;
+            }catch(e){ return null; }
+        }
+
+        function _createProductRow(productId='', price=null){
+            const wrap = document.createElement('div');
+            wrap.setAttribute('data-role','product-row');
+            wrap.className = 'flex gap-2 items-stretch';
+
+            const sel = document.createElement('select');
+            sel.setAttribute('data-role','product-select');
+            sel.className = 'w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white';
+            sel.innerHTML = _productOptionsHtml();
+            sel.value = productId || '';
+
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.setAttribute('data-role','price-input');
+            inp.placeholder = 'R$ 0,00';
+            inp.className = 'w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400';
+            inp.oninput = function(){ mascaraMoeda(this); };
+
+            _setCurrencyInput(inp, price);
+
+            sel.onchange = function(){
+                const pid = sel.value;
+                const prod = (allProducts||[]).find(p => p.id === pid);
+                // Só autocompleta se vazio
+                if(prod && (!inp.value || inp.value === 'R$ 0,00')) {
+                    _setCurrencyInput(inp, prod.price);
+                }
+            };
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'px-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 hover:bg-red-500/20';
+            btn.innerHTML = '<i class="fas fa-trash"></i>';
+            btn.onclick = function(ev){
+                ev.preventDefault(); ev.stopPropagation();
+                const container = document.getElementById('modal-products-container');
+                if(!container) return;
+                if(container.querySelectorAll('[data-role="product-row"]').length <= 1){
+                    // mantém pelo menos 1
+                    sel.value = '';
+                    inp.value = '';
+                    return;
+                }
+                wrap.remove();
+            };
+
+            wrap.appendChild(sel);
+            wrap.appendChild(inp);
+            wrap.appendChild(btn);
+            return wrap;
+        }
+
+        function _resetProductSlots(){
+            const container = document.getElementById('modal-products-container');
+            if(container) container.innerHTML = '';
+        }
+
+        function addProductSlot(prefill){
+            const container = document.getElementById('modal-products-container');
+            if(!container) return;
+            const count = container.querySelectorAll('[data-role="product-row"]').length;
+            if(count >= MAX_PRODUCT_SLOTS){
+                alert('Limite de 4 produtos por cliente.');
+                return;
+            }
+            const pid = prefill?.product_id || '';
+            const price = (prefill && prefill.agreed_price!=null) ? Number(prefill.agreed_price) : null;
+            container.appendChild(_createProductRow(pid, price));
+        }
+
+        function _renderProductSlotsFromClient(c){
+            _resetProductSlots();
+            const container = document.getElementById('modal-products-container');
+            if(!container) return;
+
+            const slots = [];
+            const push = (pid, price) => { if(pid) slots.push({product_id: pid, agreed_price: price}); };
+            try{
+                push(c?.product_id, c?.agreed_price);
+                push(c?.product_id_2, c?.agreed_price_2);
+                push(c?.product_id_3, c?.agreed_price_3);
+                push(c?.product_id_4, c?.agreed_price_4);
+            }catch(e){}
+
+            if(!slots.length) slots.push({product_id:'', agreed_price:null});
+
+            slots.slice(0, MAX_PRODUCT_SLOTS).forEach(s => addProductSlot(s));
+            // garante options atualizadas
+            updateProductUI();
+        }
+
+        async function editClient(id){
+            const c=allClients.find(x=>x.id===id);
+            if(!c)return;
+
+            document.getElementById('modal-client-id').value=c.id;
+            document.getElementById('modal-name').value=c.name;
+            document.getElementById('modal-due').value=c.due_day;
+
+            const wppInput = document.getElementById('modal-whatsapp');
+            wppInput.value = stripDDI55Digits(c.whatsapp || '');
+            maskPhone(wppInput);
+
+            document.getElementById('modal-status').value = String(c.active) === 'true' ? 'true' : (c.active ? 'true' : 'false');
+
+            _renderProductSlotsFromClient(c);
+
+            document.getElementById('history-section').classList.remove('hidden');
+            renderHistoryList(id);
+            document.getElementById('client-modal').classList.remove('hidden');
+        }
+
+        async function saveClient(){
+            const id=document.getElementById('modal-client-id').value;
+
+            let dueDay = parseInt(document.getElementById('modal-due').value);
+            if (isNaN(dueDay)) dueDay = 0;
+
+            const container = document.getElementById('modal-products-container');
+            const rows = container ? Array.from(container.querySelectorAll('[data-role="product-row"]')) : [];
+
+            const slots = rows.map(r=>{
+                const sel = r.querySelector('select[data-role="product-select"]');
+                const inp = r.querySelector('input[data-role="price-input"]');
+                const pid = sel ? sel.value : '';
+                const price = inp ? _parseCurrencyInput(inp) : null;
+                return { product_id: pid || null, agreed_price: price };
+            }).filter(s=>s.product_id);
+
+            const d = {
+                name:document.getElementById('modal-name').value,
+                due_day: dueDay,
+                whatsapp: normalizeWhatsAppForDB(document.getElementById('modal-whatsapp').value),
+                active: document.getElementById('modal-status').value==='true'
+            };
+
+            // zera todos
+            d.product_id = null; d.agreed_price = null;
+            d.product_id_2 = null; d.agreed_price_2 = null;
+            d.product_id_3 = null; d.agreed_price_3 = null;
+            d.product_id_4 = null; d.agreed_price_4 = null;
+
+            // preenche na ordem
+            const cols = [
+                ['product_id','agreed_price'],
+                ['product_id_2','agreed_price_2'],
+                ['product_id_3','agreed_price_3'],
+                ['product_id_4','agreed_price_4'],
+            ];
+
+            slots.slice(0, MAX_PRODUCT_SLOTS).forEach((s, idx)=>{
+                const [cPid, cPrice] = cols[idx];
+                d[cPid] = s.product_id;
+                d[cPrice] = (s.agreed_price!=null ? s.agreed_price : null);
+            });
+
+            try {
+                if(id) {
+                    const { error } = await sb.from('clients').update(d).eq('id',id);
+                    if(error) throw error;
+                    logAction('Editar Cliente', d.name);
+                } else {
+                    const { error } = await sb.from('clients').insert([d]);
+                    if(error) throw error;
+                    logAction('Novo Cliente', d.name);
+                }
+                closeModal();
+                loadAllData();
+            } catch(e){
+                alert("Erro ao salvar! Verifique se as colunas product_id_2..4 e agreed_price_2..4 existem no Supabase.");
+            }
+        }
+
         async function deleteClient(id, name){ if(confirm('Excluir?')) { try { await sb.from('payment_history').delete().eq('client_id',id); await sb.from('clients').delete().eq('id',id); logAction('Excluir Cliente', name); loadAllData(); } catch(e){ alert("Erro ao excluir"); } } }
-        function renderHistoryList(cid){ const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); const list = document.getElementById('history-list'); if(list) list.innerHTML=h.map(i=> { const isPending = i.status === 'pending'; const approveBtn = isPending ? `<button onclick="forceApprove('${i.id}','${cid}')" title="Forçar Aprovação" class="text-emerald-400 hover:text-emerald-200 mr-2"><i class="fas fa-check-circle"></i></button>` : ''; return `<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')} ${isPending ? '(⏳)' : ''}</span><div>${approveBtn}<span class="${isPending ? 'text-yellow-400' : 'text-emerald-400'} font-bold mr-2">${formatCurrency(i.amount)}</span> <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-red-200">x</button></div></div>`; }).join(''); }
+        function renderHistoryList(cid){ const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); const list = document.getElementById('history-list'); if(list) list.innerHTML=h.map(i=> { const isPending = i.status === 'pending'; const approveBtn = isPending ? `<button onclick="forceApprove('${i.id}','${cid}')" title="Forçar Aprovação" class="text-emerald-400 hover:text-emerald-200 mr-2"><i class="fas fa-check-circle"></i></button>` : ''; return `<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')} ${isPending ? '(⏳)' : ''}</span><div>${approveBtn}<span class="${isPending ? 'text-yellow-400' : 'text-emerald-400'} font-bold mr-2">${formatCurrency(i.amount)}</span> <button onclick="event.stopPropagation(); deleteHistory('${i.id || ''}','${cid}','${String(i.payment_date||'')}','${i.amount}')" class="text-red-400 hover:text-red-200 px-2 py-1" title="Excluir lançamento"><i class="fas fa-times"></i></button></div></div>`; }).join(''); }
         async function forceApprove(hid, cid) { if(confirm("Confirmar que o cliente pagou manualmente?")) { await sb.from('payment_history').update({ status: 'approved' }).eq('id', hid); logAction('Aprovar Pagamento', 'ID: ' + hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); } }
-        function openHistoryForm(){ document.getElementById('history-form-container').classList.add('open'); document.getElementById('hist-date').value=new Date().toISOString().split('T')[0]; let rawVal = document.getElementById('modal-price').value; rawVal = rawVal.replace(/[^\d,]/g, '').replace(',', '.'); document.getElementById('hist-amount').value = rawVal; }
+        function openHistoryForm(){
+            document.getElementById('history-form-container').classList.add('open');
+            document.getElementById('hist-date').value=new Date().toISOString().split('T')[0];
+
+            // Prefill com o 1º produto (se houver)
+            let rawVal = '';
+            try{
+                const container = document.getElementById('modal-products-container');
+                const first = container ? container.querySelector('input[data-role="price-input"]') : null;
+                rawVal = first ? String(first.value||'') : '';
+            }catch(e){}
+            rawVal = rawVal.replace(/[^\d,]/g, '').replace(',', '.');
+            document.getElementById('hist-amount').value = rawVal;
+        }
         function closeHistoryForm(){ document.getElementById('history-form-container').classList.remove('open'); }
         async function saveHistory(){ const cid=document.getElementById('modal-client-id').value; const amount = document.getElementById('hist-amount').value; const date = document.getElementById('hist-date').value; if(!amount || !date) return alert("Preencha data e valor!"); const d={client_id:cid, amount: amount, payment_date: date +'T12:00:00Z', method:'manual', status: 'approved'}; await sb.from('payment_history').insert([d]); logAction('Novo Pagamento', `Cliente ID: ${cid} | Valor: ${amount}`); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); closeHistoryForm(); }
-        async function deleteHistory(hid,cid){ if(confirm('Apagar?')){ try { await sb.from('payment_history').delete().eq('id',hid); logAction('Excluir Pagamento', `ID: ${hid}`); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); } catch(e) { alert("Erro: Exclusão bloqueada por segurança (RLS)."); } } }
-        function renderReportTable() { const v = document.getElementById('report-filter-month').value; if(!v) return; const [y, m] = v.split('-'); const d = new Date(parseInt(y), parseInt(m)-1, 1); const f = new Date(d.getFullYear(), d.getMonth(), 1).toISOString(); const l = new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59).toISOString(); const fp = document.getElementById('report-filter-product').value; let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && c.product_id !== fp) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0)); let tot = 0; lst.forEach(c => { const sum = historyData.filter(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l && (x.status === 'approved' || !x.status)).reduce((acc, x) => acc + (Number(x.amount)||0), 0); tot += sum; }); const header = document.getElementById('report-header'); if(header) header.innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Dia</th><th class="sub-header text-emerald-300">Pago</th></tr>`; const body = document.getElementById('report-body'); if(body) body.innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0); const pending = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && h.status === 'pending'); const price = c.agreed_price || c.products?.price || 0; let statusColor = 'text-slate-700'; if(totalPaid >= price && price > 0) statusColor = 'text-emerald-400 font-bold bg-emerald-500/5'; else if(totalPaid > 0) statusColor = 'text-yellow-400 font-bold'; else if(pending) statusColor = 'text-blue-400 animate-pulse'; return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="editClient('${c.id}')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(price)}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">-</td><td class="${statusColor} text-[9px]">${totalPaid > 0 ? formatCurrency(totalPaid) : (pending ? '⏳' : '-')}</td></tr>`; }).join(''); }
+                async function deleteHistory(hid,cid,pdate,amount){
+            if(!confirm('Apagar?')) return;
+            try {
+                const hidNorm = String(hid||'').trim().toLowerCase();
+                const badId = (!hidNorm || hidNorm === 'null' || hidNorm === 'undefined');
+                let q = sb.from('payment_history').delete();
+
+                if(!badId){
+                    q = q.eq('id', hidNorm);
+                } else {
+                    // fallback robusto (caso algum registro antigo venha sem id):
+                    // remove por (client_id + intervalo do dia + amount)
+                    const dateStr = String(pdate || '').slice(0,10);
+                    const amt = Number(String(amount).replace(',', '.'));
+                    q = q.eq('client_id', cid);
+
+                    if(dateStr){
+                        const start = `${dateStr}T00:00:00.000Z`;
+                        const end   = `${dateStr}T23:59:59.999Z`;
+                        q = q.gte('payment_date', start).lte('payment_date', end);
+                    }
+                    if(Number.isFinite(amt)) q = q.eq('amount', amt);
+                }
+
+                const { error } = await q;
+                if(error){
+                    alert("Erro ao excluir lançamento: " + error.message);
+                    return;
+                }
+
+                logAction('Excluir Pagamento', `ID: ${hid || 'sem-id'}`);
+                await fetchFullHistory();
+                renderHistoryList(cid);
+                calculateDashboard();
+                renderReportTable();
+                updateNotificationBadge();
+                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
+                try {
+                    const badge = document.getElementById('notif-badge');
+                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
+                } catch(e) {}
+            } catch(e) {
+                alert("Erro ao excluir lançamento.");
+            }
+        }
+        function renderReportTable() { const v = document.getElementById('report-filter-month').value; if(!v) return; const [y, m] = v.split('-'); const d = new Date(parseInt(y), parseInt(m)-1, 1); const f = new Date(d.getFullYear(), d.getMonth(), 1).toISOString(); const l = new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59).toISOString(); const fp = document.getElementById('report-filter-product').value; let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && !getClientProductIds(c).includes(fp)) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0)); let tot = 0; lst.forEach(c => { const sum = historyData.filter(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l && (x.status === 'approved' || !x.status)).reduce((acc, x) => acc + (Number(x.amount)||0), 0); tot += sum; }); const header = document.getElementById('report-header'); if(header) header.innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Dia</th><th class="sub-header text-emerald-300">Pago</th></tr>`; const body = document.getElementById('report-body'); if(body) body.innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0); const pending = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && h.status === 'pending'); const price = c.agreed_price || c.products?.price || 0; let statusColor = 'text-slate-700'; if(totalPaid >= price && price > 0) statusColor = 'text-emerald-400 font-bold bg-emerald-500/5'; else if(totalPaid > 0) statusColor = 'text-yellow-400 font-bold'; else if(pending) statusColor = 'text-blue-400 animate-pulse'; return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="event.stopPropagation(); editClient(\'${c.id}\')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(price)}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">-</td><td class="${statusColor} text-[9px]">${totalPaid > 0 ? formatCurrency(totalPaid) : (pending ? '⏳' : '-')}</td></tr>`; }).join(''); }
         function openProductModal() { document.getElementById('prod-id').value=''; document.getElementById('prod-name').value=''; document.getElementById('prod-price').value=''; document.getElementById('product-modal').classList.remove('hidden'); }
         async function saveProduct(){ const id=document.getElementById('prod-id').value; const d={name:document.getElementById('prod-name').value, price:document.getElementById('prod-price').value}; if(!d.name)return; if(id) { await sb.from('products').update(d).eq('id',id); logAction('Editar Produto', d.name); } else { await sb.from('products').insert([d]); logAction('Novo Produto', d.name); } document.getElementById('product-modal').classList.add('hidden'); await fetchProducts(); calculateDashboard(); }
         function editProduct(id){ const p=allProducts.find(x=>x.id===id); if(!p)return; document.getElementById('prod-id').value=p.id; document.getElementById('prod-name').value=p.name; document.getElementById('prod-price').value=p.price; document.getElementById('product-modal').classList.remove('hidden'); }
@@ -697,16 +1049,30 @@ if(error) {
             setTxt('stat-total-clients', total);
             setTxt('stat-active-clients', active);
             setTxt('stat-inactive-clients', inactive);
+
+            // Contagem de planos considerando múltiplos produtos por cliente (até 4 colunas)
             const planCounts = {};
-            allClients.filter(c => c.active).forEach(c => {
-                const pName = c.products?.name || 'Sem Plano';
-                planCounts[pName] = (planCounts[pName] || 0) + 1;
+            (allClients || []).filter(c => c.active).forEach(c => {
+                const ids = getClientProductIds(c);
+                if(!ids.length){
+                    planCounts['Sem Plano'] = (planCounts['Sem Plano'] || 0) + 1;
+                    return;
+                }
+                ids.forEach(pid => {
+                    const p = (allProducts || []).find(x => x.id === pid);
+                    const pName = p?.name || 'Sem Plano';
+                    planCounts[pName] = (planCounts[pName] || 0) + 1;
+                });
             });
-            let plansHtml = '';
-            for (const [name, count] of Object.entries(planCounts)) {
-                plansHtml += `<span class="bg-slate-800 px-2 py-1 rounded border border-slate-700">${name}: <b class="text-white">${count}</b></span>`;
-            }
-            const stats = document.getElementById('stats-by-plan'); if(stats) stats.innerHTML = plansHtml;
+
+            let pills = '';
+            Object.keys(planCounts).sort((a,b)=>planCounts[b]-planCounts[a]).forEach((k, idx) => {
+                const count = planCounts[k];
+                pills += `<span class="text-[10px] bg-slate-800 border border-slate-700 px-3 py-1 rounded-xl">${k}: <b>${count}</b></span>`;
+            });
+
+            const cont = document.getElementById('client-stats-container');
+            if(cont) cont.innerHTML = pills || `<span class="text-[10px] text-slate-500">Sem dados</span>`;
         }
 // ===============================
 // CHAT IA (Assistente BoxPower)
