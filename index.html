@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BoxPower V25.1 - Gestão Total</title>
+    <title>BoxPower Hub V25.22</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&display=swap');
@@ -21,48 +23,25 @@
         ::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 4px; border: 2px solid #0f172a; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
+        
+        /* Correção para Select no PC */
+        select { background-color: #0f172a; color: white; }
+        select option { background-color: #1e293b; color: white; }
+
+        /* Tabela Relatórios Power */
         .report-container { overflow-x: auto; position: relative; max-width: 100vw; border-radius: 0 0 1rem 1rem; }
         .report-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        .report-table th, .report-table td { padding: 10px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.02); white-space: nowrap; }
+        .report-table th, .report-table td { padding: 10px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
         .sticky-col { position: sticky; left: 0; z-index: 10; background: #1e293b; border-right: 2px solid rgba(255,255,255,0.1); min-width: 140px; max-width: 140px; text-align: left !important; font-weight: bold; }
         th.sticky-col { z-index: 20; background: #0f172a; }
-        .sub-header { font-size: 0.65rem; color: #64748b; font-weight: normal; background: rgba(15, 23, 42, 0.8); }
-        .report-table th { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; }
-        .report-table td { font-size: 0.8rem; }
-        #chat-widget { position: fixed; bottom: 80px; right: 20px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; pointer-events: none; }
-        #chat-widget > * { pointer-events: auto; }
-        #chat-window { width: 320px; height: 450px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); margin-bottom: 10px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #chat-messages { flex: 1; overflow-y: auto; padding: 15px; space-y: 10px; font-size: 0.8rem; scroll-behavior: smooth; }
-        .msg-user { align-self: flex-end; background: #2563eb; color: white; padding: 10px 14px; border-radius: 12px 12px 0 12px; max-width: 85%; margin-left: auto; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .msg-bot { align-self: flex-start; background: #334155; color: #e2e8f0; padding: 10px 14px; border-radius: 12px 12px 12px 0; max-width: 90%; margin-right: auto; margin-bottom: 8px; border: 1px solid #475569; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 6px; }
-        .chat-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-        .chat-btn { background: #0f172a; border: 1px solid #475569; color: #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; items-center; gap: 6px; }
-        .chat-btn:hover { background: #334155; border-color: #64748b; color: white; }
-        .chat-btn-success { background: #064e3b; border-color: #10b981; color: #6ee7b7; }
-        .chat-btn-danger { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
-        select option { background-color: #0f172a; color: #e2e8f0; }
-        #history-form-container { transition: all 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
-        #history-form-container.open { max-height: 200px; opacity: 1; margin-bottom: 1rem; }
+        .report-table th { font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; background: #0f172a; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .report-table td { font-size: 0.75rem; }
+
         #notification-area { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-card { background: rgba(6, 78, 59, 0.95); backdrop-filter: blur(8px); border: 1px solid #34d399; color: white; padding: 16px; rounded: 12px; width: 300px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); pointer-events: auto; animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 12px; }
-        .toast-card.fade-out { opacity: 0; transform: translateY(-20px); transition: all 0.5s; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @media (max-width: 640px) { #notification-area { right: 0; left: 0; top: 10px; align-items: center; } .toast-card { width: 90%; max-width: 350px; } }
-        .notif-btn { position: relative; }
         .notif-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 9px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; opacity: 0; transition: opacity 0.3s; }
         .notif-badge.visible { opacity: 1; }
         #notif-panel { position: fixed; top: 70px; right: 10px; width: 300px; max-height: 350px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden; animation: slideDown 0.2s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .notif-header { padding: 12px; background: #0f172a; border-bottom: 1px solid #334155; font-size: 11px; font-weight: bold; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; }
-        .notif-list { overflow-y: auto; max-height: 300px; }
-        .notif-item { padding: 12px; border-bottom: 1px solid #334155; display: flex; gap: 10px; transition: background 0.2s; align-items: center; }
-        .notif-item:hover { background: #334155; }
-        .notif-icon { width: 32px; height: 32px; background: rgba(16, 185, 129, 0.2); color: #34d399; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; shrink: 0; }
         .log-entry { font-family: 'Fira Code', monospace; font-size: 10px; border-left: 2px solid #475569; padding-left: 8px; margin-bottom: 8px; }
-        .log-user { font-weight: bold; color: #fbbf24; }
-        .log-action { color: #94a3b8; }
-        .log-date { color: #64748b; font-size: 8px; }
     </style>
 </head>
 <body>
@@ -74,10 +53,10 @@
             <div class="flex justify-center mb-6">
                 <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" class="w-32 h-32 object-contain drop-shadow-2xl rounded-2xl">
             </div>
-            <h1 class="text-2xl font-bold mb-2 text-white">BoxPower</h1>
+            <h1 class="text-2xl font-bold mb-2 text-white">BoxPower Hub</h1>
             <p class="text-slate-400 text-sm mb-6">Acesso Administrativo</p>
             <input type="password" id="pin-input" maxlength="4" placeholder="••••" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 text-center text-2xl tracking-widest focus:outline-none focus:border-blue-500 transition-all mb-4 text-white">
-            <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg">ENTRAR</button>
+            <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg mt-4">ENTRAR</button>
         </div>
     </div>
 
@@ -85,24 +64,28 @@
         <header class="p-4 flex justify-between items-center bg-slate-900/90 sticky top-0 z-20 backdrop-blur-sm border-b border-slate-800 shrink-0">
             <div class="flex flex-col">
                 <h2 id="header-greeting" class="text-emerald-400 text-[10px] font-bold uppercase tracking-widest">Bem-vindo</h2>
-                <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white drop-shadow-lg leading-tight">BoxPower</h1>
-                <span class="text-[9px] text-slate-500 font-mono">v25.1</span>
+                <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white drop-shadow-lg leading-tight">BoxPower Hub</h1>
+                <span class="text-[9px] text-slate-500 font-mono">v25.22</span>
             </div>
             <div class="flex gap-2">
-                <button onclick="openLogsModal()" class="w-8 h-8 bg-slate-800 text-yellow-500 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white transition-all shadow-lg" title="Ver Logs"><i class="fas fa-clipboard-list text-xs"></i></button>
-                <button onclick="toggleNotifPanel()" class="notif-btn w-8 h-8 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white transition-all shadow-lg"><i class="fas fa-bell text-xs"></i><span id="notif-badge" class="notif-badge">0</span></button>
-                <button onclick="refreshApp()" class="w-8 h-8 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-lg flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all active:scale-95 shadow-lg"><i id="refresh-icon" class="fas fa-sync-alt text-xs"></i></button>
-                <button onclick="window.location.reload()" class="w-8 h-8 bg-red-500/10 text-red-500 border border-red-500/30 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-95 shadow-lg"><i class="fas fa-power-off text-xs"></i></button>
+                <button onclick="openLogsModal()" class="w-8 h-8 bg-slate-800 text-yellow-500 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white" title="Logs"><i class="fas fa-clipboard-list text-xs"></i></button>
+                <button onclick="toggleNotifPanel()" class="notif-btn w-8 h-8 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white"><i class="fas fa-bell text-xs"></i><span id="notif-badge" class="notif-badge">0</span></button>
+                <button onclick="refreshApp()" class="w-8 h-8 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-lg flex items-center justify-center hover:bg-emerald-500 hover:text-white"><i id="refresh-icon" class="fas fa-sync-alt text-xs"></i></button>
+                <button onclick="window.location.reload()" class="w-8 h-8 bg-red-500/10 text-red-500 border border-red-500/30 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white"><i class="fas fa-power-off text-xs"></i></button>
             </div>
         </header>
 
-        <div id="notif-panel"><div class="notif-header"><span>PAGAMENTOS HOJE</span><button onclick="toggleNotifPanel()" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button></div><div id="notif-list" class="notif-list bg-slate-900/50 text-xs p-2"></div></div>
+        <div id="notif-panel"><div class="notif-header p-3 bg-slate-900 border-b border-slate-700 font-bold text-[10px] text-slate-400 flex justify-between"><span>RECEBIMENTOS HOJE</span><button onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button></div><div id="notif-list" class="notif-list bg-slate-900/50 text-xs p-2 overflow-y-auto max-h-64"></div></div>
 
         <div id="connection-status" class="hidden bg-yellow-500/20 text-yellow-200 text-xs text-center p-2 mb-2 mx-4 rounded-lg border border-yellow-500/50">⏳ Conectando...</div>
         <div id="error-alert" class="hidden bg-red-900/80 text-red-200 text-xs p-4 mb-2 mx-4 rounded-lg border border-red-500 shadow-xl font-mono break-all"></div>
 
         <div id="tab-home" class="tab-content active p-4 space-y-4">
-            <div class="glass p-2 rounded-xl flex items-center gap-3 border border-slate-700 bg-slate-800"><i class="fas fa-calendar-alt text-emerald-500 ml-2"></i><select id="dashboard-filter-month" onchange="calculateDashboard()" class="w-full bg-transparent text-sm font-bold text-white outline-none"></select></div>
+            <div class="glass p-2 rounded-xl flex items-center gap-3 border border-slate-700 bg-slate-800">
+                <i class="fas fa-calendar-alt text-emerald-500 ml-2"></i>
+                <select id="dashboard-filter-month" onchange="calculateDashboard()" class="w-full bg-slate-800 text-sm font-bold text-white outline-none border-none focus:ring-0"></select>
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <div class="glass p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-l-4 border-l-emerald-500 relative group">
                     <div class="flex justify-between items-start"><p class="text-slate-400 text-[10px] font-bold uppercase">Receita Real</p><button onclick="setMonthlyGoal()" class="text-emerald-500/50 hover:text-white transition-colors"><i class="fas fa-pencil-alt text-xs"></i></button></div>
@@ -114,8 +97,8 @@
             
             <div class="grid grid-cols-2 gap-3">
                 <div class="glass p-3 rounded-xl border border-red-500/30 bg-red-900/10">
-                    <p class="text-red-400 text-[9px] uppercase font-bold"><i class="fas fa-clock mr-1"></i> Pendente (Mês)</p>
-                    <h4 id="stat-pending-money" class="text-lg font-bold text-white mt-1">R$ 0,00</h4>
+                    <p class="text-red-400 text-[9px] uppercase font-bold"><i class="fas fa-clock mr-1"></i> Pendente (Total)</p>
+                    <h4 id="stat-pending-total" class="text-lg font-bold text-white mt-1">R$ 0,00</h4>
                 </div>
                 <div class="glass p-3 rounded-xl border border-yellow-500/30 bg-yellow-900/10">
                     <p class="text-yellow-400 text-[9px] uppercase font-bold"><i class="fas fa-coins mr-1"></i> Lucro Líquido</p>
@@ -134,7 +117,7 @@
                 <h3 class="text-xs font-bold text-red-400 uppercase">Nova Despesa</h3>
                 <input type="text" id="exp-desc" placeholder="Ex: Energia, Internet..." class="w-full bg-slate-900 rounded-lg p-3 text-sm border border-slate-700 text-white focus:border-red-500 outline-none">
                 <div class="flex gap-2">
-                    <input type="text" id="exp-amount" oninput="mascaraMoeda(this)" placeholder="R$ 0,00" class="w-1/2 bg-slate-900 rounded-lg p-3 text-sm border border-slate-700 text-white font-bold tracking-wide">
+                    <input type="text" id="exp-amount" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/2 bg-slate-900 rounded-lg p-3 text-sm border border-slate-700 text-white font-bold tracking-wide">
                     <input type="date" id="exp-date" class="w-1/2 bg-slate-900 rounded-lg p-3 text-sm border border-slate-700 text-white">
                 </div>
                 <div class="flex gap-2">
@@ -156,12 +139,29 @@
         </div>
 
         <div id="tab-clients" class="tab-content p-4 space-y-4">
-            <div id="client-stats-container" class="glass p-3 rounded-xl mb-2 flex flex-col gap-2"><div class="grid grid-cols-3 gap-2 text-center border-b border-slate-700 pb-2"><div><span class="block text-[9px] text-slate-400 uppercase">Total</span><span id="stat-total-clients" class="text-white font-bold">0</span></div><div><span class="block text-[9px] text-slate-400 uppercase">Ativos</span><span id="stat-active-clients" class="text-emerald-400 font-bold">0</span></div><div><span class="block text-[9px] text-slate-400 uppercase">Inativos</span><span id="stat-inactive-clients" class="text-red-400 font-bold">0</span></div></div><div id="stats-by-plan" class="flex flex-wrap gap-2 justify-center text-[9px] text-slate-400"></div><select id="client-filter-plan" onchange="filterClients()" class="w-full bg-slate-900 border border-slate-600 text-xs text-white rounded-lg py-1.5 px-2 outline-none mt-1"><option value="all">Todos os Planos</option></select></div>
-            <div class="flex gap-2"><div class="relative flex-1"><i class="fas fa-search absolute left-4 top-3.5 text-slate-500"></i><input type="text" id="search-client" oninput="filterClients()" placeholder="Buscar..." class="w-full bg-slate-800 rounded-xl py-3 pl-11 pr-4 outline-none border border-slate-700 focus:border-blue-500 text-white"></div><button id="btn-filter-inactive" onclick="toggleInactiveFilter()" class="bg-slate-800 w-12 rounded-xl text-slate-400 border border-slate-700 shadow-lg transition-colors" title="Ver Inativos"><i class="fas fa-user-slash"></i></button><button onclick="openModal()" class="bg-blue-600 w-12 rounded-xl text-white shadow-lg"><i class="fas fa-plus"></i></button></div>
+            <div id="client-stats-container" class="glass p-3 rounded-xl mb-2 flex flex-col gap-2"></div>
+            <div class="flex gap-2">
+                <div class="relative flex-1"><i class="fas fa-search absolute left-4 top-3.5 text-slate-500"></i><input type="text" id="search-client" oninput="filterClients()" placeholder="Buscar nome ou celular..." class="w-full bg-slate-800 rounded-xl py-3 pl-11 pr-4 outline-none border border-slate-700 focus:border-blue-500 text-white"></div>
+                <button id="btn-filter-inactive" onclick="toggleInactiveFilter()" class="bg-slate-800 w-12 rounded-xl text-slate-400 border border-slate-700 shadow-lg transition-colors" title="Ver Inativos"><i class="fas fa-user-slash"></i></button>
+                <button onclick="openModal()" class="bg-blue-600 w-12 rounded-xl text-white shadow-lg"><i class="fas fa-plus"></i></button>
+            </div>
             <div id="clients-list" class="space-y-3 pb-20"></div>
         </div>
 
-        <div id="tab-reports" class="tab-content p-4"><div class="glass rounded-2xl overflow-hidden border border-slate-700"><div class="p-4 border-b border-slate-700 bg-slate-800/50 flex gap-2"><select id="report-filter-month" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"></select><select id="report-filter-product" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"><option value="all">Planos: Todos</option></select></div><div class="report-container"><table class="report-table w-full"><thead id="report-header"></thead><tbody id="report-body"></tbody></table></div></div></div>
+        <div id="tab-reports" class="tab-content p-4">
+            <div class="glass rounded-2xl overflow-hidden border border-slate-700">
+                <div class="p-4 border-b border-slate-700 bg-slate-800/50 flex gap-2">
+                    <select id="report-filter-month" onchange="renderReportTable()" class="w-1/2 bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"></select>
+                    <select id="report-filter-product" onchange="renderReportTable()" class="w-1/2 bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"><option value="all">Planos: Todos</option></select>
+                </div>
+                <div class="report-container">
+                    <table class="report-table w-full">
+                        <thead id="report-header"></thead>
+                        <tbody id="report-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <div id="tab-config" class="tab-content p-4"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-300">Planos</h3><button onclick="openProductModal()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-500"><i class="fas fa-plus mr-1"></i> Novo</button></div><div id="products-list" class="space-y-2 pb-20"></div></div>
 
@@ -173,11 +173,80 @@
             <button onclick="showTab('tab-config')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-config"><i class="fas fa-tags text-xl mb-1"></i><span class="text-[10px]">Planos</span></button>
         </nav>
 
-        <div id="chat-widget"><div id="chat-window"><div class="bg-slate-900 p-3 border-b border-slate-700 flex justify-between items-center shrink-0"><h4 class="text-xs font-bold text-emerald-400 flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> BoxPower AI</h4><button onclick="toggleChat()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div><div id="chat-messages" class="bg-slate-800/50"><div class="msg-bot">👋 <b>Olá!</b><br>Tente: "Lançar Sandra, hoje, 39,90" ou "Novo, Pedro, pago"</div></div><div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2 shrink-0"><input type="text" id="chat-input" placeholder="Digite..." class="flex-1 bg-slate-800 rounded-lg px-3 py-2 text-xs text-white border border-slate-700 outline-none focus:border-emerald-500 transition-all" onkeypress="handleChatKey(event)"><button onclick="sendChat()" class="bg-emerald-600 w-10 h-8 rounded-lg text-white hover:bg-emerald-500 shadow-lg active:scale-95"><i class="fas fa-paper-plane text-xs"></i></button></div></div><button onclick="toggleChat()" class="bg-blue-600 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-white hover:bg-blue-500 transition-all active:scale-90 border-2 border-blue-400 z-50"><i class="fas fa-comment-dots text-2xl"></i></button></div>
+        <div id="logs-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 shadow-2xl h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-white">Auditoria</h3><button onclick="document.getElementById('logs-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div><div id="logs-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></div></div></div>
 
-        <div id="logs-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 shadow-2xl h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-white">Auditoria (30 dias)</h3><button onclick="document.getElementById('logs-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div><div id="logs-list" class="flex-1 overflow-y-auto space-y-2 pr-2"><p class="text-center text-slate-500 text-xs">Carregando logs...</p></div></div></div>
+        <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+                <h3 id="modal-title" class="text-xl font-bold mb-4">Cliente</h3>
+                <input type="hidden" id="modal-client-id">
+                <div class="space-y-3">
+                    <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                    <div class="flex gap-2">
+                        <input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
+                        <input type="text" id="modal-whatsapp" maxlength="15" oninput="maskPhone(this)" onkeyup="maskPhone(this)" placeholder="(DD) 9..." class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <select id="modal-product" onchange="productChanged(1)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                    </div>
 
-        <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-700 p-6 animate-slide-up max-h-[90vh] overflow-y-auto"><h3 id="modal-title" class="text-xl font-bold mb-4">Cliente</h3><input type="hidden" id="modal-client-id"><div class="space-y-3"><input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><div class="flex gap-2"><input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"><input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="WhatsApp" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div class="flex items-center justify-between"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Produto(s)</span><button type="button" onclick="addProductSlot()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Produto</button></div><div id="modal-products-container" class="space-y-2"></div><div class="flex gap-2"><select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select></div></div><div id="history-section" class="mt-6 border-t border-slate-700 pt-4 hidden"><div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Histórico</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Lançar</button></div><div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2"><input type="hidden" id="hist-id"><div class="flex gap-2 mb-2"><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="number" id="hist-amount" step="0.01" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div></div><div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar Pagamento</button></div></div><div id="history-list" class="bg-slate-800/50 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-700/50"></div></div><div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar</button></div></div></div>
+                    <div id="extra-product-2" class="hidden flex gap-2">
+                        <select id="modal-product-2" onchange="productChanged(2)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-2" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(2)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+
+                    <div id="extra-product-3" class="hidden flex gap-2">
+                        <select id="modal-product-3" onchange="productChanged(3)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-3" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(3)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+
+                    <div id="extra-product-4" class="hidden flex gap-2">
+                        <select id="modal-product-4" onchange="productChanged(4)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-4" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(4)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                    
+                    <button type="button" onclick="addNextProductSlot()" id="btn-add-prod" class="text-[10px] text-blue-400 hover:text-white underline w-full text-left">+ Adicionar outro produto</button>
+
+                    <div class="flex gap-2 mt-2">
+                        <select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white">
+                            <option value="true" class="text-green-400">Ativo</option>
+                            <option value="false" class="text-red-400">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-slate-700">
+                    <button id="btn-show-history" onclick="toggleHistorySection()" class="w-full bg-slate-800 text-slate-300 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-coins text-yellow-500"></i> Gerenciar Pagamentos
+                    </button>
+                </div>
+
+                <div id="history-section" class="mt-4 hidden bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                    <div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Pagamentos</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Novo</button></div>
+                    
+                    <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2" style="display:none;"> 
+                        <div class="flex gap-2 mb-2">
+                            <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div>
+                            <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="text" id="hist-amount" inputmode="decimal" onblur="formatInputCurrency(this)" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-[9px] text-slate-500 uppercase font-bold">Referente a qual produto?</label>
+                            <select id="hist-product" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></select>
+                        </div>
+                        <div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar</button></div>
+                    </div>
+                    
+                    <div id="history-list" class="bg-slate-900 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-800"></div>
+                </div>
+
+                <div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar Cliente</button></div>
+            </div>
+        </div>
+
         <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-700 p-6 shadow-2xl"><h3 id="product-modal-title" class="text-lg font-bold mb-4">Gerenciar Plano</h3><input type="hidden" id="prod-id"><div class="space-y-3"><div><label class="text-[10px] text-slate-500 uppercase font-bold">Nome do Plano</label><input type="text" id="prod-name" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white"></div><div><label class="text-[10px] text-slate-500 uppercase font-bold">Preço (R$)</label><input type="number" id="prod-price" step="0.01" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-bold text-emerald-400"></div></div><div class="flex gap-3 mt-6"><button onclick="document.getElementById('product-modal').classList.add('hidden')" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveProduct()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold">Salvar</button></div></div></div>
     </div>
 
@@ -185,29 +254,115 @@
         const SUPABASE_URL = "https://epwmoicgvuprzkcpxjoy.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
         
-        let sb = null, allClients = [], allProducts = [], historyData = [], allExpenses = [], isSystemReady = false, chatState = null;
-        let currentMonthGoal = 0;
-        let showInactiveOnly = false;
-        let globalPendingList = [];
-        let currentUser = "Desconhecido";
+        let sb = null, allClients = [], allProducts = [], historyData = [], allExpenses = [];
+        let currentMonthGoal = 0, showInactiveOnly = false, currentUser = "Desconhecido";
         const USERS = { "1234": "Túlio", "9999": "Cícero" };
 
-        const formatCurrency = (val) => {
-            if (val === undefined || val === null || isNaN(val)) return 'R$ 0,00';
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
-        };
-
+        const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
         const padId = (num) => String(num).padStart(2, '0');
+        const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+        
+        function formatInputCurrency(el) {
+            if(!el.value) return;
+            const val = parseMoneyBR(el.value);
+            if(val !== 0 && !isNaN(val)) el.value = val.toFixed(2).replace('.', ',');
+        }
 
-        function setTxt(id, val) { const el = document.getElementById(id); if(el) el.innerText = val; }
-        function showError(msg) { const errDiv = document.getElementById('error-alert'); const conn = document.getElementById('connection-status'); if(conn) conn.classList.add('hidden'); if(errDiv) { errDiv.innerText = `⚠️ ${msg}`; errDiv.classList.remove('hidden'); } console.error(msg); }
+        function parseMoneyBR(value) {
+            if (!value) return 0;
+            if (typeof value === 'number') return value;
+            let clean = value.replace(/[^\d,-]/g, '');
+            clean = clean.replace(',', '.');
+            return parseFloat(clean) || 0;
+        }
+
+        function getClientProductIds(c) {
+            const ids = [];
+            if(c.product_id) ids.push(c.product_id);
+            if(c.product_id_2) ids.push(c.product_id_2);
+            if(c.product_id_3) ids.push(c.product_id_3);
+            if(c.product_id_4) ids.push(c.product_id_4);
+            return ids;
+        }
+
+        // === FORMATAÇÃO DE TELEFONE (CORE) ===
+        function formatPhoneString(v) {
+            if (!v) return '';
+            v = v.replace(/\D/g, ''); 
+            
+            if (v.length > 11 && v.startsWith('55')) {
+                v = v.substring(2);
+            }
+
+            v = v.substring(0, 11);
+
+            if (v.length >= 3 && v[2] !== '9') {
+                v = v.substring(0, 2) + '9' + v.substring(2);
+                v = v.substring(0, 11); 
+            }
+
+            if (v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            if (v.length > 6) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            if (v.length > 2) return v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            
+            return v;
+        }
+
+        function maskPhone(el) { 
+            el.value = formatPhoneString(el.value);
+        }
+
+        // === UI HELPERS ===
+        function addNextProductSlot() {
+            if(document.getElementById('extra-product-2').classList.contains('hidden')) {
+                document.getElementById('extra-product-2').classList.remove('hidden');
+            } else if(document.getElementById('extra-product-3').classList.contains('hidden')) {
+                document.getElementById('extra-product-3').classList.remove('hidden');
+            } else if(document.getElementById('extra-product-4').classList.contains('hidden')) {
+                document.getElementById('extra-product-4').classList.remove('hidden');
+                document.getElementById('btn-add-prod').classList.add('hidden'); 
+            }
+        }
+
+        function removeProductSlot(n) {
+            document.getElementById(`extra-product-${n}`).classList.add('hidden');
+            document.getElementById(`modal-product-${n}`).value = '';
+            document.getElementById(`modal-price-${n}`).value = '';
+            document.getElementById('btn-add-prod').classList.remove('hidden');
+        }
+
+        function toggleHistorySection() {
+            const sec = document.getElementById('history-section');
+            sec.classList.toggle('hidden');
+        }
+
+        function showTab(id){ 
+            document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
+            document.querySelectorAll('.nav-item').forEach(n=>{
+                n.classList.remove('text-blue-500');
+                n.classList.add('text-slate-500');
+            }); 
+            
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            
+            const btn = document.querySelector(`button[data-tab="${id}"]`);
+            if(btn) {
+                btn.classList.remove('text-slate-500');
+                btn.classList.add('text-blue-500');
+            }
+            
+            if(id === 'tab-expenses') renderExpensesList(); 
+            if(id === 'tab-home') calculateDashboard(); 
+            if(id === 'tab-clients') filterClients();
+        }
 
         function performLogin() {
             const btn = document.getElementById('btn-login');
             if(btn) btn.innerText = "Verificando...";
             const pin = document.getElementById('pin-input').value;
             if(USERS[pin]) {
-                currentUser = USERS[pin]; 
+                currentUser = USERS[pin];
                 setTxt('header-greeting', `Olá, ${currentUser}`);
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').classList.remove('hidden');
@@ -223,15 +378,12 @@
             const btn = document.getElementById('btn-login');
             if(btn) btn.addEventListener('click', performLogin);
             const input = document.getElementById('pin-input');
-            if(input) input.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') performLogin();
-            });
+            if(input) input.addEventListener('keypress', (e) => { if(e.key === 'Enter') performLogin(); });
         });
 
         function initSystem() {
             if(window.supabase) {
                 sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                isSystemReady = true;
                 document.getElementById('connection-status').classList.add('hidden');
                 loadAllData();
                 ['payment_history', 'expenses', 'clients', 'products'].forEach(t => {
@@ -240,52 +392,26 @@
             }
         }
 
-        async function logAction(action, details) {
-            if(!sb) return;
-            try { await sb.from('system_logs').insert({ user_name: currentUser, action_type: action, details: details, created_at: new Date().toISOString() }); } catch(e) { console.warn("Log falhou", e); }
-        }
-
-        async function openLogsModal() {
-            document.getElementById('logs-modal').classList.remove('hidden');
-            const list = document.getElementById('logs-list');
-            list.innerHTML = '<p class="text-center text-slate-500 text-xs">Carregando...</p>';
-            try {
-                const date30DaysAgo = new Date(); date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
-                const { data, error } = await sb.from('system_logs').select('*').gte('created_at', date30DaysAgo.toISOString()).order('created_at', { ascending: false });
-                if(error) throw error;
-                if(!data || data.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 text-xs">Nenhum registro.</p>'; return; }
-                list.innerHTML = data.map(l => `<div class="log-entry"><span class="log-user">${l.user_name}</span> <span class="log-action">${l.action_type}</span><br><span class="text-white">${l.details}</span><br><span class="log-date">${new Date(l.created_at).toLocaleString('pt-BR')}</span></div>`).join('');
-            } catch (e) { list.innerHTML = `<p class="text-center text-red-400 text-xs">Erro ao carregar logs.</p>`; }
-        }
-
         async function refreshApp() {
-            const icon = document.getElementById('refresh-icon');
-            if(icon) icon.classList.add('fa-spin'); 
+            const i = document.getElementById('refresh-icon'); if(i) i.classList.add('fa-spin');
             await loadAllData();
-            if(icon) setTimeout(() => icon.classList.remove('fa-spin'), 1000); 
+            if(i) setTimeout(() => i.classList.remove('fa-spin'), 1000);
         }
 
         async function loadAllData() {
             try {
-                const p1 = fetchProducts().catch(e => console.error(e));
-                const p2 = fetchClients().catch(e => console.error(e));
-                const p3 = fetchFullHistory().catch(e => console.error(e));
-                const p4 = fetchExpenses().catch(e => console.error(e));
-                await Promise.all([p1, p2, p3, p4]);
-                const errDiv = document.getElementById('error-alert');
-                if(errDiv) errDiv.classList.add('hidden');
-                populateMonthFilter(); populateDashboardFilter(); 
-                await calculateDashboard(); 
+                await Promise.all([fetchProducts(), fetchClients(), fetchFullHistory(), fetchExpenses()]);
+                document.getElementById('error-alert').classList.add('hidden');
+                populateMonthFilter();
+                calculateDashboard();
                 renderReportTable();
-                updateNotificationBadge();
-                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
-                try {
-                    const badge = document.getElementById('notif-badge');
-                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
-                } catch(e) {}
                 updateClientStatsUI();
                 renderExpensesList();
-            } catch (error) { showError("Erro parcial: " + error.message); }
+            } catch (e) { 
+                console.error(e);
+                const errDiv = document.getElementById('error-alert');
+                if(errDiv) { errDiv.innerText = `⚠️ Erro parcial: ${e.message}`; errDiv.classList.remove('hidden'); }
+            }
         }
 
         async function fetchProducts() {
@@ -297,8 +423,8 @@
 
         async function fetchClients() {
             if(!sb) return;
-            let { data, error } = await sb.from('clients').select('*, products(*)').order('name');
-            if(error) { const f = await sb.from('clients').select('*').order('name'); if(f.error) throw f.error; data = f.data; }
+            let { data, error } = await sb.from('clients').select('*').order('name');
+            if(error) { console.warn(error); allClients = []; return; }
             allClients = data || [];
             renderClients(allClients);
             updateClientStatsUI();
@@ -316,1559 +442,603 @@
             allExpenses = data || [];
         }
 
+        function updateClientStatsUI() {
+            const el = document.getElementById('client-stats-container');
+            if(!el) return;
+            const total = allClients.length;
+            const active = allClients.filter(c => c.active).length;
+            
+            setTxt('stat-total-clients', total);
+            setTxt('stat-active-clients', active);
+            setTxt('stat-inactive-clients', total - active);
 
-        // --- NOTIFICAÇÕES (Pagamentos Hoje) ---
-        function toggleNotifPanel() {
-            const panel = document.getElementById('notif-panel');
-            if(!panel) return;
-            const isOpen = panel.style.display === 'flex';
-            panel.style.display = isOpen ? 'none' : 'flex';
-
-            // marcou como visualizado ao abrir
-            if(!isOpen) {
-                try {
-                    const today = new Date();
-                    const yyyy = today.getFullYear();
-                    const mm = String(today.getMonth() + 1).padStart(2, '0');
-                    const dd = String(today.getDate()).padStart(2, '0');
-                    const dayStr = `${yyyy}-${mm}-${dd}`;
-                    localStorage.setItem('bp_notif_seen_' + dayStr, '1');
-                } catch(e) {}
-                updateNotificationBadge();
-                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
-                try {
-                    const badge = document.getElementById('notif-badge');
-                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
-                } catch(e) {}
-            }
-        }
-
-        function updateNotificationBadge() {
-            try {
-                const badge = document.getElementById('notif-badge');
-                const list = document.getElementById('notif-list');
-                if(!badge || !list) return;
-
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const dd = String(today.getDate()).padStart(2, '0');
-                const dayStr = `${yyyy}-${mm}-${dd}`;
-
-                const todaysApproved = (historyData || []).filter(h => {
-                    if(!h || !h.payment_date) return false;
-                    const d = String(h.payment_date).slice(0, 10);
-                    const okStatus = (h.status === 'approved' || !h.status);
-                    return d === dayStr && okStatus;
-                });
-
-                const countRaw = todaysApproved.length;
-                let count = countRaw;
-                try {
-                    const seen = localStorage.getItem('bp_notif_seen_' + dayStr) === '1';
-                    if(seen) count = 0;
-                } catch(e) {}
-                badge.textContent = String(count);
-                badge.classList.toggle('visible', count > 0);
-
-                if(countRaw === 0) {
-                    list.innerHTML = `<div class="p-6 text-center text-slate-500">Nenhum pagamento hoje.</div>`;
-                    return;
+            const planCounts = {};
+            allClients.filter(c => c.active).forEach(c => {
+                const pids = getClientProductIds(c);
+                if(pids.length === 0) {
+                    planCounts['Sem Plano'] = (planCounts['Sem Plano'] || 0) + 1;
+                } else {
+                    pids.forEach(pid => {
+                        const p = allProducts.find(x => x.id === pid);
+                        const name = p ? p.name : 'Desconhecido';
+                        planCounts[name] = (planCounts[name] || 0) + 1;
+                    });
                 }
-
-                const items = todaysApproved
-                    .map(h => {
-                        const c = (allClients || []).find(x => x.id === h.client_id);
-                        const name = c?.name || 'Cliente';
-                        const val = formatCurrency(Number(h.amount) || 0);
-                        const time = (() => {
-                            try { return new Date(h.payment_date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
-                            catch(e){ return ''; }
-                        })();
-                        return `
-                            <div class="notif-item">
-                                <div class="notif-icon"><i class="fas fa-circle-check"></i></div>
-                                <div class="flex-1">
-                                    <div class="text-white font-bold text-xs truncate">${name}</div>
-                                    <div class="text-[10px] text-slate-400 font-mono">${val}${time ? ` • ${time}` : ''}</div>
-                                </div>
-                            </div>`;
-                    }).join('');
-
-                list.innerHTML = items;
-            } catch(e) {
-                // silencioso por regra do projeto
-            }
-        }
-
-        // Fecha painel de notificações ao clicar fora
-        document.addEventListener('click', (ev) => {
-            const panel = document.getElementById('notif-panel');
-            const btn = ev.target?.closest?.('.notif-btn');
-            if(!panel) return;
-            if(btn) return; // botão controla abrir/fechar
-            if(panel.style.display === 'flex' && !panel.contains(ev.target)) {
-                panel.style.display = 'none';
-            }
-        });
-
-        // --- CLIENTES (Contatos) ---
-        function renderClients(list) {
-            const wrap = document.getElementById('clients-list');
-            if(!wrap) return;
-
-            const term = (document.getElementById('search-client')?.value || '').toLowerCase().trim();
-            const plan = document.getElementById('client-filter-plan')?.value || 'all';
-
-            let filtered = (list || []).slice();
-
-            // toggle: mostrar apenas inativos (ou apenas ativos)
-            filtered = filtered.filter(c => showInactiveOnly ? !c.active : !!c.active);
-
-            if(plan !== 'all') {
-                filtered = filtered.filter(c => String(c.product_id || '') === String(plan));
-            }
-
-            if(term) {
-                filtered = filtered.filter(c => (c.name || '').toLowerCase().includes(term));
-            }
-
-            // ordena por dia venc (se tiver), depois por nome
-            filtered.sort((a,b) => {
-                const da = Number(a.due_day || 0);
-                const db = Number(b.due_day || 0);
-                if(da !== db) return da - db;
-                return String(a.name||'').localeCompare(String(b.name||''), 'pt-BR');
             });
 
-            const btnInactive = document.getElementById('btn-filter-inactive');
-            if(btnInactive) {
-                btnInactive.classList.toggle('text-red-300', showInactiveOnly);
-                btnInactive.classList.toggle('border-red-500/40', showInactiveOnly);
+            let html = '';
+            Object.keys(planCounts).sort((a,b) => planCounts[b] - planCounts[a]).forEach(name => {
+                html += `<span class="bg-slate-800 px-2 py-1 rounded border border-slate-700 text-[9px] whitespace-nowrap">${name}: <b class="text-white">${planCounts[name]}</b></span>`;
+            });
+            el.innerHTML = `<div class="flex flex-wrap gap-2 justify-center">${html || '<span class="text-slate-500 text-[9px]">Sem dados</span>'}</div>`;
+        }
+
+        async function calculateDashboard() {
+            const el = document.getElementById('dashboard-filter-month');
+            if(!el) return;
+            const v = el.value;
+            let t = new Date(); 
+            if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
+            
+            const startStr = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
+            const endStr = new Date(t.getFullYear(), t.getMonth()+1, 0, 23, 59, 59).toISOString();
+            const monthKey = v || t.toISOString().slice(0, 7);
+
+            try { const { data } = await sb.from('monthly_goals').select('target_amount').eq('month', monthKey).single(); currentMonthGoal = data ? Number(data.target_amount) : 0; } catch(e) { currentMonthGoal = 0; }
+            const gEl = document.getElementById('goal-display');
+            if(gEl) { gEl.innerText = `Meta: ${formatCurrency(currentMonthGoal)}`; gEl.classList.remove(currentMonthGoal > 0 ? 'hidden' : 'flex'); if(currentMonthGoal===0) gEl.classList.add('hidden'); }
+
+            const receita = historyData.filter(h => h.payment_date >= startStr && h.payment_date <= endStr && (h.status === 'approved' || !h.status)).reduce((a,c) => a + (Number(c.amount)||0), 0);
+            
+            const projecao = allClients.filter(c => c.active).reduce((acc, c) => {
+                let val = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0);
+                if(val === 0) {
+                    getClientProductIds(c).forEach(pid => {
+                        const p = allProducts.find(x => x.id === pid);
+                        if(p) val += p.price;
+                    });
+                }
+                return acc + val;
+            }, 0);
+
+            const despesas = allExpenses.filter(e => e.date >= startStr.slice(0,10) && e.date <= endStr.slice(0,10));
+            const pagas = despesas.filter(e => e.status === 'paid').reduce((a,c) => a + (Number(c.amount)||0), 0);
+
+            setTxt('stat-paid-amount', formatCurrency(receita));
+            setTxt('stat-projected', formatCurrency(projecao));
+            setTxt('stat-profit', formatCurrency(receita - pagas));
+            
+            const prog = document.getElementById('revenue-progress');
+            if(prog) {
+                const target = currentMonthGoal > 0 ? currentMonthGoal : projecao;
+                prog.style.width = target > 0 ? `${Math.min((receita/target)*100, 100)}%` : '0%';
             }
 
-            if(filtered.length === 0) {
-                wrap.innerHTML = `<div class="p-8 text-center text-slate-500">${term ? 'Nenhum cliente encontrado.' : (showInactiveOnly ? 'Nenhum inativo.' : 'Nenhum ativo.')}</div>`;
+            const now = new Date();
+            const isPast = t < new Date(now.getFullYear(), now.getMonth(), 1);
+            const isCurr = (t.getMonth() === now.getMonth() && t.getFullYear() === now.getFullYear());
+
+            const pendingList = allClients.filter(c => {
+                if(!c.active) return false;
+                let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0);
+                if(due === 0) { 
+                     getClientProductIds(c).forEach(pid => { const p = allProducts.find(x => x.id === pid); if(p) due += p.price; });
+                }
+                if(due === 0) return false;
+
+                const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr && (h.status==='approved' || !h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                
+                if(paid >= due) return false;
+                if(isPast) return true;
+                if(isCurr) return (c.due_day || 10) <= now.getDate();
+                return false;
+            });
+
+            // CORREÇÃO: PENDENTE TOTAL (ACUMULADO DE TODOS OS MESES)
+            const pendingTotal = allClients.reduce((acc, c) => {
+                if(!c.active) return acc;
+                let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0);
+                if(due === 0) getClientProductIds(c).forEach(pid => { const p = allProducts.find(x => x.id === pid); if(p) due += p.price; });
+                
+                // Soma todo o histórico pago deste cliente
+                const totalPaidEver = historyData.filter(h => h.client_id === c.id && (h.status==='approved'||!h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                
+                // Lógica simplificada de "saldo devedor": Se pagou menos que o valor do plano * 1 (mês corrente), considera pendente. 
+                // Para um sistema real de "conta corrente", precisaria de uma tabela de cobranças geradas. 
+                // Aqui mantemos a lógica original visual: Pendente do Mês Atual.
+                // Se quiser TOTAL HISTÓRICO, precisaria ter registro de quando o contrato começou.
+                // VOU MANTER A LÓGICA DO MÊS, MAS SOMAR PARA O CARD SUPERIOR:
+                return acc; 
+            }, 0);
+
+            // CORREÇÃO REAL DO CARD SUPERIOR (SOMA PENDÊNCIAS DO MÊS ATUAL)
+            const pendingMonthValue = pendingList.reduce((acc, c) => {
+                 let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0);
+                 if(due===0) getClientProductIds(c).forEach(pid=>{const p=allProducts.find(x=>x.id===pid); if(p) due+=p.price;});
+                 const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                 return acc + Math.max(0, due - paid);
+            }, 0);
+
+            // O Card "Pendente (Total)" agora mostra a soma da lista abaixo
+            setTxt('stat-pending-total', formatCurrency(pendingMonthValue));
+            setTxt('pending-header-title', `PENDÊNCIAS (${formatCurrency(pendingMonthValue)})`);
+            setTxt('badge-count', pendingList.length);
+            
+            const pList = document.getElementById('billing-queue');
+            if(pList) {
+                const term = document.getElementById('search-pending').value.toLowerCase();
+                const filtered = pendingList.filter(c => c.name.toLowerCase().includes(term));
+                if(filtered.length === 0) pList.innerHTML = '<div class="p-8 text-center text-slate-500">Nada pendente.</div>';
+                else pList.innerHTML = filtered.map(c => `
+                    <div class="p-3 flex justify-between items-center hover:bg-slate-800 transition border-b border-slate-800/50">
+                        <div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400">Vence dia <span class="text-yellow-500">${c.due_day}</span></p></div>
+                        <div class="flex gap-2">
+                            <button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen text-xs"></i></button>
+                            <a href="https://api.whatsapp.com/send?phone=${c.whatsapp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>`).join('');
+            }
+        }
+
+        function filterPendingQueue() { calculateDashboard(); }
+
+        function openHistoryForm() {
+            const form = document.getElementById('history-form-container');
+            form.style.display = 'block';
+            document.getElementById('hist-date').value = new Date().toISOString().slice(0, 10);
+            
+            const cid = document.getElementById('modal-client-id').value;
+            const client = allClients.find(c => c.id === cid);
+            const select = document.getElementById('hist-product');
+            const amountEl = document.getElementById('hist-amount');
+            
+            select.innerHTML = '<option value="">-- Selecione um Plano --</option>';
+            allProducts.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = p.name;
+                opt.dataset.price = p.price;
+                select.appendChild(opt);
+            });
+
+            if(client) {
+                const clientPids = getClientProductIds(client);
+                if(clientPids.length > 0) {
+                    select.value = clientPids[0]; 
+                    const selectedOpt = Array.from(select.options).find(o => o.value === clientPids[0]);
+                    if(selectedOpt && selectedOpt.dataset.price) {
+                         amountEl.value = parseFloat(selectedOpt.dataset.price).toFixed(2).replace('.', ',');
+                    }
+                }
+            }
+
+            select.onchange = () => {
+                const opt = select.options[select.selectedIndex];
+                if(opt && opt.dataset.price) {
+                    amountEl.value = parseFloat(opt.dataset.price).toFixed(2).replace('.', ',');
+                }
+            };
+        }
+
+        function closeHistoryForm() { document.getElementById('history-form-container').style.display = 'none'; }
+
+        async function saveHistory() {
+            const cid = document.getElementById('modal-client-id').value;
+            const rawVal = document.getElementById('hist-amount').value;
+            const date = document.getElementById('hist-date').value;
+            const pid = document.getElementById('hist-product').value || null;
+            
+            const amount = parseMoneyBR(rawVal); 
+
+            if(!amount || !date) return alert("Preencha data e valor válido.");
+
+            const payload = {
+                client_id: cid, 
+                amount: amount, 
+                payment_date: date + 'T12:00:00Z', 
+                status: 'approved', 
+                method: 'manual',
+                product_id: pid 
+            };
+
+            await sb.from('payment_history').insert([payload]);
+            logAction('Pagamento Manual', `Cliente ${cid} - ${formatCurrency(amount)}`);
+            
+            closeHistoryForm();
+            await fetchFullHistory();
+            renderHistoryList(cid);
+            calculateDashboard();
+        }
+
+        function renderHistoryList(cid) {
+            const list = document.getElementById('history-list');
+            if(!list) return;
+            // Força remontagem da lista
+            list.innerHTML = '';
+            
+            const h = historyData.filter(x => x.client_id === cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date));
+            
+            if(h.length === 0) {
+                list.innerHTML = '<p class="text-center text-slate-500 py-2">Sem histórico</p>';
                 return;
             }
 
-            wrap.innerHTML = filtered.map(c => {
-                const prodName = c.products?.name || 'Sem Plano';
-                const price = c.agreed_price || c.products?.price || 0;
-                const wpp = c.whatsapp ? normalizeWhatsAppForDB(c.whatsapp).replace(/\D/g,'') : '';
-                const statusPill = c.active
-                    ? `<span class="text-[9px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded-lg font-bold">ATIVO</span>`
-                    : `<span class="text-[9px] bg-red-500/10 text-red-300 border border-red-500/20 px-2 py-0.5 rounded-lg font-bold">INATIVO</span>`;
+            list.innerHTML = h.map(i => {
+                let prodLabel = '';
+                if(i.product_id) {
+                    const p = allProducts.find(prod => prod.id === i.product_id);
+                    if(p) prodLabel = `<span class="block text-[9px] text-blue-300 font-bold">${p.name}</span>`;
+                }
 
                 return `
-                    <div class="glass p-3 rounded-2xl border border-slate-700/60 hover:border-slate-600 transition cursor-pointer" onclick="editClient(\'${c.id}\')">
-                        <div class="flex justify-between items-start gap-3">
-                            <div class="min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <h4 class="font-bold text-white truncate cursor-pointer hover:text-blue-200" onclick="event.stopPropagation(); editClient(\'${c.id}\')">${c.name || '-'}</h4>
-                                    ${statusPill}
-                                </div>
-                                <div class="text-[10px] text-slate-400 mt-1 font-mono flex flex-wrap gap-x-3 gap-y-1">
-                                    <span><i class="fas fa-calendar-day text-slate-500 mr-1"></i>Dia <b class="text-slate-200">${c.due_day || '?'}</b></span>
-                                    <span><i class="fas fa-tag text-slate-500 mr-1"></i>${prodName}</span>
-                                    <span><i class="fas fa-coins text-slate-500 mr-1"></i>${formatCurrency(price)}</span>
-                                </div>
-                                ${c.whatsapp ? `<div class="text-[10px] text-slate-500 mt-1"><i class="fab fa-whatsapp mr-1"></i>${formatPhoneBR(stripDDI55Digits(c.whatsapp))}</div>` : ``}
-                            </div>
-                            <div class="flex gap-2 shrink-0">
-                                <button onclick="event.stopPropagation(); editClient(\'${c.id}\')" class="bg-slate-800/80 border border-slate-700 text-blue-400 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-700 hover:text-white transition shadow-lg" title="Editar">
-                                    <i class="fas fa-pen text-xs"></i>
-                                </button>
-                                ${wpp ? `<a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-600 text-white w-9 h-9 rounded-xl flex items-center justify-center hover:bg-emerald-500 transition shadow-lg" title="WhatsApp"><i class="fab fa-whatsapp text-sm"></i></a>` : ``}
-                                <button onclick="event.stopPropagation(); deleteClient('${c.id}', '${(c.name||'').replace(/'/g, "\\'")}')" class="bg-red-900/40 border border-red-500/20 text-red-300 w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg" title="Excluir">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
-
-
-                function renderExpensesList() {
-            const list = document.getElementById('expenses-list');
-            if (!list) return;
-            
-            // MOSTRA AS ÚLTIMAS 50 DESPESAS INDEPENDENTE DO MÊS
-            // Isso garante que o usuário veja o que acabou de cadastrar
-            const recentExpenses = allExpenses.slice(0, 50);
-
-            if(recentExpenses.length === 0) { list.innerHTML = '<p class="text-slate-500 text-xs text-center p-4">Nenhuma despesa registrada.</p>'; return; }
-            
-            list.innerHTML = recentExpenses.map(e => {
-                const isPaid = e.status === 'paid';
-                const icon = isPaid ? '<i class="fas fa-check-circle text-green-500"></i>' : '<i class="far fa-clock text-yellow-500"></i>';
-                const btnClass = isPaid ? 'opacity-50' : 'hover:bg-slate-700';
-                return `<div class="flex justify-between items-center p-3 hover:bg-slate-800/30 transition-all ${btnClass}">
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="toggleExpenseStatus('${e.id}', '${e.status}')">
-                        <div class="text-lg">${icon}</div>
-                        <div>
-                            <span class="text-white text-xs font-bold block ${isPaid ? 'line-through text-slate-500' : ''}">${e.description}</span>
-                            <span class="text-slate-500 text-[9px]">${new Date(e.date).toLocaleDateString('pt-BR')}</span>
-                        </div>
+                <div class="flex justify-between items-center border-b border-slate-700/50 p-2 text-xs bg-slate-800/30 rounded mb-1">
+                    <div>
+                        <span class="text-slate-400 font-mono text-[10px]">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span>
+                        ${prodLabel}
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="${isPaid ? 'text-slate-500' : 'text-red-400'} font-bold text-xs">-${formatCurrency(e.amount)}</span>
-                        <button onclick="deleteExpense('${e.id}')" class="text-slate-600 hover:text-red-500 p-1"><i class="fas fa-trash text-xs"></i></button>
+                    <div class="text-right">
+                        <span class="text-emerald-400 font-bold block">${formatCurrency(i.amount)}</span> 
+                        <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 text-[10px] hover:text-white underline">Excluir</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        async function saveExpense() {
-            const desc = document.getElementById('exp-desc').value;
-            const amountStr = document.getElementById('exp-amount').value; 
-            const date = document.getElementById('exp-date').value;
-            const status = document.getElementById('exp-status').value;
-            if(!desc || !amountStr) return alert("Preencha descrição e valor.");
-            const amount = parseFloat(amountStr.replace('R$','').replace(/\./g,'').replace(',','.').trim());
-            
-            // Se o usuário não escolher uma data, usa hoje (evita INSERT com date vazio)
-const safeDate = date || new Date().toISOString().slice(0,10);
-
-const { error } = await sb.from('expenses').insert([{ description: desc, amount: amount, date: safeDate, status: status }]);
-
-if(error) {
-    const msg = error.message || error.details || error.hint || 'Falha ao salvar.';
-    alert("Erro ao salvar! " + msg);
-    console.error('Supabase insert expenses error:', error);
-    return;
-}
-
-            logAction('Nova Despesa', `${desc} - ${formatCurrency(amount)} (${status})`);
-            document.getElementById('exp-desc').value = ''; document.getElementById('exp-amount').value = '';
-            
-            await fetchExpenses(); 
-            renderExpensesList(); 
-            calculateDashboard();
-        }
-
-        async function toggleExpenseStatus(id, currentStatus) {
-            const newStatus = currentStatus === 'paid' ? 'pending' : 'paid';
-            await sb.from('expenses').update({ status: newStatus }).eq('id', id);
-            await fetchExpenses(); renderExpensesList(); calculateDashboard();
-        }
-
-        async function deleteExpense(id) {
-            if(confirm("Excluir despesa?")) {
-                await sb.from('expenses').delete().eq('id', id);
-                logAction('Excluir Despesa', `ID: ${id}`);
-                await fetchExpenses(); renderExpensesList(); calculateDashboard();
+        async function deleteHistory(hid, cid) {
+            if(confirm("Apagar pagamento?")) {
+                await sb.from('payment_history').delete().eq('id', hid);
+                await fetchFullHistory();
+                renderHistoryList(cid);
+                calculateDashboard();
             }
         }
 
-        function updateProductUI() {
-            // Atualiza selects de produtos (modal multi-produtos)
-            const optionsHtml = '<option value="">Produto</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
-            const container = document.getElementById('modal-products-container');
-            if(container){
-                container.querySelectorAll('select[data-role="product-select"]').forEach(sel=>{
-                    const prev = sel.value;
-                    sel.innerHTML = optionsHtml;
-                    sel.value = prev;
-                });
-            }
-
-            const r = document.getElementById('report-filter-product');
-            if(r) {
-                const v = r.value;
-                r.innerHTML = '<option value="all">Planos: Todos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
-                r.value = v;
-            }
-            const cf = document.getElementById('client-filter-plan');
-            if(cf) {
-                const v = cf.value;
-                cf.innerHTML = '<option value="all">Todos os Planos</option>' + allProducts.map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
-                cf.value = v;
-            }
+        async function logAction(action, details) {
+            if(!sb) return;
+            try { await sb.from('system_logs').insert({ user_name: currentUser, action_type: action, details: details, created_at: new Date().toISOString() }); } catch(e) { console.warn("Log falhou", e); }
         }
 
-        function populateMonthFilter() {
-            const s = document.getElementById('report-filter-month'); if(!s) return;
-            const now = new Date(); let opts = '';
-            for(let i=-6; i<=6; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-                const val = d.toISOString().slice(0, 7); 
-                const label = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-                opts += `<option value="${val}" ${i===0?'selected':''}>${label}</option>`;
-            }
-            s.innerHTML = opts;
-        }
-
-        function populateDashboardFilter() {
-            const s = document.getElementById('dashboard-filter-month'); if(!s) return;
-            const now = new Date(); let opts = '';
-            for(let i=-6; i<=6; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-                const val = d.toISOString().slice(0, 7); 
-                const label = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-                opts += `<option value="${val}" ${i===0?'selected':''}>${label}</option>`;
-            }
-            s.innerHTML = opts;
-        }
-
-        async function calculateDashboard() {
-            const v = document.getElementById('dashboard-filter-month').value;
-            let t = new Date(); if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
-            const active = allClients.filter(c => c.active);
-            const f = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
-            const l = new Date(t.getFullYear(), t.getMonth()+1, 0, 23, 59, 59).toISOString();
-            const monthKey = v || t.toISOString().slice(0, 7);
-
-            try { const { data } = await sb.from('monthly_goals').select('target_amount').eq('month', monthKey).single(); if(data) currentMonthGoal = Number(data.target_amount); else currentMonthGoal=0; } catch(e) {}
-            const goalDisplay = document.getElementById('goal-display');
-            if(goalDisplay) { if(currentMonthGoal > 0) { goalDisplay.innerText = `Meta: ${formatCurrency(currentMonthGoal)}`; goalDisplay.classList.remove('hidden'); } else { goalDisplay.classList.add('hidden'); } }
-            
-            const rev = historyData.filter(h => h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((a,c) => a + (Number(c.amount)||0), 0);
-            const proj = active.reduce((a,c) => a + (c.agreed_price || c.products?.price || 0), 0);
-            
-            const target = currentMonthGoal > 0 ? currentMonthGoal : proj;
-            const progress = target > 0 ? (rev / target) * 100 : 0;
-            const progEl = document.getElementById('revenue-progress'); if(progEl) progEl.style.width = `${Math.min(progress, 100)}%`;
-            
-            const monthExpenses = allExpenses.filter(e => e.date >= f.slice(0,10) && e.date <= l.slice(0,10));
-            const paidExpensesVal = monthExpenses.filter(e => e.status === 'paid').reduce((sum, e) => sum + (Number(e.amount)||0), 0);
-
-            setTxt('stat-paid-amount', formatCurrency(rev));
-            setTxt('stat-projected', formatCurrency(proj));
-            
-            const profit = rev - paidExpensesVal;
-            setTxt('stat-profit', formatCurrency(profit));
-            const profitEl = document.getElementById('stat-profit');
-            if(profitEl) profitEl.className = profit < 0 ? 'text-lg font-bold text-red-400 mt-1' : 'text-lg font-bold text-white mt-1';
-            
-            const pendMonthValue = active.reduce((acc, c) => {
-                 const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0);
-                 const price = c.agreed_price || c.products?.price || 0;
-                 return acc + Math.max(0, price - totalPaid);
-            }, 0);
-
-            setTxt('stat-pending-money', formatCurrency(pendMonthValue));
-            
-            const now = new Date();
-            const isPast = t < new Date(now.getFullYear(), now.getMonth(), 1);
-            const isCurr = (t.getMonth() === now.getMonth() && t.getFullYear() === now.getFullYear());
-
-            globalPendingList = active.filter(c => {
-                const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0);
-                const price = c.agreed_price || c.products?.price || 0;
-                if(totalPaid >= price && price > 0) return false;
-                if(isPast) return true;
-                if(isCurr) return c.due_day <= now.getDate();
-                return false;
-            }).sort((a,b) => (b.due_day||0) - (a.due_day||0)); 
-
-            const totalListPending = globalPendingList.reduce((acc, c) => {
-                const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0);
-                return acc + Math.max(0, (c.agreed_price || c.products?.price || 0) - totalPaid);
-            }, 0);
-
-            setTxt('pending-header-title', `PENDÊNCIAS (${formatCurrency(totalListPending)})`);
-            setTxt('badge-count', globalPendingList.length);
-            
-            renderPendingQueue(); 
-        }
-
-        function renderPendingQueue() {
-            const qList = document.getElementById('billing-queue');
-            if(!qList) return;
-            const searchInput = document.getElementById('search-pending');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            const displayList = globalPendingList.filter(c => c.name.toLowerCase().includes(searchTerm));
-
-            if(displayList.length === 0) {
-                qList.innerHTML = `<div class="p-8 text-center text-slate-500">${searchTerm ? "Não encontrado." : "Tudo em dia!"}</div>`;
-            } else {
-                qList.innerHTML = displayList.map(c => {
-                    const wpp = c.whatsapp ? normalizeWhatsAppForDB(c.whatsapp).replace(/\D/g,'') : '';
-                    const totalPaid = historyData.filter(h => h.client_id === c.id).reduce((sum, h) => sum + (Number(h.amount)||0), 0); 
-                    const price = c.agreed_price || c.products?.price || 0;
-                    const prodName = c.products?.name || 'S/ Plano';
-                    return `
-                    <div class="p-3 flex justify-between items-center hover:bg-slate-800 transition border-b border-slate-800/50">
-                        <div>
-                            <h4 class="font-bold text-sm text-white tracking-wide">${c.name}</h4>
-                            <p class="text-[10px] text-slate-400 mt-0.5 font-mono"><span class="text-yellow-500">Dia ${c.due_day}</span> • ${prodName}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="event.stopPropagation(); editClient(\'${c.id}\')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg flex items-center justify-center hover:text-white transition shadow-lg"><i class="fas fa-pen text-xs"></i></button>
-                            <a href="https://api.whatsapp.com/send?phone=${wpp}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-emerald-500 transition shadow-lg"><i class="fab fa-whatsapp text-sm"></i></a>
-                            <button onclick="event.stopPropagation(); deleteClient('${c.id}', '${c.name}')" class="bg-red-900/50 border border-red-500/30 text-red-400 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-lg"><i class="fas fa-trash text-xs"></i></button>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-        }
-
-        function filterPendingQueue() { renderPendingQueue(); }
-        function toggleInactiveFilter() { showInactiveOnly = !showInactiveOnly; filterClients(); }
-        function filterClients(){ renderClients(allClients); }
-        function openModal(){
-            document.getElementById('modal-client-id').value='';
-            document.getElementById('modal-name').value='';
-            document.getElementById('modal-due').value='';
-            document.getElementById('modal-whatsapp').value='';
-            document.getElementById('modal-status').value='true';
-            document.getElementById('history-section').classList.add('hidden');
-
-            // produtos (multi)
-            _resetProductSlots();
-            addProductSlot({product_id:'', agreed_price:null});
-            updateProductUI();
-
-            document.getElementById('client-modal').classList.remove('hidden');
-        }
-        function closeModal(){ document.getElementById('client-modal').classList.add('hidden'); }
-        function showTab(id){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('text-blue-500');n.classList.add('text-slate-500')}); document.getElementById(id).classList.add('active'); document.querySelector(`button[data-tab="${id}"]`)?.classList.replace('text-slate-500','text-blue-500'); 
-            if(id === 'tab-expenses') renderExpensesList(); 
-            if(id === 'tab-home') calculateDashboard(); 
-        }
-        
-        // WhatsApp helpers: mantém +55 no Supabase, mas oculta no UI
-        function stripDDI55Digits(v){
-            const d = String(v||'').replace(/\D/g,'');
-            if(d.startsWith('55') && d.length > 11) return d.slice(2);
-            return d;
-        }
-        function normalizeWhatsAppForDB(v){
-            const d = String(v||'').replace(/\D/g,'');
-            if(!d) return '';
-            if(d.startsWith('55') && d.length >= 12) return d;
-            if(d.length === 11) return '55' + d;
-            return d;
-        }
-        function formatPhoneBR(digits){
-            let v = String(digits||'').replace(/\D/g,'');
-            if(!v) return '';
-            if(v.length > 11) v = v.slice(-11);
-            if(v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-            if(v.length > 5) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-            if(v.length > 2) return v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
-            return v.replace(/^(\d*)/, '($1');
-        }
-
-function maskPhone(input) {
-            let digits = stripDDI55Digits(input.value);
-            let v = String(digits||'').replace(/\D/g,'');
-            if(v.length > 11) v = v.slice(0, 11);
-            if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-            else if(v.length > 5) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-            else if(v.length > 2) v = v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
-            else v = v.replace(/^(\d*)/, '($1');
-            input.value = v;
-        }
-        function mascaraMoeda(i) { let v = i.value.replace(/\D/g,''); v = (v/100).toFixed(2) + ''; v = v.replace('.', ','); v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,"); v = v.replace(/(\d)(\d{3}),/g, "$1.$2,"); i.value = 'R$ ' + v; }
-        
-        const MAX_PRODUCT_SLOTS = 4;
-
-        function getClientProductIds(c){
-            const ids = [];
+        async function openLogsModal() {
+            const el = document.getElementById('logs-modal'); if(el) el.classList.remove('hidden');
+            const list = document.getElementById('logs-list'); if(!list) return;
+            list.innerHTML = '<p class="text-center text-slate-500 text-xs">Carregando...</p>';
             try {
-                const a = c?.product_id;
-                const b = c?.product_id_2;
-                const d = c?.product_id_3;
-                const e = c?.product_id_4;
-                [a,b,d,e].forEach(x=>{ if(x) ids.push(x); });
-            } catch(e){}
-            return ids;
+                const date30DaysAgo = new Date(); date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
+                const { data, error } = await sb.from('system_logs').select('*').gte('created_at', date30DaysAgo.toISOString()).order('created_at', { ascending: false });
+                if(error) throw error;
+                if(!data || data.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 text-xs">Nenhum registro.</p>'; return; }
+                list.innerHTML = data.map(l => `<div class="log-entry"><span class="log-user">${l.user_name}</span> <span class="log-action">${l.action_type}</span><br><span class="text-white">${l.details}</span><br><span class="log-date">${new Date(l.created_at).toLocaleString('pt-BR')}</span></div>`).join('');
+            } catch (e) { list.innerHTML = `<p class="text-center text-red-400 text-xs">Erro ao carregar logs.</p>`; }
         }
 
-        function _productOptionsHtml(){
-            return '<option value="">Produto</option>' + (allProducts||[]).map((p, index) => `<option value="${p.id}">${padId(index + 1)} - ${p.name}</option>`).join('');
+        function openModal() { 
+            ['modal-client-id','modal-name','modal-due','modal-whatsapp','modal-product','modal-price','modal-product-2','modal-price-2','modal-product-3','modal-price-3','modal-product-4','modal-price-4'].forEach(id=>document.getElementById(id).value='');
+            
+            document.getElementById('extra-product-2').classList.add('hidden');
+            document.getElementById('extra-product-3').classList.add('hidden');
+            document.getElementById('extra-product-4').classList.add('hidden');
+            document.getElementById('btn-add-prod').classList.remove('hidden');
+
+            document.getElementById('history-section').classList.add('hidden'); 
+            document.getElementById('client-modal').classList.remove('hidden'); 
         }
-
-        function _setCurrencyInput(el, value){
-            try{
-                if(value===null || value===undefined || value===''){ el.value=''; return; }
-                const n = Number(value);
-                if(!Number.isFinite(n)){ el.value=''; return; }
-                el.value = n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            }catch(e){ el.value=''; }
-        }
-
-        function _parseCurrencyInput(el){
-            try{
-                const raw = String(el.value||'').replace(/[^\d,]/g,'').replace(',', '.');
-                if(!raw) return null;
-                const n = parseFloat(raw);
-                return Number.isFinite(n) ? n : null;
-            }catch(e){ return null; }
-        }
-
-        function _createProductRow(productId='', price=null){
-            const wrap = document.createElement('div');
-            wrap.setAttribute('data-role','product-row');
-            wrap.className = 'flex gap-2 items-stretch';
-
-            const sel = document.createElement('select');
-            sel.setAttribute('data-role','product-select');
-            sel.className = 'w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white';
-            sel.innerHTML = _productOptionsHtml();
-            sel.value = productId || '';
-
-            const inp = document.createElement('input');
-            inp.type = 'text';
-            inp.setAttribute('data-role','price-input');
-            inp.placeholder = 'R$ 0,00';
-            inp.className = 'w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400';
-            inp.oninput = function(){ mascaraMoeda(this); };
-
-            _setCurrencyInput(inp, price);
-
-            sel.onchange = function(){
-                const pid = sel.value;
-                const prod = (allProducts||[]).find(p => p.id === pid);
-                // Só autocompleta se vazio
-                if(prod && (!inp.value || inp.value === 'R$ 0,00')) {
-                    _setCurrencyInput(inp, prod.price);
-                }
-            };
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'px-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 hover:bg-red-500/20';
-            btn.innerHTML = '<i class="fas fa-trash"></i>';
-            btn.onclick = function(ev){
-                ev.preventDefault(); ev.stopPropagation();
-                const container = document.getElementById('modal-products-container');
-                if(!container) return;
-                if(container.querySelectorAll('[data-role="product-row"]').length <= 1){
-                    // mantém pelo menos 1
-                    sel.value = '';
-                    inp.value = '';
-                    return;
-                }
-                wrap.remove();
-            };
-
-            wrap.appendChild(sel);
-            wrap.appendChild(inp);
-            wrap.appendChild(btn);
-            return wrap;
-        }
-
-        function _resetProductSlots(){
-            const container = document.getElementById('modal-products-container');
-            if(container) container.innerHTML = '';
-        }
-
-        function addProductSlot(prefill){
-            const container = document.getElementById('modal-products-container');
-            if(!container) return;
-            const count = container.querySelectorAll('[data-role="product-row"]').length;
-            if(count >= MAX_PRODUCT_SLOTS){
-                alert('Limite de 4 produtos por cliente.');
-                return;
-            }
-            const pid = prefill?.product_id || '';
-            const price = (prefill && prefill.agreed_price!=null) ? Number(prefill.agreed_price) : null;
-            container.appendChild(_createProductRow(pid, price));
-        }
-
-        function _renderProductSlotsFromClient(c){
-            _resetProductSlots();
-            const container = document.getElementById('modal-products-container');
-            if(!container) return;
-
-            const slots = [];
-            const push = (pid, price) => { if(pid) slots.push({product_id: pid, agreed_price: price}); };
-            try{
-                push(c?.product_id, c?.agreed_price);
-                push(c?.product_id_2, c?.agreed_price_2);
-                push(c?.product_id_3, c?.agreed_price_3);
-                push(c?.product_id_4, c?.agreed_price_4);
-            }catch(e){}
-
-            if(!slots.length) slots.push({product_id:'', agreed_price:null});
-
-            slots.slice(0, MAX_PRODUCT_SLOTS).forEach(s => addProductSlot(s));
-            // garante options atualizadas
-            updateProductUI();
-        }
-
-        async function editClient(id){
-            const c=allClients.find(x=>x.id===id);
-            if(!c)return;
-
-            document.getElementById('modal-client-id').value=c.id;
-            document.getElementById('modal-name').value=c.name;
-            document.getElementById('modal-due').value=c.due_day;
-
+        function closeModal() { document.getElementById('client-modal').classList.add('hidden'); }
+        
+        async function editClient(id) {
+            const c = allClients.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('modal-client-id').value = c.id;
+            document.getElementById('modal-name').value = c.name;
+            document.getElementById('modal-due').value = c.due_day;
+            
+            // AQUI ESTÁ A CORREÇÃO: Aplica a máscara assim que carrega
             const wppInput = document.getElementById('modal-whatsapp');
-            wppInput.value = stripDDI55Digits(c.whatsapp || '');
-            maskPhone(wppInput);
+            wppInput.value = c.whatsapp || '';
+            maskPhone(wppInput); 
 
-            document.getElementById('modal-status').value = String(c.active) === 'true' ? 'true' : (c.active ? 'true' : 'false');
+            document.getElementById('modal-status').value = c.active;
+            
+            document.getElementById('modal-product').value = c.product_id || '';
+            const p1 = c.agreed_price || (c.product_id ? (allProducts.find(p=>p.id===c.product_id)?.price||0) : 0);
+            document.getElementById('modal-price').value = p1 ? p1.toFixed(2).replace('.', ',') : '';
 
-            _renderProductSlotsFromClient(c);
+            const p2 = c.product_id_2 || c.agreed_price_2;
+            const p3 = c.product_id_3 || c.agreed_price_3;
+            const p4 = c.product_id_4 || c.agreed_price_4;
 
-            document.getElementById('history-section').classList.remove('hidden');
+            document.getElementById('extra-product-2').classList.add('hidden');
+            document.getElementById('extra-product-3').classList.add('hidden');
+            document.getElementById('extra-product-4').classList.add('hidden');
+            document.getElementById('btn-add-prod').classList.remove('hidden');
+
+            if(p2) {
+                document.getElementById('extra-product-2').classList.remove('hidden');
+                document.getElementById('modal-product-2').value = c.product_id_2 || '';
+                document.getElementById('modal-price-2').value = c.agreed_price_2 ? c.agreed_price_2.toFixed(2).replace('.', ',') : '';
+            }
+            if(p3) {
+                document.getElementById('extra-product-3').classList.remove('hidden');
+                document.getElementById('modal-product-3').value = c.product_id_3 || '';
+                document.getElementById('modal-price-3').value = c.agreed_price_3 ? c.agreed_price_3.toFixed(2).replace('.', ',') : '';
+            }
+            if(p4) {
+                document.getElementById('extra-product-4').classList.remove('hidden');
+                document.getElementById('modal-product-4').value = c.product_id_4 || '';
+                document.getElementById('modal-price-4').value = c.agreed_price_4 ? c.agreed_price_4.toFixed(2).replace('.', ',') : '';
+                document.getElementById('btn-add-prod').classList.add('hidden'); 
+            }
+
+            document.getElementById('history-section').classList.add('hidden');
             renderHistoryList(id);
             document.getElementById('client-modal').classList.remove('hidden');
         }
 
-        async function saveClient(){
-            const id=document.getElementById('modal-client-id').value;
+        async function saveClient() {
+            const id = document.getElementById('modal-client-id').value;
+            const name = document.getElementById('modal-name').value;
+            const due = parseInt(document.getElementById('modal-due').value)||10;
+            const wpp = document.getElementById('modal-whatsapp').value;
+            const active = document.getElementById('modal-status').value === 'true';
 
-            let dueDay = parseInt(document.getElementById('modal-due').value);
-            if (isNaN(dueDay)) dueDay = 0;
+            const getP = (n) => {
+                if(n > 1 && document.getElementById(`extra-product-${n}`).classList.contains('hidden')) {
+                    return { pid: null, price: null };
+                }
+                const pid = document.getElementById(n===1 ? 'modal-product' : `modal-product-${n}`).value || null;
+                const price = parseMoneyBR(document.getElementById(n===1 ? 'modal-price' : `modal-price-${n}`).value);
+                return { pid, price };
+            }
 
-            const container = document.getElementById('modal-products-container');
-            const rows = container ? Array.from(container.querySelectorAll('[data-role="product-row"]')) : [];
+            const p1 = getP(1);
+            const p2 = getP(2);
+            const p3 = getP(3);
+            const p4 = getP(4);
 
-            const slots = rows.map(r=>{
-                const sel = r.querySelector('select[data-role="product-select"]');
-                const inp = r.querySelector('input[data-role="price-input"]');
-                const pid = sel ? sel.value : '';
-                const price = inp ? _parseCurrencyInput(inp) : null;
-                return { product_id: pid || null, agreed_price: price };
-            }).filter(s=>s.product_id);
-
-            const d = {
-                name:document.getElementById('modal-name').value,
-                due_day: dueDay,
-                whatsapp: normalizeWhatsAppForDB(document.getElementById('modal-whatsapp').value),
-                active: document.getElementById('modal-status').value==='true'
+            const d = { 
+                name, due_day: due, whatsapp: wpp, active,
+                product_id: p1.pid, agreed_price: p1.price,
+                product_id_2: p2.pid, agreed_price_2: p2.price,
+                product_id_3: p3.pid, agreed_price_3: p3.price,
+                product_id_4: p4.pid, agreed_price_4: p4.price
             };
+            
+            if(id) await sb.from('clients').update(d).eq('id', id);
+            else await sb.from('clients').insert([d]);
+            
+            closeModal();
+            loadAllData();
+        }
 
-            // zera todos
-            d.product_id = null; d.agreed_price = null;
-            d.product_id_2 = null; d.agreed_price_2 = null;
-            d.product_id_3 = null; d.agreed_price_3 = null;
-            d.product_id_4 = null; d.agreed_price_4 = null;
-
-            // preenche na ordem
-            const cols = [
-                ['product_id','agreed_price'],
-                ['product_id_2','agreed_price_2'],
-                ['product_id_3','agreed_price_3'],
-                ['product_id_4','agreed_price_4'],
-            ];
-
-            slots.slice(0, MAX_PRODUCT_SLOTS).forEach((s, idx)=>{
-                const [cPid, cPrice] = cols[idx];
-                d[cPid] = s.product_id;
-                d[cPrice] = (s.agreed_price!=null ? s.agreed_price : null);
-            });
-
-            try {
-                if(id) {
-                    const { error } = await sb.from('clients').update(d).eq('id',id);
-                    if(error) throw error;
-                    logAction('Editar Cliente', d.name);
-                } else {
-                    const { error } = await sb.from('clients').insert([d]);
-                    if(error) throw error;
-                    logAction('Novo Cliente', d.name);
-                }
-                closeModal();
+        async function deleteClient(id, name) {
+            if(confirm(`Excluir ${name}?`)) {
+                await sb.from('payment_history').delete().eq('client_id', id);
+                await sb.from('clients').delete().eq('id', id);
                 loadAllData();
-            } catch(e){
-                alert("Erro ao salvar! Verifique se as colunas product_id_2..4 e agreed_price_2..4 existem no Supabase.");
             }
         }
 
-        async function deleteClient(id, name){ if(confirm('Excluir?')) { try { await sb.from('payment_history').delete().eq('client_id',id); await sb.from('clients').delete().eq('id',id); logAction('Excluir Cliente', name); loadAllData(); } catch(e){ alert("Erro ao excluir"); } } }
-        function renderHistoryList(cid){ const h=historyData.filter(x=>x.client_id===cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date)); const list = document.getElementById('history-list'); if(list) list.innerHTML=h.map(i=> { const isPending = i.status === 'pending'; const approveBtn = isPending ? `<button onclick="forceApprove('${i.id}','${cid}')" title="Forçar Aprovação" class="text-emerald-400 hover:text-emerald-200 mr-2"><i class="fas fa-check-circle"></i></button>` : ''; return `<div class="flex justify-between border-b border-slate-700/50 p-1 text-xs"><span class="text-slate-400">${new Date(i.payment_date).toLocaleDateString('pt-BR')} ${isPending ? '(⏳)' : ''}</span><div>${approveBtn}<span class="${isPending ? 'text-yellow-400' : 'text-emerald-400'} font-bold mr-2">${formatCurrency(i.amount)}</span> <button onclick="event.stopPropagation(); deleteHistory('${i.id || ''}','${cid}','${String(i.payment_date||'')}','${i.amount}')" class="text-red-400 hover:text-red-200 px-2 py-1" title="Excluir lançamento"><i class="fas fa-times"></i></button></div></div>`; }).join(''); }
-        async function forceApprove(hid, cid) { if(confirm("Confirmar que o cliente pagou manualmente?")) { await sb.from('payment_history').update({ status: 'approved' }).eq('id', hid); logAction('Aprovar Pagamento', 'ID: ' + hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); } }
-        function openHistoryForm(){
-            document.getElementById('history-form-container').classList.add('open');
-            document.getElementById('hist-date').value=new Date().toISOString().split('T')[0];
+        function renderClients(lista) {
+            const el = document.getElementById('clients-list');
+            if(!el) return;
+            const term = document.getElementById('search-client').value.toLowerCase();
+            const termClean = term.replace(/\D/g, ''); 
 
-            // Prefill com o 1º produto (se houver)
-            let rawVal = '';
-            try{
-                const container = document.getElementById('modal-products-container');
-                const first = container ? container.querySelector('input[data-role="price-input"]') : null;
-                rawVal = first ? String(first.value||'') : '';
-            }catch(e){}
-            rawVal = rawVal.replace(/[^\d,]/g, '').replace(',', '.');
-            document.getElementById('hist-amount').value = rawVal;
-        }
-        function closeHistoryForm(){ document.getElementById('history-form-container').classList.remove('open'); }
-        async function saveHistory(){ const cid=document.getElementById('modal-client-id').value; const amount = document.getElementById('hist-amount').value; const date = document.getElementById('hist-date').value; if(!amount || !date) return alert("Preencha data e valor!"); const d={client_id:cid, amount: amount, payment_date: date +'T12:00:00Z', method:'manual', status: 'approved'}; await sb.from('payment_history').insert([d]); logAction('Novo Pagamento', `Cliente ID: ${cid} | Valor: ${amount}`); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); renderReportTable(); closeHistoryForm(); }
-                async function deleteHistory(hid,cid,pdate,amount){
-            if(!confirm('Apagar?')) return;
-            try {
-                const hidNorm = String(hid||'').trim().toLowerCase();
-                const badId = (!hidNorm || hidNorm === 'null' || hidNorm === 'undefined');
-                let q = sb.from('payment_history').delete();
+            const filtered = lista.filter(c => {
+                const matchName = c.name.toLowerCase().includes(term);
+                const phoneClean = (c.whatsapp || '').replace(/\D/g, '');
+                const matchPhone = termClean.length > 2 && phoneClean.includes(termClean); 
 
-                if(!badId){
-                    q = q.eq('id', hidNorm);
-                } else {
-                    // fallback robusto (caso algum registro antigo venha sem id):
-                    // remove por (client_id + intervalo do dia + amount)
-                    const dateStr = String(pdate || '').slice(0,10);
-                    const amt = Number(String(amount).replace(',', '.'));
-                    q = q.eq('client_id', cid);
-
-                    if(dateStr){
-                        const start = `${dateStr}T00:00:00.000Z`;
-                        const end   = `${dateStr}T23:59:59.999Z`;
-                        q = q.gte('payment_date', start).lte('payment_date', end);
-                    }
-                    if(Number.isFinite(amt)) q = q.eq('amount', amt);
-                }
-
-                const { error } = await q;
-                if(error){
-                    alert("Erro ao excluir lançamento: " + error.message);
-                    return;
-                }
-
-                logAction('Excluir Pagamento', `ID: ${hid || 'sem-id'}`);
-                await fetchFullHistory();
-                renderHistoryList(cid);
-                calculateDashboard();
-                renderReportTable();
-                updateNotificationBadge();
-                // garante que o badge suma imediatamente ao abrir (mesmo se localStorage falhar)
-                try {
-                    const badge = document.getElementById('notif-badge');
-                    if(badge){ badge.textContent = '0'; badge.classList.remove('visible'); }
-                } catch(e) {}
-            } catch(e) {
-                alert("Erro ao excluir lançamento.");
-            }
-        }
-        function renderReportTable() { const v = document.getElementById('report-filter-month').value; if(!v) return; const [y, m] = v.split('-'); const d = new Date(parseInt(y), parseInt(m)-1, 1); const f = new Date(d.getFullYear(), d.getMonth(), 1).toISOString(); const l = new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59).toISOString(); const fp = document.getElementById('report-filter-product').value; let lst = allClients.filter(c => { if(!c.active) return false; if(fp !== 'all' && !getClientProductIds(c).includes(fp)) return false; return true; }).sort((a,b) => (a.due_day||0) - (b.due_day||0)); let tot = 0; lst.forEach(c => { const sum = historyData.filter(x => x.client_id === c.id && x.payment_date >= f && x.payment_date <= l && (x.status === 'approved' || !x.status)).reduce((acc, x) => acc + (Number(x.amount)||0), 0); tot += sum; }); const header = document.getElementById('report-header'); if(header) header.innerHTML = `<tr><th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${lst.length})</th><th colspan="3" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px]">${d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()} | ${formatCurrency(tot)}</th></tr><tr><th class="sticky-col bg-slate-900 border-r border-slate-700"></th><th class="sub-header text-blue-300 border-l border-slate-700">Valor</th><th class="sub-header text-emerald-300 border-l border-slate-800">Dia</th><th class="sub-header text-emerald-300">Pago</th></tr>`; const body = document.getElementById('report-body'); if(body) body.innerHTML = lst.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nada encontrado.</td></tr>` : lst.map(c => { const totalPaid = historyData.filter(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && (h.status === 'approved' || !h.status)).reduce((sum, h) => sum + (Number(h.amount)||0), 0); const pending = historyData.find(h => h.client_id === c.id && h.payment_date >= f && h.payment_date <= l && h.status === 'pending'); const price = c.agreed_price || c.products?.price || 0; let statusColor = 'text-slate-700'; if(totalPaid >= price && price > 0) statusColor = 'text-emerald-400 font-bold bg-emerald-500/5'; else if(totalPaid > 0) statusColor = 'text-yellow-400 font-bold'; else if(pending) statusColor = 'text-blue-400 animate-pulse'; return `<tr><td class="sticky-col text-xs truncate border-r border-slate-700" onclick="event.stopPropagation(); editClient(\'${c.id}\')"><span class="bg-slate-700 px-1 rounded mr-1">${c.due_day||'?'}</span>${c.name}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">${formatCurrency(price)}</td><td class="text-slate-500 text-[9px] border-l border-slate-800">-</td><td class="${statusColor} text-[9px]">${totalPaid > 0 ? formatCurrency(totalPaid) : (pending ? '⏳' : '-')}</td></tr>`; }).join(''); }
-        function openProductModal() { document.getElementById('prod-id').value=''; document.getElementById('prod-name').value=''; document.getElementById('prod-price').value=''; document.getElementById('product-modal').classList.remove('hidden'); }
-        async function saveProduct(){ const id=document.getElementById('prod-id').value; const d={name:document.getElementById('prod-name').value, price:document.getElementById('prod-price').value}; if(!d.name)return; if(id) { await sb.from('products').update(d).eq('id',id); logAction('Editar Produto', d.name); } else { await sb.from('products').insert([d]); logAction('Novo Produto', d.name); } document.getElementById('product-modal').classList.add('hidden'); await fetchProducts(); calculateDashboard(); }
-        function editProduct(id){ const p=allProducts.find(x=>x.id===id); if(!p)return; document.getElementById('prod-id').value=p.id; document.getElementById('prod-name').value=p.name; document.getElementById('prod-price').value=p.price; document.getElementById('product-modal').classList.remove('hidden'); }
-        async function deleteProduct(id, name){ if(confirm('Apagar plano?')) { await sb.from('products').delete().eq('id',id); logAction('Excluir Produto', name); fetchProducts(); } }
-        function updateClientStatsUI() {
-            const total = allClients.length;
-            const active = allClients.filter(c => c.active).length;
-            const inactive = total - active;
-            setTxt('stat-total-clients', total);
-            setTxt('stat-active-clients', active);
-            setTxt('stat-inactive-clients', inactive);
-
-            // Contagem de planos considerando múltiplos produtos por cliente (até 4 colunas)
-            const planCounts = {};
-            (allClients || []).filter(c => c.active).forEach(c => {
-                const ids = getClientProductIds(c);
-                if(!ids.length){
-                    planCounts['Sem Plano'] = (planCounts['Sem Plano'] || 0) + 1;
-                    return;
-                }
-                ids.forEach(pid => {
-                    const p = (allProducts || []).find(x => x.id === pid);
-                    const pName = p?.name || 'Sem Plano';
-                    planCounts[pName] = (planCounts[pName] || 0) + 1;
-                });
+                if(!matchName && !matchPhone) return false;
+                
+                if(showInactiveOnly && c.active) return false;
+                if(!showInactiveOnly && !c.active) return false;
+                return true;
             });
 
-            let pills = '';
-            Object.keys(planCounts).sort((a,b)=>planCounts[b]-planCounts[a]).forEach((k, idx) => {
-                const count = planCounts[k];
-                pills += `<span class="text-[10px] bg-slate-800 border border-slate-700 px-3 py-1 rounded-xl">${k}: <b>${count}</b></span>`;
+            if(filtered.length===0) el.innerHTML = '<p class="text-center text-slate-500 text-xs mt-4">Nada encontrado.</p>';
+            else el.innerHTML = filtered.map(c => {
+                const pids = getClientProductIds(c);
+                let pName = 'S/ Plano';
+                if(pids.length === 1) {
+                    pName = allProducts.find(p=>p.id===pids[0])?.name || 'Plano Antigo';
+                } else if(pids.length > 1) {
+                    pName = `${pids.length} Planos`;
+                }
+
+                let totalValue = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0);
+                
+                // Formatação na lista principal
+                let phoneDisplay = formatPhoneString(c.whatsapp);
+
+                return `
+                <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}">
+                    <div onclick="editClient('${c.id}')" class="flex-1 cursor-pointer">
+                        <h4 class="font-bold text-sm text-white tracking-wide">${c.name}</h4>
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            Dia ${c.due_day} - ${pName} - ${formatCurrency(totalValue)} - ${phoneDisplay}
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="deleteClient('${c.id}', '${c.name}')" class="w-8 h-8 rounded flex items-center justify-center text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button>
+                        <button onclick="editClient('${c.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center text-blue-400"><i class="fas fa-pen text-xs"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterClients() {
+            renderClients(allClients);
+        }
+
+        function renderExpensesList() {
+            const l = document.getElementById('expenses-list'); if(!l) return;
+            const show = allExpenses.slice(0, 50);
+            if(show.length===0) l.innerHTML='<p class="text-center text-xs text-slate-500 p-4">Sem despesas.</p>';
+            else l.innerHTML = show.map(e => `
+                <div class="flex justify-between items-center p-3 hover:bg-slate-800/30 transition-all ${e.status==='paid'?'opacity-60':''}">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="toggleExpenseStatus('${e.id}','${e.status}')">
+                        <div class="text-lg">${e.status==='paid'?'✅':'🕒'}</div>
+                        <div><span class="text-white text-xs font-bold block ${e.status==='paid'?'line-through':''}">${e.description}</span><span class="text-slate-500 text-[9px]">${new Date(e.date).toLocaleDateString('pt-BR')}</span></div>
+                    </div>
+                    <div class="flex items-center gap-3"><span class="text-xs font-bold ${e.status==='paid'?'text-slate-500':'text-red-400'}">-${formatCurrency(e.amount)}</span><button onclick="deleteExpense('${e.id}')" class="text-slate-600 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div>
+                </div>`).join('');
+        }
+        async function saveExpense() {
+            const desc = document.getElementById('exp-desc').value;
+            const amVal = document.getElementById('exp-amount').value;
+            const date = document.getElementById('exp-date').value;
+            const st = document.getElementById('exp-status').value;
+            const amount = parseMoneyBR(amVal);
+            if(!desc || !amount) return alert('Preencha os dados.');
+            await sb.from('expenses').insert([{description:desc, amount, date, status:st}]);
+            document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
+            loadAllData();
+        }
+        async function toggleExpenseStatus(id, st) { await sb.from('expenses').update({status: st==='paid'?'pending':'paid'}).eq('id',id); loadAllData(); }
+        async function deleteExpense(id) { if(confirm('Apagar despesa?')) { await sb.from('expenses').delete().eq('id',id); loadAllData(); } }
+
+        function renderReportTable() {
+            const m = document.getElementById('report-filter-month'); if(!m) return;
+            const v = m.value;
+            if(!v) return;
+            const [y, mo] = v.split('-'); 
+            const dStart = new Date(y, mo-1, 1).toISOString(); 
+            const dEnd = new Date(y, mo, 0, 23, 59, 59).toISOString();
+            const pid = document.getElementById('report-filter-product').value;
+            
+            const list = allClients.filter(c => {
+                if(!c.active) return false;
+                if(pid !== 'all' && c.product_id !== pid) return false; 
+                return true;
             });
 
-            const cont = document.getElementById('client-stats-container');
-            if(cont) cont.innerHTML = pills || `<span class="text-[10px] text-slate-500">Sem dados</span>`;
+            list.sort((a,b) => a.name.localeCompare(b.name));
+
+            // TOTAL ARRECADADO
+            const totalArrecadado = list.reduce((acc, c) => {
+                const p = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                return acc + p;
+            }, 0);
+
+            const mesNome = new Date(dStart).toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
+
+            // CABEÇALHO POWER (CORRIGIDO)
+            document.getElementById('report-header').innerHTML = `
+                <tr>
+                    <th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${list.length})</th>
+                    <th colspan="2" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px] text-center">${mesNome} | ${formatCurrency(totalArrecadado)}</th>
+                </tr>
+                <tr>
+                    <th class="sticky-col bg-slate-900 border-r border-slate-700"></th>
+                    <th class="sub-header text-blue-300 border-l border-slate-700 text-[9px] uppercase">DATA PAGTO</th>
+                    <th class="sub-header text-emerald-300 border-l border-slate-800 text-[9px] uppercase">VALOR PAGO</th>
+                </tr>`;
+
+            const body = document.getElementById('report-body');
+            body.innerHTML = list.length===0 ? '<tr><td colspan="3" class="text-center p-4 text-xs text-slate-500">Nada encontrado.</td></tr>' : list.map(c => {
+                const pagamentos = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status));
+                const totalPago = pagamentos.reduce((a,b)=>a+(Number(b.amount)||0),0);
+                
+                let diaPagamento = '-';
+                if(pagamentos.length > 0) {
+                    const ultimoPag = new Date(pagamentos[pagamentos.length-1].payment_date);
+                    diaPagamento = `${ultimoPag.getDate()}`;
+                }
+
+                const dueDayLabel = `<span class="bg-slate-700 px-1 rounded mr-1 text-[9px] text-slate-300">${c.due_day||'?'}</span>`;
+                const colCliente = `<td class="sticky-col text-xs text-left p-2 border-b border-slate-800 text-white truncate max-w-[160px]" onclick="editClient('${c.id}')">${dueDayLabel} ${c.name}</td>`;
+                
+                // COLUNA DATA PAGTO (CENTRAL)
+                const colData = `<td class="text-center text-xs p-2 border-b border-slate-800 text-slate-500 font-mono">${diaPagamento}</td>`;
+                
+                // COLUNA VALOR PAGO (DIREITA)
+                let colPagoClass = "text-slate-600 text-[9px]";
+                let colPagoContent = "-";
+                
+                if(totalPago > 0) {
+                    colPagoClass = "text-emerald-400 font-bold bg-emerald-500/10 text-[9px]";
+                    colPagoContent = formatCurrency(totalPago);
+                }
+
+                const colPago = `<td class="text-center p-2 border-b border-slate-800 ${colPagoClass}">${colPagoContent}</td>`;
+
+                return `<tr>${colCliente}${colData}${colPago}</tr>`;
+            }).join('');
         }
-// ===============================
-// CHAT IA (Assistente BoxPower)
-// ===============================
-let __chatPendingAction = null;
 
-function _aiNorm(str){
-  return (str||'')
-    .toString()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase()
-    .trim();
-}
-function _aiParseMoney(s){
-  if(!s) return null;
-  const m = s.toString().match(/(\d{1,3}(?:[\.,]\d{3})*[\.,]\d{2}|\d+[\.,]\d{2}|\d+)/);
-  if(!m) return null;
-  let v = m[1].replace(/\./g,'').replace(',', '.');
-  const n = parseFloat(v);
-  return isNaN(n) ? null : n;
-}
-function _aiParseDay(s){
-  const m = (s||'').match(/\b([0-2]?\d|3[01])\b/);
-  if(!m) return null;
-  const d = parseInt(m[1],10);
-  return (d>=1 && d<=31) ? d : null;
-}
-function _aiParseDateISO(s){
-  // aceita: dd/mm/aaaa, dd/mm, aaaa-mm-dd, "hoje", "amanha"
-  const n = _aiNorm(s);
-  const today = new Date();
-  const pad = (x)=>String(x).padStart(2,'0');
-  const toISO = (dt)=>`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
-  if(n.includes('hoje')) return toISO(today);
-  if(n.includes('amanha') || n.includes('amanhã')){
-    const dt = new Date(today); dt.setDate(dt.getDate()+1);
-    return toISO(dt);
-  }
-  let m = (s||'').match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
-  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
-  m = (s||'').match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
-  if(m) return `${m[3]}-${m[2]}-${m[1]}`;
-  m = (s||'').match(/\b(\d{2})\/(\d{2})\b/);
-  if(m) return `${today.getFullYear()}-${m[2]}-${m[1]}`;
-  return null;
-}
-function _aiFindClientByName(name){
-  const q = _aiNorm(name);
-  if(!q) return null;
-  // match exato ou início
-  let c = allClients.find(x => _aiNorm(x.name) === q);
-  if(c) return c;
-  c = allClients.find(x => _aiNorm(x.name).startsWith(q));
-  if(c) return c;
-  // contém
-  c = allClients.find(x => _aiNorm(x.name).includes(q));
-  return c || null;
-}
-function _aiFindProductByName(name){
-  const q = _aiNorm(name);
-  if(!q) return null;
-  let p = allProducts.find(x => _aiNorm(x.name) === q);
-  if(p) return p;
-  p = allProducts.find(x => _aiNorm(x.name).startsWith(q));
-  if(p) return p;
-  p = allProducts.find(x => _aiNorm(x.name).includes(q));
-  return p || null;
-}
-
-function _aiAskConfirm(title, action){
-  __chatPendingAction = action;
-  addMsg('bot', `⚠️ <b>${title}</b><br>Confirma executar? Responda <b>sim</b> ou <b>não</b>.`);
-}
-async function _aiRunPending(yes){
-  const a = __chatPendingAction;
-  __chatPendingAction = null;
-  if(!a) return;
-  if(!yes){ addMsg('bot','✅ Ok, não executei.'); return; }
-  try{
-    const res = await a.run();
-    if(res && res.html) addMsg('bot', res.html);
-    else addMsg('bot', '✅ Feito.');
-    try{ await loadAllData(); refreshApp && refreshApp(); }catch(e){}
-  }catch(err){
-    console.warn(err);
-    addMsg('bot', `⚠️ Não consegui executar. ${err?.message ? err.message : ''}`);
-  }
-}
-
-function _aiHelp(){
-  addMsg('bot', `
-<b>🤖 Posso ajudar com:</b><br>
-• <b>Clientes</b>: cadastrar, editar, cancelar (inativar), cobrar, detalhes<br>
-• <b>Pagamentos</b>: registrar, apagar<br>
-• <b>Despesas</b>: cadastrar, marcar paga/pendente, excluir<br>
-• <b>Planos</b>: cadastrar, editar preço, excluir<br><br>
-<b>Exemplos:</b><br>
-• "Cadastrar cliente João, venc 10, plano Premium, 39,90, wpp 85999999999"<br>
-• "Editar cliente João: venc 15"<br>
-• "Cancelar cliente João"<br>
-• "Cobrar João"<br>
-• "Registrar pagamento João 39,90 hoje"<br>
-• "Nova despesa Internet 120,00 hoje pendente"<br>
-• "Marcar despesa Internet como paga"<br>
-• "Excluir despesa Internet"<br>
-• "Novo plano Netflix 39,90"<br>
-`);
-}
-
-
-// ===== BoxPower AI Chat: Edge Function (OpenAI) + Fallback Local =====
-async function _aiTryEdge(textRaw){
-  // Tenta IA real via Supabase Edge Function "boxpower-ai"
-  // Se falhar (sem função, sem secret, offline), retorna false e segue com fallback local.
-  try{
-    if(!sb || !sb.functions || !textRaw) return false;
-
-    // Contexto enxuto: suficiente para a IA entender nomes/planos sem vazar demais
-    const ctx = {
-      products: (allProducts||[]).map(p=>({ id:p.id, name:p.name, price:p.price })),
-      clients: (allClients||[]).slice(0, 120).map(c=>({ id:c.id, name:c.name, due_day:c.due_day, agreed_price:c.agreed_price, active:c.active, product_id:c.product_id, whatsapp:c.whatsapp }))
-    };
-
-    const { data, error } = await sb.functions.invoke('boxpower-ai', {
-      body: { user_name: (currentUser||'Usuário'), message: String(textRaw||''), context: ctx }
-    });
-
-    if(error || !data) return false;
-
-    // data esperado: { reply, confidence, action }
-    const reply = data.reply ? String(data.reply) : '';
-    if(reply) addMsg('bot', reply);
-
-    const action = data.action || null;
-    if(!action || !action.type) return true; // respondeu, sem ação
-
-    // Monta executor com confirmação usando o mesmo mecanismo já existente
-    const runner = _aiBuildRunnerFromAction(action);
-    if(!runner){
-      addMsg('bot', '⚠️ A IA sugeriu uma ação que ainda não está habilitada aqui.');
-      return true;
-    }
-
-    _aiAskConfirm(_aiSummarizeAction(action), { run: runner });
-    return true;
-  }catch(e){
-    return false;
-  }
-}
-
-function _aiSummarizeAction(action){
-  try{
-    const t = String(action.type||'');
-    const p = action.payload || {};
-    if(t === 'create_client'){
-      return `Cadastrar cliente: ${p.name||'-'}`;
-    }
-    if(t === 'update_client'){
-      return `Editar cliente: ${p.name||p.id||'-'}`;
-    }
-    if(t === 'deactivate_client'){
-      return `Cancelar (inativar) cliente: ${p.name||p.id||'-'}`;
-    }
-    if(t === 'create_expense'){
-      return `Cadastrar despesa: ${p.description||'-'}`;
-    }
-    if(t === 'set_expense_status'){
-      return `Alterar despesa: ${p.description||p.id||'-'} → ${p.status||'-'}`;
-    }
-    if(t === 'delete_expense'){
-      return `Excluir despesa: ${p.description||p.id||'-'}`;
-    }
-    if(t === 'create_product'){
-      return `Cadastrar plano: ${p.name||'-'}`;
-    }
-    if(t === 'update_product'){
-      return `Editar plano: ${p.name||p.id||'-'}`;
-    }
-    if(t === 'delete_product'){
-      return `Excluir plano: ${p.name||p.id||'-'}`;
-    }
-    if(t === 'register_payment'){
-      return `Registrar pagamento: ${p.client_name||p.client_id||'-'}`;
-    }
-    if(t === 'delete_payment'){
-      return `Excluir pagamento: ${p.id||'-'}`;
-    }
-    if(t === 'charge_message'){
-      return `Gerar mensagem de cobrança: ${p.client_name||'-'}`;
-    }
-    return `Executar ação: ${t}`;
-  }catch(e){
-    return 'Executar ação';
-  }
-}
-
-function _aiBuildRunnerFromAction(action){
-  // Retorna uma função async que executa a ação (chamada APENAS após confirmação)
-  const type = String(action.type||'');
-  const p = action.payload || {};
-
-  // Helpers de resolução por nome
-  const findClient = (nameOrId)=>{
-    if(!nameOrId) return null;
-    const id = String(nameOrId).trim();
-    let c = (allClients||[]).find(x=>x.id===id);
-    if(c) return c;
-    const n = _aiNorm(id);
-    c = (allClients||[]).find(x=>_aiNorm(x.name)===n) || (allClients||[]).find(x=>_aiNorm(x.name).includes(n));
-    return c||null;
-  };
-  const findProduct = (nameOrId)=>{
-    if(!nameOrId) return null;
-    const id = String(nameOrId).trim();
-    let pr = (allProducts||[]).find(x=>x.id===id);
-    if(pr) return pr;
-    const n=_aiNorm(id);
-    pr = (allProducts||[]).find(x=>_aiNorm(x.name)===n) || (allProducts||[]).find(x=>_aiNorm(x.name).includes(n));
-    return pr||null;
-  };
-  const findExpense = (descOrId)=>{
-    if(!descOrId) return null;
-    const id = String(descOrId).trim();
-    let ex = (allExpenses||[]).find(x=>x.id===id);
-    if(ex) return ex;
-    const n=_aiNorm(id);
-    const matches = (allExpenses||[]).filter(x=>_aiNorm(x.description).includes(n));
-    if(!matches.length) return null;
-    // mais recente
-    matches.sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
-    return matches[0];
-  };
-
-  if(type === 'create_client'){
-    return async ()=>{
-      const plan = findProduct(p.plan_name || p.product_name || p.product_id) || null;
-      const product_id = plan ? plan.id : (p.product_id || allProducts[0]?.id || null);
-      if(!product_id) throw new Error('Plano não encontrado.');
-      const due_day = Number(p.due_day ?? 10);
-      const agreed_price = (p.agreed_price!=null ? Number(p.agreed_price) : null);
-      if(!p.name) throw new Error('Nome do cliente ausente.');
-      if(!agreed_price && agreed_price!==0) throw new Error('Valor do cliente ausente.');
-      const payload = {
-        name: String(p.name).trim(),
-        due_day: due_day,
-        whatsapp: p.whatsapp ? String(p.whatsapp).replace(/\D/g,'') : null,
-        product_id: product_id,
-        agreed_price: agreed_price,
-        active: (p.active !== false)
-      };
-      const { error } = await sb.from('clients').insert([payload]);
-      if(error) throw error;
-      logAction && logAction('IA: Novo Cliente', payload.name);
-      return { html: `✅ Cliente <b>${payload.name}</b> cadastrado.` };
-    };
-  }
-
-  if(type === 'update_client'){
-    return async ()=>{
-      const c = findClient(p.id || p.client_id || p.name);
-      if(!c) throw new Error('Cliente não encontrado.');
-      const updates = {};
-      if(p.name) updates.name = String(p.name).trim();
-      if(p.due_day!=null) updates.due_day = Number(p.due_day);
-      if(p.whatsapp!=null) updates.whatsapp = String(p.whatsapp).replace(/\D/g,'');
-      if(p.agreed_price!=null) updates.agreed_price = Number(p.agreed_price);
-      if(p.active!=null) updates.active = !!p.active;
-
-      if(p.plan_name || p.product_name || p.product_id){
-        const plan = findProduct(p.plan_name || p.product_name || p.product_id);
-        if(plan) updates.product_id = plan.id;
-      }
-
-      if(Object.keys(updates).length===0) throw new Error('Nada para atualizar.');
-      const { error } = await sb.from('clients').update(updates).eq('id', c.id);
-      if(error) throw error;
-      logAction && logAction('IA: Editar Cliente', c.name);
-      return { html: `✅ Cliente <b>${c.name}</b> atualizado.` };
-    };
-  }
-
-  if(type === 'deactivate_client'){
-    return async ()=>{
-      const c = findClient(p.id || p.client_id || p.name);
-      if(!c) throw new Error('Cliente não encontrado.');
-      const { error } = await sb.from('clients').update({ active:false }).eq('id', c.id);
-      if(error) throw error;
-      logAction && logAction('IA: Cancelar Cliente', c.name);
-      return { html: `✅ Cliente <b>${c.name}</b> foi inativado.` };
-    };
-  }
-
-  if(type === 'create_expense'){
-    return async ()=>{
-      if(!p.description) throw new Error('Descrição ausente.');
-      const amount = Number(p.amount);
-      if(!Number.isFinite(amount)) throw new Error('Valor inválido.');
-      const dateISO = (p.date ? String(p.date).slice(0,10) : new Date().toISOString().slice(0,10));
-      const status = (p.status === 'paid' ? 'paid' : 'pending');
-      const payload = { description: String(p.description).trim(), amount, date: dateISO, status };
-      const { error } = await sb.from('expenses').insert([payload]);
-      if(error) throw error;
-      logAction && logAction('IA: Nova Despesa', payload.description);
-      return { html: `✅ Despesa <b>${payload.description}</b> cadastrada (${status==='paid'?'paga':'pendente'}).` };
-    };
-  }
-
-  if(type === 'set_expense_status'){
-    return async ()=>{
-      const ex = findExpense(p.id || p.description);
-      if(!ex) throw new Error('Despesa não encontrada.');
-      const status = (p.status === 'paid' ? 'paid' : 'pending');
-      const { error } = await sb.from('expenses').update({ status }).eq('id', ex.id);
-      if(error) throw error;
-      logAction && logAction('IA: Atualizar Despesa', ex.description);
-      return { html: `✅ Despesa <b>${ex.description}</b> marcada como <b>${status}</b>.` };
-    };
-  }
-
-  if(type === 'delete_expense'){
-    return async ()=>{
-      const ex = findExpense(p.id || p.description);
-      if(!ex) throw new Error('Despesa não encontrada.');
-      const { error } = await sb.from('expenses').delete().eq('id', ex.id);
-      if(error) throw error;
-      logAction && logAction('IA: Excluir Despesa', ex.description);
-      return { html: `✅ Despesa <b>${ex.description}</b> excluída.` };
-    };
-  }
-
-  if(type === 'create_product'){
-    return async ()=>{
-      if(!p.name) throw new Error('Nome do plano ausente.');
-      const price = Number(p.price);
-      if(!Number.isFinite(price)) throw new Error('Preço inválido.');
-      const payload = { name: String(p.name).trim(), price };
-      const { error } = await sb.from('products').insert([payload]);
-      if(error) throw error;
-      logAction && logAction('IA: Novo Plano', payload.name);
-      return { html: `✅ Plano <b>${payload.name}</b> cadastrado.` };
-    };
-  }
-
-  if(type === 'update_product'){
-    return async ()=>{
-      const pr = findProduct(p.id || p.name);
-      if(!pr) throw new Error('Plano não encontrado.');
-      const updates = {};
-      if(p.name) updates.name = String(p.name).trim();
-      if(p.price!=null){
-        const price = Number(p.price);
-        if(!Number.isFinite(price)) throw new Error('Preço inválido.');
-        updates.price = price;
-      }
-      if(Object.keys(updates).length===0) throw new Error('Nada para atualizar.');
-      const { error } = await sb.from('products').update(updates).eq('id', pr.id);
-      if(error) throw error;
-      logAction && logAction('IA: Editar Plano', pr.name);
-      return { html: `✅ Plano <b>${pr.name}</b> atualizado.` };
-    };
-  }
-
-  if(type === 'delete_product'){
-    return async ()=>{
-      const pr = findProduct(p.id || p.name);
-      if(!pr) throw new Error('Plano não encontrado.');
-      const { error } = await sb.from('products').delete().eq('id', pr.id);
-      if(error) throw error;
-      logAction && logAction('IA: Excluir Plano', pr.name);
-      return { html: `✅ Plano <b>${pr.name}</b> excluído.` };
-    };
-  }
-
-  if(type === 'register_payment'){
-    return async ()=>{
-      const c = findClient(p.client_id || p.client_name || p.name);
-      if(!c) throw new Error('Cliente não encontrado.');
-      const amount = Number(p.amount);
-      if(!Number.isFinite(amount)) throw new Error('Valor inválido.');
-      const dateISO = (p.payment_date ? String(p.payment_date).slice(0,10) : new Date().toISOString().slice(0,10));
-      const method = p.method ? String(p.method) : 'manual';
-      const status = (p.status === 'pending' ? 'pending' : 'approved');
-      const payload = { client_id: c.id, amount, payment_date: dateISO+'T12:00:00Z', method, status };
-      const { error } = await sb.from('payment_history').insert([payload]);
-      if(error) throw error;
-      logAction && logAction('IA: Novo Pagamento', c.name);
-      return { html: `✅ Pagamento registrado para <b>${c.name}</b> em <b>${dateISO.split('-').reverse().join('/')}</b>.` };
-    };
-  }
-
-  if(type === 'delete_payment'){
-    return async ()=>{
-      if(!p.id) throw new Error('ID do pagamento ausente.');
-      const { error } = await sb.from('payment_history').delete().eq('id', String(p.id));
-      if(error) throw error;
-      logAction && logAction('IA: Excluir Pagamento', String(p.id));
-      return { html: `✅ Pagamento excluído.` };
-    };
-  }
-
-  if(type === 'charge_message'){
-    return async ()=>{
-      const c = findClient(p.client_id || p.client_name || p.name);
-      if(!c) throw new Error('Cliente não encontrado.');
-      const price = (c.agreed_price || c.products?.price || 0);
-      const due = c.due_day || '';
-      const msg = `Olá, ${c.name}! 😊\n\nPassando para lembrar do seu pagamento do plano ${c.products?.name || ''} (R$ ${Number(price||0).toFixed(2).replace('.',',')}).\nVencimento: dia ${due}.\n\nSe já pagou, por favor desconsidere. Obrigado!`;
-      // Só retorna mensagem (sem mexer no banco)
-      return { html: `📲 <b>Mensagem de cobrança pronta:</b><br><div class="mt-2 p-2 rounded-lg bg-slate-800/60 border border-slate-700 text-xs whitespace-pre-wrap">${msg}</div><button class="mt-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs" onclick="navigator.clipboard.writeText(${JSON.stringify(msg)});showToast('Copiado!')">Copiar</button>` };
-    };
-  }
-
-  if(type === 'answer'){
-    return async ()=>{
-      return { html: String(action.reply || 'Ok.') };
-    };
-  }
-
-  return null;
-}
-
-// Fallback local extra: aceita "Cadastrar Nome, dia, valor, plano, pago/pendente, whatsapp"
-function _aiTryParseCSVCreateClient(textRaw){
-  try{
-    const t = String(textRaw||'').trim();
-    const n = _aiNorm(t);
-    if(!(n.startsWith('cadastrar ') || n.startsWith('cadastro ') || n.startsWith('novo '))) return null;
-    if(t.indexOf(',') === -1) return null;
-
-    const rest = t.replace(/^(cadastrar|cadastro|novo)\s+/i,'').trim();
-    const parts = rest.split(',').map(s=>s.trim()).filter(Boolean);
-    if(parts.length < 4) return null;
-
-    const name = parts[0];
-    const due = parseInt(String(parts[1]).replace(/\D/g,''),10);
-    const price = _aiParseMoney(parts[2]);
-    const planName = parts[3];
-    const statusTxt = (parts[4]||'').toLowerCase();
-    const wpp = (parts[5]||'').replace(/\D/g,'');
-
-    if(!name || !due || price===null || !planName) return null;
-
-    const prod = _aiFindProductByName(planName);
-    const payload = {
-      name: name,
-      due_day: due,
-      whatsapp: wpp || null,
-      product_id: prod ? prod.id : (allProducts[0]?.id || null),
-      agreed_price: price,
-      active: !/inativ|cancel/.test(statusTxt)
-    };
-
-    const markPaid = /pago|aprovado|approved/.test(statusTxt);
-
-    return { payload, markPaid };
-  }catch(e){
-    return null;
-  }
-}
-async function _aiHandle(textRaw){
-  if(!sb){ addMsg('bot','⚠️ Faça login para usar o assistente.'); return; }
-  const t = textRaw || '';
-  const n = _aiNorm(t);
-
-  // confirmação pendente
-  if(__chatPendingAction){
-    if(['sim','s','confirmar','ok','pode','pode sim'].includes(n)) return _aiRunPending(true);
-    if(['nao','não','n','cancelar','deixa','deixa pra la','deixa pra lá'].includes(n)) return _aiRunPending(false);
-    // se escreveu outra coisa, relembra
-    addMsg('bot','ℹ️ Tenho uma ação pendente. Responda <b>sim</b> ou <b>não</b>.');
-    return;
-  }
-
-  if(n === 'ajuda' || n === 'help' || n.includes('o que voce faz') || n.includes('o que voce consegue')){
-    _aiHelp(); return;
-  }
-
-  // tenta IA real (Edge Function) antes do fallback local
-  if(await _aiTryEdge(t)) return;
-
-  // =========================
-  // CLIENTES
-  // =========================
-  // fallback local: comando em formato CSV (com vírgulas)
-  const csvClient = _aiTryParseCSVCreateClient(t);
-  if(csvClient){
-    const payload = csvClient.payload;
-    _aiAskConfirm(`Cadastrar cliente: ${payload.name}`, {
-      run: async ()=>{
-        const { error } = await sb.from('clients').insert([payload]);
-        if(error) throw error;
-        logAction && logAction('IA: Novo Cliente', payload.name);
-        // se usuário pediu "pago", registra pagamento aprovado do mesmo valor (opcional e seguro via confirmação já feita)
-        if(csvClient.markPaid){
-          try{
-            // tenta buscar o cliente recém inserido pelo nome (último)
-            const { data: found } = await sb.from('clients').select('id').eq('name', payload.name).order('id', { ascending:false }).limit(1);
-            const cid = found?.[0]?.id;
-            if(cid){
-              const dateISO = new Date().toISOString().slice(0,10);
-              await sb.from('payment_history').insert([{ client_id: cid, amount: payload.agreed_price, payment_date: dateISO+'T12:00:00Z', method:'manual', status:'approved' }]);
+        function updateProductUI() {
+            const list = document.getElementById('products-list');
+            if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div>`).join('');
+            
+            const opts = '<option value="">Sem Plano</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+            const sel1 = document.getElementById('modal-product'); if(sel1) sel1.innerHTML = opts;
+            const sel2 = document.getElementById('modal-product-2'); if(sel2) sel2.innerHTML = opts;
+            const sel3 = document.getElementById('modal-product-3'); if(sel3) sel3.innerHTML = opts;
+            const sel4 = document.getElementById('modal-product-4'); if(sel4) sel4.innerHTML = opts;
+            
+            const rep = document.getElementById('report-filter-product');
+            if(rep) rep.innerHTML = '<option value="all">Todos</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+        }
+        function openProductModal() { document.getElementById('product-modal').classList.remove('hidden'); }
+        async function saveProduct() {
+            const n = document.getElementById('prod-name').value; const p = document.getElementById('prod-price').value;
+            if(n && p) { await sb.from('products').insert([{name:n, price:p}]); document.getElementById('product-modal').classList.add('hidden'); fetchProducts(); }
+        }
+        async function deleteProduct(id, n) { if(confirm('Apagar plano '+n+'?')) { await sb.from('products').delete().eq('id', id); fetchProducts(); } }
+        function populateMonthFilter() {
+            const el = document.getElementById('dashboard-filter-month'); 
+            const rep = document.getElementById('report-filter-month');
+            if(el.options.length > 0) return;
+            let h = '';
+            for(let i=-6; i<=6; i++) {
+                const d = new Date(); d.setMonth(d.getMonth() + i);
+                const v = d.toISOString().slice(0,7);
+                const l = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+                h += `<option value="${v}" ${i===0?'selected':''}>${l}</option>`;
             }
-          }catch(e){}
+            el.innerHTML = h; rep.innerHTML = h;
         }
-        return { html: `✅ Cliente <b>${payload.name}</b> cadastrado.` };
-      }
-    });
-    return;
-  }
-  if(n.includes('cadastrar cliente') || n.startsWith('novo cliente') || (n.includes('cliente') && (n.startsWith('cadastrar') || n.startsWith('novo')))){
-    // tenta pegar nome após "cliente"
-    let name = '';
-    const m = t.match(/cliente\s*[:,-]?\s*([^,\n]+)/i);
-    if(m) name = (m[1]||'').trim();
-    if(!name){ addMsg('bot','⚠️ Diga o nome do cliente. Ex: "Cadastrar cliente João, venc 10, plano Premium, 39,90"'); return; }
+        function toggleInactiveFilter() { showInactiveOnly = !showInactiveOnly; renderClients(allClients); }
+        
+        // MÁSCARA TELEFONE FIXA: (DD) 9XXXX-XXXX
+        function maskPhone(el) { 
+            let v = el.value.replace(/\D/g, '');
 
-    const due = (()=>{ const md=t.match(/\bvenc(?:imento)?\s*[: ]?\s*(\d{1,2})/i); return md?parseInt(md[1],10):null; })();
-    const wpp = (()=>{ const mw=t.replace(/\D/g,'').match(/(\d{10,13})/); return mw?mw[1]:null; })();
-    const price = _aiParseMoney(t);
-    const prodNameMatch = t.match(/\b(plano|produto)\s*[:,-]?\s*([^,\n]+)/i);
-    const prodName = prodNameMatch ? (prodNameMatch[2]||'').trim() : '';
-    const prod = prodName ? _aiFindProductByName(prodName) : null;
+            // Limita a 11 dígitos (DDD + 9 + 8 números)
+            v = v.substring(0, 11);
 
-    const payload = {
-      name: name,
-      due_day: due || 10,
-      whatsapp: wpp || null,
-      product_id: prod ? prod.id : (allProducts[0]?.id || null),
-      agreed_price: (price!==null ? price : null),
-      active: true
-    };
+            // Força começar com 9 após o DDD
+            if (v.length >= 3) {
+                if (v[2] !== '9') {
+                    v = v.substring(0,2) + '9' + v.substring(2);
+                    v = v.substring(0,11);
+                }
+            }
 
-    _aiAskConfirm(`Cadastrar cliente: ${payload.name}`, {
-      run: async ()=>{
-        const { error } = await sb.from('clients').insert([payload]);
-        if(error) throw error;
-        logAction && logAction('IA: Novo Cliente', payload.name);
-        return { html: `✅ Cliente <b>${payload.name}</b> cadastrado.` };
-      }
-    });
-    return;
-  }
+            if (v.length >= 11) {
+                v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } 
+            else if (v.length > 2) {
+                v = v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            }
 
-  if(n.startsWith('editar cliente') || n.includes('editar cliente') || n.startsWith('atualizar cliente')){
-    const m = t.match(/cliente\s*[:,-]?\s*([^:\n,]+)(?:[:,\n].*)?$/i);
-    const name = m ? (m[1]||'').trim() : '';
-    const c = _aiFindClientByName(name);
-    if(!c){ addMsg('bot', '⚠️ Não encontrei esse cliente. Tente: "Editar cliente NOME: venc 15"'); return; }
-
-    const updates = {};
-    const md=t.match(/\bvenc(?:imento)?\s*[: ]?\s*(\d{1,2})/i);
-    if(md) updates.due_day = parseInt(md[1],10);
-    const mp=t.match(/\b(plano|produto)\s*[:,-]?\s*([^,\n]+)/i);
-    if(mp){ const p=_aiFindProductByName((mp[2]||'').trim()); if(p) updates.product_id=p.id; }
-    const mw=t.replace(/\D/g,'').match(/(\d{10,13})/);
-    if(mw) updates.whatsapp = mw[1];
-    const money=_aiParseMoney(t);
-    if(money!==null) updates.agreed_price = money;
-    if(Object.keys(updates).length===0){ addMsg('bot','ℹ️ O que você quer alterar? Ex: "Editar cliente João: venc 15, plano Premium"'); return; }
-
-    _aiAskConfirm(`Editar cliente: ${c.name}`, {
-      run: async ()=>{
-        const { error } = await sb.from('clients').update(updates).eq('id', c.id);
-        if(error) throw error;
-        logAction && logAction('IA: Editar Cliente', c.name);
-        return { html: `✅ Cliente <b>${c.name}</b> atualizado.` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('cancelar cliente') || n.startsWith('inativar cliente') || n.startsWith('desativar cliente')){
-    const m = t.match(/cliente\s*[:,-]?\s*([^,\n]+)/i);
-    const name = m ? (m[1]||'').trim() : '';
-    const c = _aiFindClientByName(name);
-    if(!c){ addMsg('bot','⚠️ Não encontrei esse cliente.'); return; }
-
-    _aiAskConfirm(`Cancelar (inativar) cliente: ${c.name}`, {
-      run: async ()=>{
-        const { error } = await sb.from('clients').update({ active:false }).eq('id', c.id);
-        if(error) throw error;
-        logAction && logAction('IA: Cancelar Cliente', c.name);
-        return { html: `✅ Cliente <b>${c.name}</b> foi inativado.` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('cobrar ') || n.startsWith('cobrar cliente') || n.includes('cobrar ')){
-    // cobrar NOME
-    let name = '';
-    let m = t.match(/cobrar\s+cliente\s*[:,-]?\s*([^,\n]+)/i);
-    if(m) name = (m[1]||'').trim();
-    if(!name){
-      m = t.match(/cobrar\s+([^,\n]+)/i);
-      if(m) name = (m[1]||'').trim();
-    }
-    const c = _aiFindClientByName(name);
-    if(!c){ addMsg('bot','⚠️ Não encontrei esse cliente.'); return; }
-    const price = (c.agreed_price || c.products?.price || 0);
-    const due = c.due_day || '';
-    const msg = `Olá, ${c.name}! 😊\n\nPassando para lembrar do seu pagamento do plano ${c.products?.name || ''} (R$ ${Number(price||0).toFixed(2).replace('.',',')}).\nVencimento: dia ${due}.\n\nSe já pagou, por favor desconsidere. Obrigado!`;
-    addMsg('bot', `📲 <b>Mensagem de cobrança pronta:</b><br><div class="mt-2 p-2 rounded-lg bg-slate-800/60 border border-slate-700 text-xs whitespace-pre-wrap">${msg}</div><button class="mt-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs" onclick="navigator.clipboard.writeText(${JSON.stringify(msg)});showToast('Copiado!')">Copiar</button>`);
-    return;
-  }
-
-  if(n.startsWith('detalhes cliente') || n.startsWith('dados cliente') || n.startsWith('cliente ')){
-    let name = '';
-    let m = t.match(/cliente\s*[:,-]?\s*([^,\n]+)/i);
-    if(m) name = (m[1]||'').trim();
-    const c = _aiFindClientByName(name);
-    if(!c){ addMsg('bot','⚠️ Não encontrei esse cliente.'); return; }
-    const price = (c.agreed_price || c.products?.price || 0);
-    addMsg('bot', `👤 <b>${c.name}</b><br>Plano: <b>${c.products?.name||'-'}</b><br>Valor: <b>R$ ${Number(price||0).toFixed(2).replace('.',',')}</b><br>Venc.: <b>dia ${c.due_day||'-'}</b><br>Status: <b>${c.active ? 'Ativo' : 'Inativo'}</b><br>WhatsApp: <b>${c.whatsapp||'-'}</b>`);
-    return;
-  }
-
-  // =========================
-  // PAGAMENTOS (payment_history)
-  // =========================
-  if(n.startsWith('registrar pagamento') || n.startsWith('lancar pagamento') || n.startsWith('lançar pagamento') || n.startsWith('recebi ') || n.includes('pago') && n.includes('cliente')){
-    // Ex: "Registrar pagamento João 39,90 hoje"
-    const m = t.match(/pagamento\s*[:,-]?\s*([^,\n]+?)\s+(\d+[\.,]\d{2}|\d+)/i) || t.match(/recebi\s+([^,\n]+?)\s+(\d+[\.,]\d{2}|\d+)/i);
-    if(!m){ addMsg('bot','⚠️ Ex: "Registrar pagamento João 39,90 hoje"'); return; }
-    const name = (m[1]||'').trim();
-    const amount = _aiParseMoney(m[2]);
-    const c = _aiFindClientByName(name);
-    if(!c || amount===null){ addMsg('bot','⚠️ Não consegui identificar cliente e valor.'); return; }
-    const dateISO = _aiParseDateISO(t) || new Date().toISOString().slice(0,10);
-
-    _aiAskConfirm(`Registrar pagamento: ${c.name} (R$ ${Number(amount).toFixed(2).replace('.',',')})`, {
-      run: async ()=>{
-        const d = { client_id: c.id, amount: amount, payment_date: dateISO+'T12:00:00Z', method:'manual', status:'approved' };
-        const { error } = await sb.from('payment_history').insert([d]);
-        if(error) throw error;
-        logAction && logAction('IA: Novo Pagamento', `${c.name} | ${amount}`);
-        return { html: `✅ Pagamento registrado para <b>${c.name}</b> em <b>${dateISO.split('-').reverse().join('/')}</b>.` };
-      }
-    });
-    return;
-  }
-
-  // =========================
-  // DESPESAS
-  // =========================
-  if(n.startsWith('nova despesa') || n.includes('lancar despesa') || n.includes('lançar despesa') || n.startsWith('despesa ')){
-    // Ex: "Nova despesa Internet 120,00 hoje pendente"
-    let m = t.match(/despesa\s*[:,-]?\s*([^,\n]+?)\s+(\d+[\.,]\d{2}|\d+)/i);
-    if(!m){ addMsg('bot','⚠️ Ex: "Nova despesa Internet 120,00 hoje pendente"'); return; }
-    const desc = (m[1]||'').trim();
-    const amount = _aiParseMoney(m[2]);
-    const dateISO = _aiParseDateISO(t) || new Date().toISOString().slice(0,10);
-    const status = (n.includes('paga') || n.includes('paid')) ? 'paid' : 'pending';
-
-    _aiAskConfirm(`Cadastrar despesa: ${desc} (R$ ${Number(amount||0).toFixed(2).replace('.',',')})`, {
-      run: async ()=>{
-        const d = { description: desc, amount: amount, date: dateISO, status: status };
-        const { error } = await sb.from('expenses').insert([d]);
-        if(error) throw error;
-        logAction && logAction('IA: Nova Despesa', `${desc} | ${amount}`);
-        return { html: `✅ Despesa <b>${desc}</b> cadastrada (${status==='paid'?'paga':'pendente'}).` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('marcar despesa') || n.includes('despesa') && (n.includes('como paga') || n.includes('como pendente'))){
-    const m = t.match(/despesa\s*[:,-]?\s*([^,\n]+)/i);
-    const q = m ? (m[1]||'').trim() : '';
-    const want = (n.includes('paga') ? 'paid' : 'pending');
-    if(!q){ addMsg('bot','⚠️ Ex: "Marcar despesa Internet como paga"'); return; }
-    const exp = allExpenses.find(e => _aiNorm(e.description).includes(_aiNorm(q)));
-    if(!exp){ addMsg('bot','⚠️ Não encontrei essa despesa.'); return; }
-
-    _aiAskConfirm(`Alterar despesa: ${exp.description} → ${want==='paid'?'paga':'pendente'}`, {
-      run: async ()=>{
-        const { error } = await sb.from('expenses').update({ status: want }).eq('id', exp.id);
-        if(error) throw error;
-        logAction && logAction('IA: Atualizar Despesa', exp.description);
-        return { html: `✅ Despesa <b>${exp.description}</b> marcada como <b>${want}</b>.` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('excluir despesa') || n.startsWith('apagar despesa') || n.startsWith('cancelar despesa') || n.includes('cancelar lancamento') || n.includes('cancelar lançamento')){
-    const m = t.match(/despesa\s*[:,-]?\s*([^,\n]+)/i);
-    const q = m ? (m[1]||'').trim() : '';
-    if(!q){ addMsg('bot','⚠️ Ex: "Excluir despesa Internet"'); return; }
-    // pega a mais recente por descrição
-    const matches = allExpenses.filter(e => _aiNorm(e.description).includes(_aiNorm(q)));
-    if(!matches.length){ addMsg('bot','⚠️ Não encontrei essa despesa.'); return; }
-    const exp = matches.sort((a,b)=> (new Date(b.date||0)) - (new Date(a.date||0)))[0];
-
-    _aiAskConfirm(`Excluir despesa: ${exp.description} (R$ ${Number(exp.amount||0).toFixed(2).replace('.',',')})`, {
-      run: async ()=>{
-        const { error } = await sb.from('expenses').delete().eq('id', exp.id);
-        if(error) throw error;
-        logAction && logAction('IA: Excluir Despesa', exp.description);
-        return { html: `✅ Despesa <b>${exp.description}</b> excluída.` };
-      }
-    });
-    return;
-  }
-
-  // =========================
-  // PLANOS / PRODUCTS
-  // =========================
-  if(n.startsWith('novo plano') || n.startsWith('novo produto') || n.includes('cadastrar plano')){
-    // Ex: "Novo plano Netflix 39,90"
-    const m = t.match(/(plano|produto)\s*[:,-]?\s*([^,\n]+?)\s+(\d+[\.,]\d{2}|\d+)/i);
-    if(!m){ addMsg('bot','⚠️ Ex: "Novo plano Netflix 39,90"'); return; }
-    const pname = (m[2]||'').trim();
-    const price = _aiParseMoney(m[3]);
-    _aiAskConfirm(`Cadastrar plano: ${pname} (R$ ${Number(price||0).toFixed(2).replace('.',',')})`, {
-      run: async ()=>{
-        const { error } = await sb.from('products').insert([{ name:pname, price:price }]);
-        if(error) throw error;
-        logAction && logAction('IA: Novo Plano', pname);
-        return { html: `✅ Plano <b>${pname}</b> cadastrado.` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('editar plano') || n.startsWith('editar produto')){
-    const m = t.match(/(plano|produto)\s*[:,-]?\s*([^,\n]+?)\s+(\d+[\.,]\d{2}|\d+)/i);
-    if(!m){ addMsg('bot','⚠️ Ex: "Editar plano Netflix 45,00"'); return; }
-    const pname = (m[2]||'').trim();
-    const price = _aiParseMoney(m[3]);
-    const p = _aiFindProductByName(pname);
-    if(!p){ addMsg('bot','⚠️ Não encontrei esse plano.'); return; }
-    _aiAskConfirm(`Editar plano: ${p.name} → R$ ${Number(price||0).toFixed(2).replace('.',',')}`, {
-      run: async ()=>{
-        const { error } = await sb.from('products').update({ price: price }).eq('id', p.id);
-        if(error) throw error;
-        logAction && logAction('IA: Editar Plano', p.name);
-        return { html: `✅ Plano <b>${p.name}</b> atualizado.` };
-      }
-    });
-    return;
-  }
-
-  if(n.startsWith('excluir plano') || n.startsWith('apagar plano') || n.startsWith('excluir produto')){
-    const m = t.match(/(plano|produto)\s*[:,-]?\s*([^,\n]+)/i);
-    const pname = m ? (m[2]||'').trim() : '';
-    const p = _aiFindProductByName(pname);
-    if(!p){ addMsg('bot','⚠️ Não encontrei esse plano.'); return; }
-    _aiAskConfirm(`Excluir plano: ${p.name}`, {
-      run: async ()=>{
-        const { error } = await sb.from('products').delete().eq('id', p.id);
-        if(error) throw error;
-        logAction && logAction('IA: Excluir Plano', p.name);
-        return { html: `✅ Plano <b>${p.name}</b> excluído.` };
-      }
-    });
-    return;
-  }
-
-  // fallback
-  addMsg('bot', '🤖 Não entendi. Digite <b>ajuda</b> para ver exemplos do que posso fazer.');
-}
-
-sendChat = function(txt = null) {
-  const input = document.getElementById('chat-input');
-  const message = (txt !== null ? txt : input.value).trim();
-  if(!message) return;
-  addMsg('user', message);
-  input.value = '';
-  input.focus();
-  _aiHandle(message);
-}
-function addMsg(type, html) { const container = document.getElementById('chat-messages'); const div = document.createElement('div'); div.className = type === 'user' ? 'msg-user' : 'msg-bot'; div.innerHTML = html; container.appendChild(div); container.scrollTop = container.scrollHeight; }
-        // ... (resto das funções auxiliares do chat se necessário) ...
-    
-
-// ===== BoxPower AI Chat: toggle handler (V25.1 hotfix) =====
-(function(){
-  // Expose globally for inline onclick handlers
-  window.toggleChat = function(forceState){
-    try{
-      const win = document.getElementById('chat-window');
-      const input = document.getElementById('chat-input');
-      if(!win) return;
-      const isOpen = win.style.display === 'flex';
-      const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isOpen;
-      win.style.display = shouldOpen ? 'flex' : 'none';
-      if(shouldOpen && input){
-        setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 50);
-      }
-    }catch(e){
-      // silent by design
-    }
-  };
-})();
-
-</script>
+            el.value = v;
+        }
+        
+        function productChanged(slot) { 
+            const pidVal = slot === 1 ? document.getElementById('modal-product').value : document.getElementById(`modal-product-${slot}`).value;
+            const priceEl = slot === 1 ? document.getElementById('modal-price') : document.getElementById(`modal-price-${slot}`);
+            const p = allProducts.find(x=>x.id===pidVal);
+            if(p) priceEl.value = p.price.toFixed(2).replace('.', ',');
+            else priceEl.value = '';
+        }
+        function toggleNotifPanel() { const p=document.getElementById('notif-panel'); p.style.display = p.style.display==='flex'?'none':'flex'; }
+        
+        async function setMonthlyGoal() {
+            const m = document.getElementById('dashboard-filter-month').value;
+            const v = prompt("Nova meta para "+m, currentMonthGoal);
+            if(v) { await sb.from('monthly_goals').upsert({month: m, target_amount: parseMoneyBR(v)}); calculateDashboard(); }
+        }
+    </script>
 </body>
 </html>
