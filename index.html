@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BoxPower V25.23 - Telefone Final</title>
+    <title>BoxPower V25.24 - Gestão Focada</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -63,7 +63,7 @@
             <div class="flex flex-col">
                 <h2 id="header-greeting" class="text-emerald-400 text-[10px] font-bold uppercase tracking-widest">Bem-vindo</h2>
                 <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white drop-shadow-lg leading-tight">BoxPower Hub</h1>
-                <span class="text-[9px] text-slate-500 font-mono">v25.23</span>
+                <span class="text-[9px] text-slate-500 font-mono">v25.24</span>
             </div>
             <div class="flex gap-2">
                 <button onclick="openLogsModal()" class="w-8 h-8 bg-slate-800 text-yellow-500 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white" title="Logs"><i class="fas fa-clipboard-list text-xs"></i></button>
@@ -83,18 +83,27 @@
                 <i class="fas fa-calendar-alt text-emerald-500 ml-2"></i>
                 <select id="dashboard-filter-month" onchange="calculateDashboard()" class="w-full bg-slate-800 text-sm font-bold text-white outline-none border-none focus:ring-0"></select>
             </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <div class="glass p-4 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-l-4 border-l-emerald-500 relative group">
                     <div class="flex justify-between items-start"><p class="text-slate-400 text-[10px] font-bold uppercase">Receita Real</p><button onclick="setMonthlyGoal()" class="text-emerald-500/50 hover:text-white transition-colors"><i class="fas fa-pencil-alt text-xs"></i></button></div>
                     <h3 id="stat-paid-amount" class="text-xl font-bold text-emerald-400">R$ 0,00</h3><p id="goal-display" class="text-[9px] text-emerald-600 font-mono hidden">Meta: R$ 0,00</p>
                     <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden"><div id="revenue-progress" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div></div>
                 </div>
-                <div class="glass p-4 rounded-2xl border-l-4 border-l-blue-500"><p class="text-slate-400 text-[10px] font-bold uppercase">RECEITA PREVISTA</p><h3 id="stat-projected" class="text-xl font-bold text-blue-400">R$ 0,00</h3><p class="text-[9px] text-slate-500 mt-1">Soma de Contratos</p></div>
+                <div class="glass p-4 rounded-2xl border-l-4 border-l-blue-500"><p class="text-slate-400 text-[10px] font-bold uppercase">RECEITA PREVISTA</p><h3 id="stat-projected" class="text-xl font-bold text-blue-400">R$ 0,00</h3><p class="text-[9px] text-slate-500 mt-1">Estimativa Média</p></div>
             </div>
+            
             <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-3 rounded-xl border border-red-500/30 bg-red-900/10"><p class="text-red-400 text-[9px] uppercase font-bold"><i class="fas fa-clock mr-1"></i> Pendente (Total)</p><h4 id="stat-pending-total" class="text-lg font-bold text-white mt-1">R$ 0,00</h4></div>
-                <div class="glass p-3 rounded-xl border border-yellow-500/30 bg-yellow-900/10"><p class="text-yellow-400 text-[9px] uppercase font-bold"><i class="fas fa-coins mr-1"></i> Lucro Líquido</p><h4 id="stat-profit" class="text-lg font-bold text-white mt-1">R$ 0,00</h4></div>
+                <div class="glass p-3 rounded-xl border border-red-500/30 bg-red-900/10">
+                    <p class="text-red-400 text-[9px] uppercase font-bold"><i class="fas fa-clock mr-1"></i> Pendente (Total)</p>
+                    <h4 id="stat-pending-total" class="text-lg font-bold text-white mt-1">R$ 0,00</h4>
+                </div>
+                <div class="glass p-3 rounded-xl border border-yellow-500/30 bg-yellow-900/10">
+                    <p class="text-yellow-400 text-[9px] uppercase font-bold"><i class="fas fa-coins mr-1"></i> Lucro Líquido</p>
+                    <h4 id="stat-profit" class="text-lg font-bold text-white mt-1">R$ 0,00</h4>
+                </div>
             </div>
+
             <div class="glass rounded-3xl overflow-hidden border border-slate-700/50 mt-2">
                 <div class="p-4 border-b border-slate-700 bg-slate-800/30"><div class="flex justify-between items-center mb-2"><h3 class="font-bold flex items-center gap-2 text-sm uppercase tracking-wider text-slate-300"><i class="fas fa-exclamation-triangle text-yellow-400 text-sm"></i> <span id="pending-header-title">PENDÊNCIAS</span></h3><span id="badge-count" class="bg-yellow-600 text-white text-sm font-bold px-2.5 py-0.5 rounded-lg shadow-lg">0</span></div><input type="text" id="search-pending" oninput="filterPendingQueue()" placeholder="Buscar devedor..." class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-blue-500"></div>
                 <div id="billing-queue" class="divide-y divide-slate-800 max-h-96 overflow-y-auto bg-slate-900/30 pb-12"></div>
@@ -117,8 +126,12 @@
                 </div>
                 <button onclick="saveExpense()" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-500 shadow-md transform active:scale-95 transition-all">SALVAR CONTA</button>
             </div>
+
             <div class="glass rounded-2xl overflow-hidden border border-slate-700">
-                <div class="p-3 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center"><span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Últimos Lançamentos</span><span id="expense-total-display" class="text-xs text-red-400 font-bold"></span></div>
+                <div class="p-3 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
+                    <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Últimos Lançamentos</span>
+                    <span id="expense-total-display" class="text-xs text-red-400 font-bold"></span>
+                </div>
                 <div id="expenses-list" class="divide-y divide-slate-700/50"></div>
             </div>
         </div>
@@ -139,7 +152,13 @@
                     <select id="report-filter-month" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"></select>
                     <select id="report-filter-product" onchange="renderReportTable()" class="w-1/2 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg py-2 pl-2 outline-none"><option value="all">Planos: Todos</option></select>
                 </div>
-                <div class="report-container"><table class="report-table w-full"><thead id="report-header"></thead><tbody id="report-body"></tbody></table></div>
+                <div class="report-container">
+                    <table class="report-table w-full">
+                        <thead id="report-header">
+                            </thead>
+                        <tbody id="report-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -163,32 +182,40 @@
                     <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
                     <div class="flex gap-2">
                         <input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
-                        <input type="tel" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="(88) 9XXXX-XXXX" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
+                        <input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="(DD) 9XXXX-XXXX" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
                     </div>
-                    
-                    <div class="flex gap-2">
-                        <select id="modal-product" onchange="productChanged(1)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
-                        <input type="text" id="modal-price" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                    <div class="flex gap-2 mt-2">
+                        <select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white">
+                            <option value="true" class="text-green-400">Ativo</option>
+                            <option value="false" class="text-red-400">Inativo</option>
+                        </select>
                     </div>
-                    <div id="extra-product-2" class="hidden flex gap-2"><select id="modal-product-2" onchange="productChanged(2)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select><input type="text" id="modal-price-2" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs"><button onclick="removeProductSlot(2)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button></div>
-                    <div id="extra-product-3" class="hidden flex gap-2"><select id="modal-product-3" onchange="productChanged(3)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select><input type="text" id="modal-price-3" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs"><button onclick="removeProductSlot(3)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button></div>
-                    <div id="extra-product-4" class="hidden flex gap-2"><select id="modal-product-4" onchange="productChanged(4)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select><input type="text" id="modal-price-4" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs"><button onclick="removeProductSlot(4)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button></div>
-                    
-                    <button type="button" onclick="addNextProductSlot()" id="btn-add-prod" class="text-[10px] text-blue-400 hover:text-white underline w-full text-left">+ Adicionar outro produto</button>
-                    <div class="flex gap-2 mt-2"><select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white"><option value="true" class="text-green-400">Ativo</option><option value="false" class="text-red-400">Inativo</option></select></div>
                 </div>
                 
-                <div class="mt-4 pt-4 border-t border-slate-700"><button id="btn-show-history" onclick="toggleHistorySection()" class="w-full bg-slate-800 text-slate-300 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2"><i class="fas fa-coins text-yellow-500"></i> Gerenciar Pagamentos</button></div>
-                
+                <div class="mt-4 pt-4 border-t border-slate-700">
+                    <button id="btn-show-history" onclick="toggleHistorySection()" class="w-full bg-slate-800 text-slate-300 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-coins text-yellow-500"></i> Gerenciar Pagamentos
+                    </button>
+                </div>
+
                 <div id="history-section" class="mt-4 hidden bg-slate-800/50 p-3 rounded-xl border border-slate-700">
                     <div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Pagamentos</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Novo</button></div>
+                    
                     <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2" style="display:none;"> 
-                        <div class="flex gap-2 mb-2"><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div><div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="text" id="hist-amount" inputmode="decimal" onblur="formatInputCurrency(this)" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div></div>
-                        <div class="mb-2"><label class="text-[9px] text-slate-500 uppercase font-bold">Referente a qual produto?</label><select id="hist-product" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></select></div>
+                        <input type="hidden" id="hist-id"> <div class="flex gap-2 mb-2">
+                            <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div>
+                            <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="text" id="hist-amount" inputmode="decimal" onblur="formatInputCurrency(this)" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-[9px] text-slate-500 uppercase font-bold">Referente a qual produto?</label>
+                            <select id="hist-product" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></select>
+                        </div>
                         <div class="flex gap-2"><button onclick="closeHistoryForm()" class="flex-1 bg-slate-700 text-xs py-2 rounded text-slate-300">Cancelar</button><button onclick="saveHistory()" class="flex-1 bg-blue-600 text-xs py-2 rounded text-white font-bold">Salvar</button></div>
                     </div>
+                    
                     <div id="history-list" class="bg-slate-900 rounded-xl p-2 space-y-1 max-h-40 overflow-y-auto text-xs border border-slate-800"></div>
                 </div>
+
                 <div class="flex gap-3 mt-6"><button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-400">Cancelar</button><button onclick="saveClient()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg">Salvar Cliente</button></div>
             </div>
         </div>
@@ -223,23 +250,15 @@
             return parseFloat(clean) || 0;
         }
 
-        function getClientProductIds(c) {
-            const ids = [];
-            if(c.product_id) ids.push(c.product_id);
-            if(c.product_id_2) ids.push(c.product_id_2);
-            if(c.product_id_3) ids.push(c.product_id_3);
-            if(c.product_id_4) ids.push(c.product_id_4);
-            return ids;
-        }
-
         // === MÁSCARA TELEFONE ELÁSTICA (SEM TRAVAMENTO) ===
         function maskPhone(el) { 
             let v = el.value.replace(/\D/g,'');
-            v = v.substring(0, 11); // Max 11 digitos
-
+            // Removemos o limite rígido de 11 aqui para permitir digitação fluida
+            
             // Máscara Dinâmica
             if(v.length > 10) {
                 // (DD) 9XXXX-XXXX
+                v = v.substring(0, 11); // Corta excesso aqui
                 v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
             } else if(v.length > 6) {
                 // (DD) XXXX-XXXX (Fixo ou Celular incompleto)
@@ -250,25 +269,6 @@
             }
             
             el.value = v;
-        }
-
-        // === UI HELPERS ===
-        function addNextProductSlot() {
-            if(document.getElementById('extra-product-2').classList.contains('hidden')) {
-                document.getElementById('extra-product-2').classList.remove('hidden');
-            } else if(document.getElementById('extra-product-3').classList.contains('hidden')) {
-                document.getElementById('extra-product-3').classList.remove('hidden');
-            } else if(document.getElementById('extra-product-4').classList.contains('hidden')) {
-                document.getElementById('extra-product-4').classList.remove('hidden');
-                document.getElementById('btn-add-prod').classList.add('hidden'); 
-            }
-        }
-
-        function removeProductSlot(n) {
-            document.getElementById(`extra-product-${n}`).classList.add('hidden');
-            document.getElementById(`modal-product-${n}`).value = '';
-            document.getElementById(`modal-price-${n}`).value = '';
-            document.getElementById('btn-add-prod').classList.remove('hidden');
         }
 
         function toggleHistorySection() {
@@ -387,132 +387,458 @@
             if(!el) return;
             const total = allClients.length;
             const active = allClients.filter(c => c.active).length;
+            
             setTxt('stat-total-clients', total);
             setTxt('stat-active-clients', active);
             setTxt('stat-inactive-clients', total - active);
+
             const planCounts = {};
-            allClients.filter(c => c.active).forEach(c => {
-                const pids = getClientProductIds(c);
-                if(pids.length === 0) { planCounts['Sem Plano'] = (planCounts['Sem Plano'] || 0) + 1; } 
-                else { pids.forEach(pid => { const p = allProducts.find(x => x.id === pid); const name = p ? p.name : 'Desconhecido'; planCounts[name] = (planCounts[name] || 0) + 1; }); }
-            });
-            let html = '';
-            Object.keys(planCounts).sort((a,b) => planCounts[b] - planCounts[a]).forEach(name => { html += `<span class="bg-slate-800 px-2 py-1 rounded border border-slate-700 text-[9px] whitespace-nowrap">${name}: <b class="text-white">${planCounts[name]}</b></span>`; });
-            el.innerHTML = `<div class="flex flex-wrap gap-2 justify-center">${html || '<span class="text-slate-500 text-[9px]">Sem dados</span>'}</div>`;
+            // Lógica ajustada para contar pagamentos recentes como "ativos" se necessário, 
+            // mas aqui mantemos o cadastro ativo/inativo como base.
+            // Para "Sem Plano", podemos listar quem não tem pagamentos recentes se quiser.
+            // Por enquanto, mantendo simples:
+            el.innerHTML = ''; // Limpa pois removemos a complexidade de planos no cadastro
         }
 
         async function calculateDashboard() {
-            const el = document.getElementById('dashboard-filter-month'); if(!el) return;
-            const v = el.value; let t = new Date(); if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
+            const el = document.getElementById('dashboard-filter-month');
+            if(!el) return;
+            const v = el.value;
+            let t = new Date(); 
+            if(v) { const [y, m] = v.split('-'); t = new Date(parseInt(y), parseInt(m)-1, 1); }
+            
             const startStr = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
             const endStr = new Date(t.getFullYear(), t.getMonth()+1, 0, 23, 59, 59).toISOString();
             const monthKey = v || t.toISOString().slice(0, 7);
+
             try { const { data } = await sb.from('monthly_goals').select('target_amount').eq('month', monthKey).single(); currentMonthGoal = data ? Number(data.target_amount) : 0; } catch(e) { currentMonthGoal = 0; }
-            const gEl = document.getElementById('goal-display'); if(gEl) { gEl.innerText = `Meta: ${formatCurrency(currentMonthGoal)}`; gEl.classList.remove(currentMonthGoal > 0 ? 'hidden' : 'flex'); if(currentMonthGoal===0) gEl.classList.add('hidden'); }
+            const gEl = document.getElementById('goal-display');
+            if(gEl) { gEl.innerText = `Meta: ${formatCurrency(currentMonthGoal)}`; gEl.classList.remove(currentMonthGoal > 0 ? 'hidden' : 'flex'); if(currentMonthGoal===0) gEl.classList.add('hidden'); }
+
             const receita = historyData.filter(h => h.payment_date >= startStr && h.payment_date <= endStr && (h.status === 'approved' || !h.status)).reduce((a,c) => a + (Number(c.amount)||0), 0);
-            const projecao = allClients.filter(c => c.active).reduce((acc, c) => { let val = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0); if(val === 0) { getClientProductIds(c).forEach(pid => { const p = allProducts.find(x => x.id === pid); if(p) val += p.price; }); } return acc + val; }, 0);
+            
+            // Estimativa Média (Baseada na média de pagamentos dos clientes ativos)
+            const mediaPagamento = receita > 0 ? receita / (historyData.filter(h => h.payment_date >= startStr && h.payment_date <= endStr).length || 1) : 0;
+            const projecao = allClients.filter(c => c.active).length * mediaPagamento;
+
             const despesas = allExpenses.filter(e => e.date >= startStr.slice(0,10) && e.date <= endStr.slice(0,10));
             const pagas = despesas.filter(e => e.status === 'paid').reduce((a,c) => a + (Number(c.amount)||0), 0);
-            setTxt('stat-paid-amount', formatCurrency(receita)); setTxt('stat-projected', formatCurrency(projecao)); setTxt('stat-profit', formatCurrency(receita - pagas));
-            const prog = document.getElementById('revenue-progress'); if(prog) { const target = currentMonthGoal > 0 ? currentMonthGoal : projecao; prog.style.width = target > 0 ? `${Math.min((receita/target)*100, 100)}%` : '0%'; }
-            const now = new Date(); const isPast = t < new Date(now.getFullYear(), now.getMonth(), 1); const isCurr = (t.getMonth() === now.getMonth() && t.getFullYear() === now.getFullYear());
+
+            setTxt('stat-paid-amount', formatCurrency(receita));
+            setTxt('stat-projected', formatCurrency(projecao));
+            setTxt('stat-profit', formatCurrency(receita - pagas));
+            
+            const prog = document.getElementById('revenue-progress');
+            if(prog) {
+                const target = currentMonthGoal > 0 ? currentMonthGoal : projecao;
+                prog.style.width = target > 0 ? `${Math.min((receita/target)*100, 100)}%` : '0%';
+            }
+
+            const now = new Date();
+            
+            // Pendentes: Clientes ativos que NÃO pagaram neste mês
             const pendingList = allClients.filter(c => {
-                if(!c.active) return false; let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0); if(due === 0) { getClientProductIds(c).forEach(pid => { const p = allProducts.find(x => x.id === pid); if(p) due += p.price; }); } if(due === 0) return false;
-                const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr && (h.status==='approved' || !h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
-                if(paid >= due) return false; if(isPast) return true; if(isCurr) return (c.due_day || 10) <= now.getDate(); return false;
+                if(!c.active) return false;
+                const paid = historyData.some(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr && (h.status==='approved' || !h.status));
+                return !paid;
             });
-            const pendingMonthValue = pendingList.reduce((acc, c) => { let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0); if(due===0) getClientProductIds(c).forEach(pid=>{const p=allProducts.find(x=>x.id===pid); if(p) due+=p.price;}); const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr).reduce((a,b)=>a+(Number(b.amount)||0),0); return acc + Math.max(0, due - paid); }, 0);
-            setTxt('stat-pending-total', formatCurrency(pendingMonthValue)); setTxt('pending-header-title', `PENDÊNCIAS (${formatCurrency(pendingMonthValue)})`); setTxt('badge-count', pendingList.length);
-            const pList = document.getElementById('billing-queue'); if(pList) { const term = document.getElementById('search-pending').value.toLowerCase(); const filtered = pendingList.filter(c => c.name.toLowerCase().includes(term)); if(filtered.length === 0) pList.innerHTML = '<div class="p-8 text-center text-slate-500">Nada pendente.</div>'; else pList.innerHTML = filtered.map(c => ` <div class="p-3 flex justify-between items-center hover:bg-slate-800 transition border-b border-slate-800/50"> <div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400">Vence dia <span class="text-yellow-500">${c.due_day}</span></p></div> <div class="flex gap-2"> <button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen text-xs"></i></button> <a href="https://api.whatsapp.com/send?phone=${c.whatsapp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center"><i class="fab fa-whatsapp"></i></a> </div> </div>`).join(''); }
+
+            // Valor Pendente Total (Estimado pela média ou zero se não tiver base)
+            // Como não temos valor fixo no cadastro, usamos 0 ou uma média global para representar "pendência" visualmente
+            const pendingMonthValue = 0; // Ajuste conforme necessidade de negócio
+
+            setTxt('stat-pending-total', pendingList.length + " Clientes");
+            setTxt('pending-header-title', `PENDENTES (${pendingList.length})`);
+            setTxt('badge-count', pendingList.length);
+            
+            const pList = document.getElementById('billing-queue');
+            if(pList) {
+                const term = document.getElementById('search-pending').value.toLowerCase();
+                const filtered = pendingList.filter(c => c.name.toLowerCase().includes(term));
+                if(filtered.length === 0) pList.innerHTML = '<div class="p-8 text-center text-slate-500">Tudo em dia!</div>';
+                else pList.innerHTML = filtered.map(c => `
+                    <div class="p-3 flex justify-between items-center hover:bg-slate-800 transition border-b border-slate-800/50">
+                        <div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400">Vence dia <span class="text-yellow-500">${c.due_day}</span></p></div>
+                        <div class="flex gap-2">
+                            <button onclick="editClient('${c.id}')" class="bg-slate-700 text-blue-400 w-8 h-8 rounded-lg"><i class="fas fa-pen text-xs"></i></button>
+                            <a href="https://api.whatsapp.com/send?phone=${c.whatsapp}" target="_blank" class="bg-emerald-600 text-white w-8 h-8 rounded-lg flex items-center justify-center"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>`).join('');
+            }
         }
+
         function filterPendingQueue() { calculateDashboard(); }
 
-        function openHistoryForm() {
-            const form = document.getElementById('history-form-container'); form.style.display = 'block'; document.getElementById('hist-date').value = new Date().toISOString().slice(0, 10);
-            const cid = document.getElementById('modal-client-id').value; const client = allClients.find(c => c.id === cid); const select = document.getElementById('hist-product'); const amountEl = document.getElementById('hist-amount');
-            select.innerHTML = '<option value="">-- Selecione um Plano --</option>'; allProducts.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.text = p.name; opt.dataset.price = p.price; select.appendChild(opt); });
-            if(client) { const clientPids = getClientProductIds(client); if(clientPids.length > 0) { select.value = clientPids[0]; const selectedOpt = Array.from(select.options).find(o => o.value === clientPids[0]); if(selectedOpt && selectedOpt.dataset.price) { amountEl.value = parseFloat(selectedOpt.dataset.price).toFixed(2).replace('.', ','); } } }
-            select.onchange = () => { const opt = select.options[select.selectedIndex]; if(opt && opt.dataset.price) { amountEl.value = parseFloat(opt.dataset.price).toFixed(2).replace('.', ','); } };
+        // === EDIÇÃO DE PAGAMENTO (NOVA LÓGICA) ===
+        function openHistoryForm(payId = null) {
+            const form = document.getElementById('history-form-container');
+            const dateEl = document.getElementById('hist-date');
+            const amountEl = document.getElementById('hist-amount');
+            const prodEl = document.getElementById('hist-product');
+            const idEl = document.getElementById('hist-id');
+
+            form.style.display = 'block';
+            
+            // Popula Select
+            prodEl.innerHTML = '<option value="">-- Selecione um Plano --</option>';
+            allProducts.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = p.name;
+                prodEl.appendChild(opt);
+            });
+
+            if (payId) {
+                // MODO EDIÇÃO
+                const pay = historyData.find(h => h.id === payId);
+                if (pay) {
+                    idEl.value = pay.id;
+                    dateEl.value = pay.payment_date.slice(0, 10);
+                    amountEl.value = formatCurrency(pay.amount).replace('R$', '').trim();
+                    prodEl.value = pay.product_id || '';
+                }
+            } else {
+                // MODO NOVO
+                idEl.value = '';
+                dateEl.value = new Date().toISOString().slice(0, 10);
+                amountEl.value = '';
+                prodEl.value = '';
+            }
         }
+
         function closeHistoryForm() { document.getElementById('history-form-container').style.display = 'none'; }
+
         async function saveHistory() {
-            const cid = document.getElementById('modal-client-id').value, rawVal = document.getElementById('hist-amount').value, date = document.getElementById('hist-date').value, pid = document.getElementById('hist-product').value || null, amount = parseMoneyBR(rawVal);
+            const hid = document.getElementById('hist-id').value;
+            const cid = document.getElementById('modal-client-id').value;
+            const rawVal = document.getElementById('hist-amount').value;
+            const date = document.getElementById('hist-date').value;
+            const pid = document.getElementById('hist-product').value || null;
+            
+            const amount = parseMoneyBR(rawVal); 
+
             if(!amount || !date) return alert("Preencha data e valor válido.");
-            await sb.from('payment_history').insert([{ client_id: cid, amount: amount, payment_date: date + 'T12:00:00Z', status: 'approved', method: 'manual', product_id: pid }]);
-            logAction('Pagamento Manual', `Cliente ${cid} - ${formatCurrency(amount)}`); closeHistoryForm(); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard();
+
+            const payload = {
+                client_id: cid, 
+                amount: amount, 
+                payment_date: date + 'T12:00:00Z', 
+                status: 'approved', 
+                method: 'manual',
+                product_id: pid 
+            };
+
+            if (hid) {
+                // ATUALIZAR
+                await sb.from('payment_history').update(payload).eq('id', hid);
+            } else {
+                // INSERIR
+                await sb.from('payment_history').insert([payload]);
+            }
+            
+            logAction(hid ? 'Editar Pagamento' : 'Novo Pagamento', `Cliente ${cid} - ${formatCurrency(amount)}`);
+            
+            closeHistoryForm();
+            await fetchFullHistory();
+            renderHistoryList(cid);
+            calculateDashboard();
         }
+
         function renderHistoryList(cid) {
-            const list = document.getElementById('history-list'); if(!list) return; list.innerHTML = '';
+            const list = document.getElementById('history-list');
+            if(!list) return;
+            list.innerHTML = '';
+            
             const h = historyData.filter(x => x.client_id === cid).sort((a,b)=>new Date(b.payment_date)-new Date(a.payment_date));
-            if(h.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 py-2">Sem histórico</p>'; return; }
-            list.innerHTML = h.map(i => { let prodLabel = ''; if(i.product_id) { const p = allProducts.find(prod => prod.id === i.product_id); if(p) prodLabel = `<span class="block text-[9px] text-blue-300 font-bold">${p.name}</span>`; } return ` <div class="flex justify-between items-center border-b border-slate-700/50 p-2 text-xs bg-slate-800/30 rounded mb-1"> <div> <span class="text-slate-400 font-mono text-[10px]">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span> ${prodLabel} </div> <div class="text-right"> <span class="text-emerald-400 font-bold block">${formatCurrency(i.amount)}</span> <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 text-[10px] hover:text-white underline">Excluir</button> </div> </div>`; }).join('');
+            
+            if(h.length === 0) {
+                list.innerHTML = '<p class="text-center text-slate-500 py-2">Sem histórico</p>';
+                return;
+            }
+
+            list.innerHTML = h.map(i => {
+                let prodLabel = '';
+                if(i.product_id) {
+                    const p = allProducts.find(prod => prod.id === i.product_id);
+                    if(p) prodLabel = `<span class="block text-[9px] text-blue-300 font-bold">${p.name}</span>`;
+                }
+
+                return `
+                <div class="flex justify-between items-center border-b border-slate-700/50 p-2 text-xs bg-slate-800/30 rounded mb-1">
+                    <div>
+                        <span class="text-slate-400 font-mono text-[10px]">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span>
+                        ${prodLabel}
+                    </div>
+                    <div class="text-right flex gap-3 items-center">
+                        <span class="text-emerald-400 font-bold block">${formatCurrency(i.amount)}</span> 
+                        <button onclick="openHistoryForm('${i.id}')" class="text-blue-400 hover:text-white" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-white" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
         }
-        async function deleteHistory(hid, cid) { if(confirm("Apagar pagamento?")) { await sb.from('payment_history').delete().eq('id', hid); await fetchFullHistory(); renderHistoryList(cid); calculateDashboard(); } }
-        async function logAction(action, details) { if(!sb) return; try { await sb.from('system_logs').insert({ user_name: currentUser, action_type: action, details: details, created_at: new Date().toISOString() }); } catch(e) { console.warn("Log falhou", e); } }
-        async function openLogsModal() { const el = document.getElementById('logs-modal'); if(el) el.classList.remove('hidden'); const list = document.getElementById('logs-list'); if(!list) return; list.innerHTML = '<p class="text-center text-slate-500 text-xs">Carregando...</p>'; const { data } = await sb.from('system_logs').select('*').gte('created_at', new Date(new Date().setDate(new Date().getDate() - 30)).toISOString()).order('created_at', { ascending: false }); if(!data || data.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 text-xs">Nenhum registro.</p>'; return; } list.innerHTML = data.map(l => `<div class="log-entry"><span class="log-user">${l.user_name}</span> <span class="log-action">${l.action_type}</span><br><span class="text-white">${l.details}</span><br><span class="log-date">${new Date(l.created_at).toLocaleString('pt-BR')}</span></div>`).join(''); }
-        function openModal() { ['modal-client-id','modal-name','modal-due','modal-whatsapp','modal-product','modal-price','modal-product-2','modal-price-2','modal-product-3','modal-price-3','modal-product-4','modal-price-4'].forEach(id=>document.getElementById(id).value=''); document.getElementById('extra-product-2').classList.add('hidden'); document.getElementById('extra-product-3').classList.add('hidden'); document.getElementById('extra-product-4').classList.add('hidden'); document.getElementById('btn-add-prod').classList.remove('hidden'); document.getElementById('history-section').classList.add('hidden'); document.getElementById('client-modal').classList.remove('hidden'); }
+
+        async function deleteHistory(hid, cid) {
+            if(confirm("Apagar pagamento?")) {
+                await sb.from('payment_history').delete().eq('id', hid);
+                await fetchFullHistory();
+                renderHistoryList(cid);
+                calculateDashboard();
+            }
+        }
+
+        async function logAction(action, details) {
+            if(!sb) return;
+            try { await sb.from('system_logs').insert({ user_name: currentUser, action_type: action, details: details, created_at: new Date().toISOString() }); } catch(e) { console.warn("Log falhou", e); }
+        }
+
+        async function openLogsModal() {
+            const el = document.getElementById('logs-modal'); if(el) el.classList.remove('hidden');
+            const list = document.getElementById('logs-list'); if(!list) return;
+            list.innerHTML = '<p class="text-center text-slate-500 text-xs">Carregando...</p>';
+            try {
+                const date30DaysAgo = new Date(); date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
+                const { data, error } = await sb.from('system_logs').select('*').gte('created_at', date30DaysAgo.toISOString()).order('created_at', { ascending: false });
+                if(error) throw error;
+                if(!data || data.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 text-xs">Nenhum registro.</p>'; return; }
+                list.innerHTML = data.map(l => `<div class="log-entry"><span class="log-user">${l.user_name}</span> <span class="log-action">${l.action_type}</span><br><span class="text-white">${l.details}</span><br><span class="log-date">${new Date(l.created_at).toLocaleString('pt-BR')}</span></div>`).join('');
+            } catch (e) { list.innerHTML = `<p class="text-center text-red-400 text-xs">Erro ao carregar logs.</p>`; }
+        }
+
+        function openModal() { 
+            ['modal-client-id','modal-name','modal-due','modal-whatsapp'].forEach(id=>document.getElementById(id).value='');
+            document.getElementById('history-section').classList.add('hidden'); 
+            document.getElementById('client-modal').classList.remove('hidden'); 
+        }
         function closeModal() { document.getElementById('client-modal').classList.add('hidden'); }
+        
         async function editClient(id) {
-            const c = allClients.find(x => x.id === id); if(!c) return;
-            document.getElementById('modal-client-id').value = c.id; document.getElementById('modal-name').value = c.name; document.getElementById('modal-due').value = c.due_day;
-            const wppInput = document.getElementById('modal-whatsapp'); wppInput.value = c.whatsapp || ''; maskPhone(wppInput);
+            const c = allClients.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('modal-client-id').value = c.id;
+            document.getElementById('modal-name').value = c.name;
+            document.getElementById('modal-due').value = c.due_day;
+            
+            // Máscara ao carregar
+            const wppInput = document.getElementById('modal-whatsapp');
+            wppInput.value = c.whatsapp || '';
+            maskPhone(wppInput); 
+
             document.getElementById('modal-status').value = c.active;
-            document.getElementById('modal-product').value = c.product_id || ''; document.getElementById('modal-price').value = c.agreed_price ? c.agreed_price.toFixed(2).replace('.', ',') : '';
-            const p2 = c.product_id_2 || c.agreed_price_2; const p3 = c.product_id_3 || c.agreed_price_3; const p4 = c.product_id_4 || c.agreed_price_4;
-            document.getElementById('extra-product-2').classList.add('hidden'); document.getElementById('extra-product-3').classList.add('hidden'); document.getElementById('extra-product-4').classList.add('hidden'); document.getElementById('btn-add-prod').classList.remove('hidden');
-            if(p2) { document.getElementById('extra-product-2').classList.remove('hidden'); document.getElementById('modal-product-2').value = c.product_id_2 || ''; document.getElementById('modal-price-2').value = c.agreed_price_2 ? c.agreed_price_2.toFixed(2).replace('.', ',') : ''; }
-            if(p3) { document.getElementById('extra-product-3').classList.remove('hidden'); document.getElementById('modal-product-3').value = c.product_id_3 || ''; document.getElementById('modal-price-3').value = c.agreed_price_3 ? c.agreed_price_3.toFixed(2).replace('.', ',') : ''; }
-            if(p4) { document.getElementById('extra-product-4').classList.remove('hidden'); document.getElementById('modal-product-4').value = c.product_id_4 || ''; document.getElementById('modal-price-4').value = c.agreed_price_4 ? c.agreed_price_4.toFixed(2).replace('.', ',') : ''; document.getElementById('btn-add-prod').classList.add('hidden'); }
-            document.getElementById('history-section').classList.add('hidden'); renderHistoryList(id); document.getElementById('client-modal').classList.remove('hidden');
+            
+            document.getElementById('history-section').classList.add('hidden');
+            renderHistoryList(id);
+            document.getElementById('client-modal').classList.remove('hidden');
         }
+
         async function saveClient() {
-            const id = document.getElementById('modal-client-id').value; const name = document.getElementById('modal-name').value; const due = parseInt(document.getElementById('modal-due').value)||10; const wpp = document.getElementById('modal-whatsapp').value; const active = document.getElementById('modal-status').value === 'true';
-            const getP = (n) => { if(n > 1 && document.getElementById(`extra-product-${n}`).classList.contains('hidden')) { return { pid: null, price: null }; } const pid = document.getElementById(n===1 ? 'modal-product' : `modal-product-${n}`).value || null; const price = parseMoneyBR(document.getElementById(n===1 ? 'modal-price' : `modal-price-${n}`).value); return { pid, price }; }
-            const p1 = getP(1), p2 = getP(2), p3 = getP(3), p4 = getP(4);
-            const d = { name, due_day: due, whatsapp: wpp, active, product_id: p1.pid, agreed_price: p1.price, product_id_2: p2.pid, agreed_price_2: p2.price, product_id_3: p3.pid, agreed_price_3: p3.price, product_id_4: p4.pid, agreed_price_4: p4.price };
-            if(id) await sb.from('clients').update(d).eq('id', id); else await sb.from('clients').insert([d]); closeModal(); loadAllData();
+            const id = document.getElementById('modal-client-id').value;
+            const name = document.getElementById('modal-name').value;
+            const due = parseInt(document.getElementById('modal-due').value)||10;
+            const wpp = document.getElementById('modal-whatsapp').value;
+            const active = document.getElementById('modal-status').value === 'true';
+
+            // DADOS LIMPOS - SEM PRODUTOS FIXOS
+            const d = { name, due_day: due, whatsapp: wpp, active };
+            
+            if(id) await sb.from('clients').update(d).eq('id', id);
+            else await sb.from('clients').insert([d]);
+            
+            closeModal();
+            loadAllData();
         }
-        async function deleteClient(id, name) { if(confirm(`Excluir ${name}?`)) { await sb.from('payment_history').delete().eq('client_id', id); await sb.from('clients').delete().eq('id', id); loadAllData(); } }
+
+        async function deleteClient(id, name) {
+            if(confirm(`Excluir ${name}?`)) {
+                await sb.from('payment_history').delete().eq('client_id', id);
+                await sb.from('clients').delete().eq('id', id);
+                loadAllData();
+            }
+        }
+
         function renderClients(lista) {
-            const el = document.getElementById('clients-list'); if(!el) return; const term = document.getElementById('search-client').value.toLowerCase(); const termClean = term.replace(/\D/g, '');
-            const filtered = lista.filter(c => { const matchName = c.name.toLowerCase().includes(term); const phoneClean = (c.whatsapp || '').replace(/\D/g, ''); const matchPhone = termClean.length > 2 && phoneClean.includes(termClean); if(!matchName && !matchPhone) return false; if(showInactiveOnly && c.active) return false; if(!showInactiveOnly && !c.active) return false; return true; });
-            if(filtered.length===0) el.innerHTML = '<p class="text-center text-slate-500 text-xs mt-4">Nada encontrado.</p>'; else el.innerHTML = filtered.map(c => {
-                const pids = getClientProductIds(c); let pName = 'S/ Plano'; if(pids.length === 1) { pName = allProducts.find(p=>p.id===pids[0])?.name || 'Plano Antigo'; } else if(pids.length > 1) { pName = `${pids.length} Planos`; }
-                let totalValue = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0);
-                // Função para formatar o telefone na exibição da lista
-                let phoneRaw = (c.whatsapp || '').replace(/\D/g, '');
-                let phoneDisplay = c.whatsapp || '';
-                if(phoneRaw.length > 10) { phoneDisplay = phoneRaw.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3'); } 
-                else if(phoneRaw.length > 5) { phoneDisplay = phoneRaw.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3'); }
+            const el = document.getElementById('clients-list');
+            if(!el) return;
+            const term = document.getElementById('search-client').value.toLowerCase();
+            const termClean = term.replace(/\D/g, ''); 
+
+            const filtered = lista.filter(c => {
+                const matchName = c.name.toLowerCase().includes(term);
+                const phoneClean = (c.whatsapp || '').replace(/\D/g, '');
+                const matchPhone = termClean.length > 2 && phoneClean.includes(termClean); 
+
+                if(!matchName && !matchPhone) return false;
                 
-                return ` <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}"> <div onclick="editClient('${c.id}')" class="flex-1 cursor-pointer"> <h4 class="font-bold text-sm text-white tracking-wide">${c.name}</h4> <div class="text-[10px] text-slate-400 mt-1"> Dia ${c.due_day} - ${pName} - ${formatCurrency(totalValue)} - ${phoneDisplay} </div> </div> <div class="flex gap-2"> <button onclick="deleteClient('${c.id}', '${c.name}')" class="w-8 h-8 rounded flex items-center justify-center text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button> <button onclick="editClient('${c.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center text-blue-400"><i class="fas fa-pen text-xs"></i></button> </div> </div>`; }).join('');
+                if(showInactiveOnly && c.active) return false;
+                if(!showInactiveOnly && !c.active) return false;
+                return true;
+            });
+
+            if(filtered.length===0) el.innerHTML = '<p class="text-center text-slate-500 text-xs mt-4">Nada encontrado.</p>';
+            else el.innerHTML = filtered.map(c => {
+                // Formatação na lista principal
+                let phoneDisplay = c.whatsapp || '';
+                // Aplica máscara visual
+                let v = phoneDisplay.replace(/\D/g,'');
+                if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                phoneDisplay = v;
+
+                return `
+                <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}">
+                    <div onclick="editClient('${c.id}')" class="flex-1 cursor-pointer">
+                        <h4 class="font-bold text-sm text-white tracking-wide">${c.name}</h4>
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            Dia ${c.due_day} - ${phoneDisplay}
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="deleteClient('${c.id}', '${c.name}')" class="w-8 h-8 rounded flex items-center justify-center text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button>
+                        <button onclick="editClient('${c.id}')" class="bg-slate-800 w-8 h-8 rounded flex items-center justify-center text-blue-400"><i class="fas fa-pen text-xs"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
         }
-        function filterClients() { renderClients(allClients); }
-        function renderExpensesList() { const l = document.getElementById('expenses-list'); if(!l) return; const show = allExpenses.slice(0, 50); if(show.length===0) l.innerHTML='<p class="text-center text-xs text-slate-500 p-4">Sem despesas.</p>'; else l.innerHTML = show.map(e => ` <div class="flex justify-between items-center p-3 hover:bg-slate-800/30 transition-all ${e.status==='paid'?'opacity-60':''}"> <div class="flex items-center gap-3 cursor-pointer" onclick="toggleExpenseStatus('${e.id}','${e.status}')"> <div class="text-lg">${e.status==='paid'?'✅':'🕒'}</div> <div><span class="text-white text-xs font-bold block ${e.status==='paid'?'line-through':''}">${e.description}</span><span class="text-slate-500 text-[9px]">${new Date(e.date).toLocaleDateString('pt-BR')}</span></div> </div> <div class="flex items-center gap-3"><span class="text-xs font-bold ${e.status==='paid'?'text-slate-500':'text-red-400'}">-${formatCurrency(e.amount)}</span><button onclick="deleteExpense('${e.id}')" class="text-slate-600 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div> </div>`).join(''); }
-        async function saveExpense() { const desc = document.getElementById('exp-desc').value; const amVal = document.getElementById('exp-amount').value; const date = document.getElementById('exp-date').value; const st = document.getElementById('exp-status').value; const amount = parseMoneyBR(amVal); if(!desc || !amount) return alert('Preencha os dados.'); await sb.from('expenses').insert([{description:desc, amount, date, status:st}]); document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value=''; loadAllData(); }
+
+        function filterClients() {
+            renderClients(allClients);
+        }
+
+        function renderExpensesList() {
+            const l = document.getElementById('expenses-list'); if(!l) return;
+            const show = allExpenses.slice(0, 50);
+            if(show.length===0) l.innerHTML='<p class="text-center text-xs text-slate-500 p-4">Sem despesas.</p>';
+            else l.innerHTML = show.map(e => `
+                <div class="flex justify-between items-center p-3 hover:bg-slate-800/30 transition-all ${e.status==='paid'?'opacity-60':''}">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="toggleExpenseStatus('${e.id}','${e.status}')">
+                        <div class="text-lg">${e.status==='paid'?'✅':'🕒'}</div>
+                        <div><span class="text-white text-xs font-bold block ${e.status==='paid'?'line-through':''}">${e.description}</span><span class="text-slate-500 text-[9px]">${new Date(e.date).toLocaleDateString('pt-BR')}</span></div>
+                    </div>
+                    <div class="flex items-center gap-3"><span class="text-xs font-bold ${e.status==='paid'?'text-slate-500':'text-red-400'}">-${formatCurrency(e.amount)}</span><button onclick="deleteExpense('${e.id}')" class="text-slate-600 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></div>
+                </div>`).join('');
+        }
+        async function saveExpense() {
+            const desc = document.getElementById('exp-desc').value;
+            const amVal = document.getElementById('exp-amount').value;
+            const date = document.getElementById('exp-date').value;
+            const st = document.getElementById('exp-status').value;
+            const amount = parseMoneyBR(amVal);
+            if(!desc || !amount) return alert('Preencha os dados.');
+            await sb.from('expenses').insert([{description:desc, amount, date, status:st}]);
+            document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
+            loadAllData();
+        }
         async function toggleExpenseStatus(id, st) { await sb.from('expenses').update({status: st==='paid'?'pending':'paid'}).eq('id',id); loadAllData(); }
         async function deleteExpense(id) { if(confirm('Apagar despesa?')) { await sb.from('expenses').delete().eq('id',id); loadAllData(); } }
+
         function renderReportTable() {
-            const m = document.getElementById('report-filter-month'); if(!m) return; const v = m.value; if(!v) return; const [y, mo] = v.split('-'); const dStart = new Date(y, mo-1, 1).toISOString(); const dEnd = new Date(y, mo, 0, 23, 59, 59).toISOString(); const pid = document.getElementById('report-filter-product').value;
-            const list = allClients.filter(c => { if(!c.active) return false; if(pid !== 'all' && c.product_id !== pid) return false; return true; }); list.sort((a,b) => a.name.localeCompare(b.name));
-            const totalArrecadado = list.reduce((acc, c) => { const p = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0); return acc + p; }, 0);
+            const m = document.getElementById('report-filter-month'); if(!m) return;
+            const v = m.value;
+            if(!v) return;
+            const [y, mo] = v.split('-'); 
+            const dStart = new Date(y, mo-1, 1).toISOString(); 
+            const dEnd = new Date(y, mo, 0, 23, 59, 59).toISOString();
+            const pid = document.getElementById('report-filter-product').value;
+            
+            const list = allClients.filter(c => {
+                if(!c.active) return false;
+                // Como não temos mais produto fixo no cliente, o filtro por produto
+                // agora deve olhar se o cliente tem PAGAMENTO daquele produto neste mês
+                if(pid !== 'all') {
+                    const hasPayment = historyData.some(h => h.client_id === c.id && h.product_id === pid && h.payment_date >= dStart && h.payment_date <= dEnd);
+                    if(!hasPayment) return false;
+                }
+                return true;
+            });
+
+            list.sort((a,b) => a.name.localeCompare(b.name));
+
+            // TOTAL ARRECADADO
+            const totalArrecadado = list.reduce((acc, c) => {
+                const p = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                return acc + p;
+            }, 0);
+
             const mesNome = new Date(dStart).toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
-            document.getElementById('report-header').innerHTML = ` <tr> <th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${list.length})</th> <th colspan="2" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px] text-center">${mesNome} | ${formatCurrency(totalArrecadado)}</th> </tr> <tr> <th class="sticky-col bg-slate-900 border-r border-slate-700"></th> <th class="sub-header text-blue-300 border-l border-slate-700 text-[9px] uppercase">DATA PAGTO</th> <th class="sub-header text-emerald-300 border-l border-slate-800 text-[9px] uppercase">VALOR PAGO</th> </tr>`;
-            const body = document.getElementById('report-body'); body.innerHTML = list.length===0 ? '<tr><td colspan="3" class="text-center p-4 text-xs text-slate-500">Nada encontrado.</td></tr>' : list.map(c => {
-                const pagamentos = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status)); const totalPago = pagamentos.reduce((a,b)=>a+(Number(b.amount)||0),0);
-                let diaPagamento = '-'; if(pagamentos.length > 0) { const ultimoPag = new Date(pagamentos[pagamentos.length-1].payment_date); diaPagamento = `${ultimoPag.getDate()}`; }
-                const dueDayLabel = `<span class="bg-slate-700 px-1 rounded mr-1 text-[9px] text-slate-300">${c.due_day||'?'}</span>`; const colCliente = `<td class="sticky-col text-xs text-left p-2 border-b border-slate-800 text-white truncate max-w-[160px]" onclick="editClient('${c.id}')">${dueDayLabel} ${c.name}</td>`; const colData = `<td class="text-center text-xs p-2 border-b border-slate-800 text-slate-500 font-mono">${diaPagamento}</td>`;
-                let colPagoClass = "text-slate-600 text-[9px]"; let colPagoContent = "-"; if(totalPago > 0) { colPagoClass = "text-emerald-400 font-bold bg-emerald-500/10 text-[9px]"; colPagoContent = formatCurrency(totalPago); } const colPago = `<td class="text-center p-2 border-b border-slate-800 ${colPagoClass}">${colPagoContent}</td>`; return `<tr>${colCliente}${colData}${colPago}</tr>`; }).join('');
+
+            // CABEÇALHO POWER
+            document.getElementById('report-header').innerHTML = `
+                <tr>
+                    <th class="sticky-col text-left text-white bg-slate-900 border-r border-slate-700">CLIENTES (${list.length})</th>
+                    <th colspan="2" class="text-emerald-400 bg-slate-900 border-l border-slate-700 font-bold tracking-widest text-[10px] text-center">${mesNome} | ${formatCurrency(totalArrecadado)}</th>
+                </tr>
+                <tr>
+                    <th class="sticky-col bg-slate-900 border-r border-slate-700"></th>
+                    <th class="sub-header text-blue-300 border-l border-slate-700 text-[9px] uppercase">DATA PAGTO</th>
+                    <th class="sub-header text-emerald-300 border-l border-slate-800 text-[9px] uppercase">VALOR PAGO</th>
+                </tr>`;
+
+            const body = document.getElementById('report-body');
+            body.innerHTML = list.length===0 ? '<tr><td colspan="3" class="text-center p-4 text-xs text-slate-500">Nada encontrado.</td></tr>' : list.map(c => {
+                const pagamentos = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status));
+                const totalPago = pagamentos.reduce((a,b)=>a+(Number(b.amount)||0),0);
+                
+                let diaPagamento = '-';
+                if(pagamentos.length > 0) {
+                    const ultimoPag = new Date(pagamentos[pagamentos.length-1].payment_date);
+                    diaPagamento = `${ultimoPag.getDate()}`;
+                }
+
+                const dueDayLabel = `<span class="bg-slate-700 px-1 rounded mr-1 text-[9px] text-slate-300">${c.due_day||'?'}</span>`;
+                const colCliente = `<td class="sticky-col text-xs text-left p-2 border-b border-slate-800 text-white truncate max-w-[160px]" onclick="editClient('${c.id}')">${dueDayLabel} ${c.name}</td>`;
+                
+                // COLUNA DATA PAGTO (CENTRAL)
+                const colData = `<td class="text-center text-xs p-2 border-b border-slate-800 text-slate-500 font-mono">${diaPagamento}</td>`;
+                
+                // COLUNA VALOR PAGO (DIREITA)
+                let colPagoClass = "text-slate-600 text-[9px]";
+                let colPagoContent = "-";
+                
+                if(totalPago > 0) {
+                    colPagoClass = "text-emerald-400 font-bold bg-emerald-500/10 text-[9px]";
+                    colPagoContent = formatCurrency(totalPago);
+                }
+
+                const colPago = `<td class="text-center p-2 border-b border-slate-800 ${colPagoClass}">${colPagoContent}</td>`;
+
+                return `<tr>${colCliente}${colData}${colPago}</tr>`;
+            }).join('');
         }
-        function updateProductUI() { const list = document.getElementById('products-list'); if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div>`).join(''); const opts = '<option value="">Sem Plano</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); const sel1 = document.getElementById('modal-product'); if(sel1) sel1.innerHTML = opts; const sel2 = document.getElementById('modal-product-2'); if(sel2) sel2.innerHTML = opts; const sel3 = document.getElementById('modal-product-3'); if(sel3) sel3.innerHTML = opts; const sel4 = document.getElementById('modal-product-4'); if(sel4) sel4.innerHTML = opts; const rep = document.getElementById('report-filter-product'); if(rep) rep.innerHTML = '<option value="all">Todos</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); }
+
+        function updateProductUI() {
+            const list = document.getElementById('products-list');
+            if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div>`).join('');
+            
+            const rep = document.getElementById('report-filter-product');
+            if(rep) rep.innerHTML = '<option value="all">Todos</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+        }
         function openProductModal() { document.getElementById('product-modal').classList.remove('hidden'); }
-        async function saveProduct() { const n = document.getElementById('prod-name').value; const p = document.getElementById('prod-price').value; if(n && p) { await sb.from('products').insert([{name:n, price:p}]); document.getElementById('product-modal').classList.add('hidden'); fetchProducts(); } }
+        async function saveProduct() {
+            const n = document.getElementById('prod-name').value; const p = document.getElementById('prod-price').value;
+            if(n && p) { await sb.from('products').insert([{name:n, price:p}]); document.getElementById('product-modal').classList.add('hidden'); fetchProducts(); }
+        }
         async function deleteProduct(id, n) { if(confirm('Apagar plano '+n+'?')) { await sb.from('products').delete().eq('id', id); fetchProducts(); } }
-        function populateMonthFilter() { const el = document.getElementById('dashboard-filter-month'); const rep = document.getElementById('report-filter-month'); if(el.options.length > 0) return; let h = ''; for(let i=-6; i<=6; i++) { const d = new Date(); d.setMonth(d.getMonth() + i); const v = d.toISOString().slice(0,7); const l = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'}); h += `<option value="${v}" ${i===0?'selected':''}>${l}</option>`; } el.innerHTML = h; rep.innerHTML = h; }
+        function populateMonthFilter() {
+            const el = document.getElementById('dashboard-filter-month'); 
+            const rep = document.getElementById('report-filter-month');
+            if(el.options.length > 0) return;
+            let h = '';
+            for(let i=-6; i<=6; i++) {
+                const d = new Date(); d.setMonth(d.getMonth() + i);
+                const v = d.toISOString().slice(0,7);
+                const l = d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+                h += `<option value="${v}" ${i===0?'selected':''}>${l}</option>`;
+            }
+            el.innerHTML = h; rep.innerHTML = h;
+        }
         function toggleInactiveFilter() { showInactiveOnly = !showInactiveOnly; renderClients(allClients); }
-        function productChanged(slot) { const pidVal = slot === 1 ? document.getElementById('modal-product').value : document.getElementById(`modal-product-${slot}`).value; const priceEl = slot === 1 ? document.getElementById('modal-price') : document.getElementById(`modal-price-${slot}`); const p = allProducts.find(x=>x.id===pidVal); if(p) priceEl.value = p.price.toFixed(2).replace('.', ','); else priceEl.value = ''; }
         function toggleNotifPanel() { const p=document.getElementById('notif-panel'); p.style.display = p.style.display==='flex'?'none':'flex'; }
-        async function setMonthlyGoal() { const m = document.getElementById('dashboard-filter-month').value; const v = prompt("Nova meta para "+m, currentMonthGoal); if(v) { await sb.from('monthly_goals').upsert({month: m, target_amount: parseMoneyBR(v)}); calculateDashboard(); } }
+        
+        async function setMonthlyGoal() {
+            const m = document.getElementById('dashboard-filter-month').value;
+            const v = prompt("Nova meta para "+m, currentMonthGoal);
+            if(v) { await sb.from('monthly_goals').upsert({month: m, target_amount: parseMoneyBR(v)}); calculateDashboard(); }
+        }
     </script>
 </body>
 </html>
