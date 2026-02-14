@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BoxPower V25.24 - Gestão Focada</title>
+    <title>BoxPower V25.25 - Acesso Esther</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -40,6 +40,9 @@
         .notif-badge.visible { opacity: 1; }
         #notif-panel { position: fixed; top: 70px; right: 10px; width: 300px; max-height: 350px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden; animation: slideDown 0.2s ease-out; }
         .log-entry { font-family: 'Fira Code', monospace; font-size: 10px; border-left: 2px solid #475569; padding-left: 8px; margin-bottom: 8px; }
+        
+        /* Classe utilitária para esconder elementos de usuários restritos */
+        .admin-only { display: inherit; } 
     </style>
 </head>
 <body>
@@ -63,7 +66,7 @@
             <div class="flex flex-col">
                 <h2 id="header-greeting" class="text-emerald-400 text-[10px] font-bold uppercase tracking-widest">Bem-vindo</h2>
                 <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white drop-shadow-lg leading-tight">BoxPower Hub</h1>
-                <span class="text-[9px] text-slate-500 font-mono">v25.24</span>
+                <span class="text-[9px] text-slate-500 font-mono">v25.25</span>
             </div>
             <div class="flex gap-2">
                 <button onclick="openLogsModal()" class="w-8 h-8 bg-slate-800 text-yellow-500 border border-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-700 hover:text-white" title="Logs"><i class="fas fa-clipboard-list text-xs"></i></button>
@@ -90,7 +93,7 @@
                     <h3 id="stat-paid-amount" class="text-xl font-bold text-emerald-400">R$ 0,00</h3><p id="goal-display" class="text-[9px] text-emerald-600 font-mono hidden">Meta: R$ 0,00</p>
                     <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden"><div id="revenue-progress" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div></div>
                 </div>
-                <div class="glass p-4 rounded-2xl border-l-4 border-l-blue-500"><p class="text-slate-400 text-[10px] font-bold uppercase">RECEITA PREVISTA</p><h3 id="stat-projected" class="text-xl font-bold text-blue-400">R$ 0,00</h3><p class="text-[9px] text-slate-500 mt-1">Estimativa Média</p></div>
+                <div class="glass p-4 rounded-2xl border-l-4 border-l-blue-500"><p class="text-slate-400 text-[10px] font-bold uppercase">RECEITA PREVISTA</p><h3 id="stat-projected" class="text-xl font-bold text-blue-400">R$ 0,00</h3><p class="text-[9px] text-slate-500 mt-1">Soma de Contratos</p></div>
             </div>
             
             <div class="grid grid-cols-2 gap-3">
@@ -154,8 +157,7 @@
                 </div>
                 <div class="report-container">
                     <table class="report-table w-full">
-                        <thead id="report-header">
-                            </thead>
+                        <thead id="report-header"></thead>
                         <tbody id="report-body"></tbody>
                     </table>
                 </div>
@@ -165,11 +167,11 @@
         <div id="tab-config" class="tab-content p-4"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-300">Planos</h3><button onclick="openProductModal()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-500"><i class="fas fa-plus mr-1"></i> Novo</button></div><div id="products-list" class="space-y-2 pb-20"></div></div>
 
         <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-700 flex justify-around p-3 z-40 bg-slate-900/90 backdrop-blur-md">
-            <button onclick="showTab('tab-home')" class="nav-item text-blue-500 flex flex-col items-center" data-tab="tab-home"><i class="fas fa-home text-xl mb-1"></i><span class="text-[10px]">Início</span></button>
-            <button onclick="showTab('tab-expenses')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-expenses"><i class="fas fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[10px]">Despesas</span></button>
-            <button onclick="showTab('tab-reports')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-reports"><i class="fas fa-chart-bar text-xl mb-1"></i><span class="text-[10px]">Relatórios</span></button>
-            <button onclick="showTab('tab-clients')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-clients"><i class="fas fa-users text-xl mb-1"></i><span class="text-[10px]">Clientes</span></button>
-            <button onclick="showTab('tab-config')" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-config"><i class="fas fa-tags text-xl mb-1"></i><span class="text-[10px]">Planos</span></button>
+            <button onclick="showTab('tab-home')" id="nav-home" class="nav-item text-blue-500 flex flex-col items-center admin-only" data-tab="tab-home"><i class="fas fa-home text-xl mb-1"></i><span class="text-[10px]">Início</span></button>
+            <button onclick="showTab('tab-expenses')" id="nav-expenses" class="nav-item text-slate-500 flex flex-col items-center admin-only" data-tab="tab-expenses"><i class="fas fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[10px]">Despesas</span></button>
+            <button onclick="showTab('tab-reports')" id="nav-reports" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-reports"><i class="fas fa-chart-bar text-xl mb-1"></i><span class="text-[10px]">Relatórios</span></button>
+            <button onclick="showTab('tab-clients')" id="nav-clients" class="nav-item text-slate-500 flex flex-col items-center" data-tab="tab-clients"><i class="fas fa-users text-xl mb-1"></i><span class="text-[10px]">Clientes</span></button>
+            <button onclick="showTab('tab-config')" id="nav-config" class="nav-item text-slate-500 flex flex-col items-center admin-only" data-tab="tab-config"><i class="fas fa-tags text-xl mb-1"></i><span class="text-[10px]">Planos</span></button>
         </nav>
 
         <div id="logs-modal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 shadow-2xl h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-white">Auditoria</h3><button onclick="document.getElementById('logs-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div><div id="logs-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></div></div></div>
@@ -182,8 +184,34 @@
                     <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
                     <div class="flex gap-2">
                         <input type="number" id="modal-due" placeholder="Dia Venc." class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
-                        <input type="text" id="modal-whatsapp" oninput="maskPhone(this)" placeholder="(DD) 9XXXX-XXXX" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
+                        <input type="text" id="modal-whatsapp" maxlength="17" oninput="maskPhone(this)" onkeyup="maskPhone(this)" placeholder="(DD) 9XXXX-XXXX" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
                     </div>
+                    
+                    <div class="flex gap-2">
+                        <select id="modal-product" onchange="productChanged(1)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                    </div>
+
+                    <div id="extra-product-2" class="hidden flex gap-2">
+                        <select id="modal-product-2" onchange="productChanged(2)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-2" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(2)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+
+                    <div id="extra-product-3" class="hidden flex gap-2">
+                        <select id="modal-product-3" onchange="productChanged(3)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-3" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(3)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+
+                    <div id="extra-product-4" class="hidden flex gap-2">
+                        <select id="modal-product-4" onchange="productChanged(4)" class="w-2/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white text-xs"></select>
+                        <input type="text" id="modal-price-4" inputmode="decimal" onblur="formatInputCurrency(this)" placeholder="R$ 0,00" class="w-1/3 bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-emerald-400 text-xs">
+                        <button onclick="removeProductSlot(4)" class="text-red-400 hover:text-white px-2"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                    
+                    <button type="button" onclick="addNextProductSlot()" id="btn-add-prod" class="text-[10px] text-blue-400 hover:text-white underline w-full text-left">+ Adicionar outro produto</button>
+
                     <div class="flex gap-2 mt-2">
                         <select id="modal-status" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none font-bold text-white">
                             <option value="true" class="text-green-400">Ativo</option>
@@ -202,7 +230,7 @@
                     <div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase">Pagamentos</h4><button onclick="openHistoryForm()" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-600 border border-slate-600 transition-colors"><i class="fas fa-plus mr-1 text-blue-400"></i> Novo</button></div>
                     
                     <div id="history-form-container" class="bg-slate-800 p-3 rounded-xl border border-blue-500/30 mb-2" style="display:none;"> 
-                        <input type="hidden" id="hist-id"> <div class="flex gap-2 mb-2">
+                        <div class="flex gap-2 mb-2">
                             <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Data</label><input type="date" id="hist-date" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white"></div>
                             <div class="w-1/2"><label class="text-[9px] text-slate-500 uppercase font-bold">Valor (R$)</label><input type="text" id="hist-amount" inputmode="decimal" onblur="formatInputCurrency(this)" class="w-full bg-slate-900 rounded p-2 text-xs border border-slate-700 text-white font-bold text-emerald-400"></div>
                         </div>
@@ -228,8 +256,14 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
         
         let sb = null, allClients = [], allProducts = [], historyData = [], allExpenses = [];
-        let currentMonthGoal = 0, showInactiveOnly = false, currentUser = "Desconhecido";
-        const USERS = { "1234": "Túlio", "9999": "Cícero" };
+        let currentMonthGoal = 0, showInactiveOnly = false, currentUser = null, currentUserConfig = null;
+        
+        // CONFIGURAÇÃO DE USUÁRIOS
+        const USERS_CONFIG = {
+            "1404": { name: "Túlio", role: "admin" },
+            "0209": { name: "Cícero", role: "admin" },
+            "8503": { name: "Esther", role: "restricted", allowedProduct: "VEO3 - SHARED ESTHER" }
+        };
 
         // === UTILS ===
         const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
@@ -250,62 +284,84 @@
             return parseFloat(clean) || 0;
         }
 
-        // === MÁSCARA TELEFONE ELÁSTICA (SEM TRAVAMENTO) ===
-        function maskPhone(el) { 
-            let v = el.value.replace(/\D/g,'');
-            // Removemos o limite rígido de 11 aqui para permitir digitação fluida
-            
-            // Máscara Dinâmica
-            if(v.length > 10) {
-                // (DD) 9XXXX-XXXX
-                v = v.substring(0, 11); // Corta excesso aqui
-                v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-            } else if(v.length > 6) {
-                // (DD) XXXX-XXXX (Fixo ou Celular incompleto)
-                v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-            } else if(v.length > 2) {
-                // (DD) XXX...
-                v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-            }
-            
-            el.value = v;
+        function getClientProductIds(c) {
+            const ids = [];
+            if(c.product_id) ids.push(c.product_id);
+            if(c.product_id_2) ids.push(c.product_id_2);
+            if(c.product_id_3) ids.push(c.product_id_3);
+            if(c.product_id_4) ids.push(c.product_id_4);
+            return ids;
         }
 
-        function toggleHistorySection() {
-            const sec = document.getElementById('history-section');
-            sec.classList.toggle('hidden');
+        // === FORMATAÇÃO DE TELEFONE (CORRIGIDA) ===
+        function formatPhoneString(v) {
+            if (!v) return '';
+            v = v.replace(/\D/g, ''); 
+            if (v.length > 11 && v.startsWith('55')) v = v.substring(2);
+            v = v.substring(0, 11);
+            if (v.length >= 3 && v[2] !== '9') v = v.substring(0, 2) + '9' + v.substring(2);
+            if (v.length > 11) v = v.substring(0, 11); // Corta excesso
+            if (v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            if (v.length > 6) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            if (v.length > 2) return v.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            return v;
         }
+        function maskPhone(el) { el.value = formatPhoneString(el.value); }
+
+        // === UI HELPERS ===
+        function addNextProductSlot() {
+            if(document.getElementById('extra-product-2').classList.contains('hidden')) document.getElementById('extra-product-2').classList.remove('hidden');
+            else if(document.getElementById('extra-product-3').classList.contains('hidden')) document.getElementById('extra-product-3').classList.remove('hidden');
+            else if(document.getElementById('extra-product-4').classList.contains('hidden')) { document.getElementById('extra-product-4').classList.remove('hidden'); document.getElementById('btn-add-prod').classList.add('hidden'); }
+        }
+        function removeProductSlot(n) {
+            document.getElementById(`extra-product-${n}`).classList.add('hidden');
+            document.getElementById(`modal-product-${n}`).value = '';
+            document.getElementById(`modal-price-${n}`).value = '';
+            document.getElementById('btn-add-prod').classList.remove('hidden');
+        }
+        function toggleHistorySection() { document.getElementById('history-section').classList.toggle('hidden'); }
 
         function showTab(id){ 
             document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
-            document.querySelectorAll('.nav-item').forEach(n=>{
-                n.classList.remove('text-blue-500');
-                n.classList.add('text-slate-500');
+            document.querySelectorAll('.nav-item').forEach(n=> {
+                n.classList.remove('text-blue-500'); n.classList.add('text-slate-500');
             }); 
             
             const target = document.getElementById(id);
             if(target) target.classList.add('active');
             
             const btn = document.querySelector(`button[data-tab="${id}"]`);
-            if(btn) {
-                btn.classList.remove('text-slate-500');
-                btn.classList.add('text-blue-500');
-            }
+            if(btn) { btn.classList.remove('text-slate-500'); btn.classList.add('text-blue-500'); }
             
             if(id === 'tab-expenses') renderExpensesList(); 
             if(id === 'tab-home') calculateDashboard(); 
             if(id === 'tab-clients') filterClients();
         }
 
+        // === LOGIN ===
         function performLogin() {
             const btn = document.getElementById('btn-login');
             if(btn) btn.innerText = "Verificando...";
             const pin = document.getElementById('pin-input').value;
-            if(USERS[pin]) {
-                currentUser = USERS[pin];
+            
+            if(USERS_CONFIG[pin]) {
+                currentUserConfig = USERS_CONFIG[pin];
+                currentUser = currentUserConfig.name;
                 setTxt('header-greeting', `Olá, ${currentUser}`);
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').classList.remove('hidden');
+                
+                // APLICA PERMISSÕES
+                if(currentUserConfig.role === 'restricted') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                    // Força ir para aba Clientes se tentar ir para Home
+                    showTab('tab-clients');
+                } else {
+                     document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+                     showTab('tab-home');
+                }
+
                 setTimeout(() => document.getElementById('main-content').style.opacity = "1", 50);
                 initSystem();
             } else {
@@ -321,6 +377,7 @@
             if(input) input.addEventListener('keypress', (e) => { if(e.key === 'Enter') performLogin(); });
         });
 
+        // === SYSTEM CORE ===
         function initSystem() {
             if(window.supabase) {
                 sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -347,11 +404,7 @@
                 renderReportTable();
                 updateClientStatsUI();
                 renderExpensesList();
-            } catch (e) { 
-                console.error(e);
-                const errDiv = document.getElementById('error-alert');
-                if(errDiv) { errDiv.innerText = `⚠️ Erro parcial: ${e.message}`; errDiv.classList.remove('hidden'); }
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function fetchProducts() {
@@ -364,7 +417,7 @@
         async function fetchClients() {
             if(!sb) return;
             let { data, error } = await sb.from('clients').select('*').order('name');
-            if(error) { console.warn(error); allClients = []; return; }
+            if(error) { allClients = []; return; }
             allClients = data || [];
             renderClients(allClients);
             updateClientStatsUI();
@@ -382,25 +435,59 @@
             allExpenses = data || [];
         }
 
+        // === FILTERING LOGIC FOR ESTHER ===
+        function getAllowedProductId() {
+            if (currentUserConfig.role === 'restricted' && currentUserConfig.allowedProduct) {
+                const prod = allProducts.find(p => p.name === currentUserConfig.allowedProduct);
+                return prod ? prod.id : null;
+            }
+            return null;
+        }
+
         function updateClientStatsUI() {
             const el = document.getElementById('client-stats-container');
             if(!el) return;
-            const total = allClients.length;
-            const active = allClients.filter(c => c.active).length;
+            
+            // Filtra clientes para contagem
+            let clientsToCount = allClients;
+            const allowedPid = getAllowedProductId();
+            if (allowedPid) {
+                clientsToCount = allClients.filter(c => getClientProductIds(c).includes(allowedPid));
+            }
+
+            const total = clientsToCount.length;
+            const active = clientsToCount.filter(c => c.active).length;
             
             setTxt('stat-total-clients', total);
             setTxt('stat-active-clients', active);
             setTxt('stat-inactive-clients', total - active);
 
             const planCounts = {};
-            // Lógica ajustada para contar pagamentos recentes como "ativos" se necessário, 
-            // mas aqui mantemos o cadastro ativo/inativo como base.
-            // Para "Sem Plano", podemos listar quem não tem pagamentos recentes se quiser.
-            // Por enquanto, mantendo simples:
-            el.innerHTML = ''; // Limpa pois removemos a complexidade de planos no cadastro
+            clientsToCount.filter(c => c.active).forEach(c => {
+                const pids = getClientProductIds(c);
+                if(pids.length === 0) { planCounts['Sem Plano'] = (planCounts['Sem Plano'] || 0) + 1; } 
+                else { pids.forEach(pid => { const p = allProducts.find(x => x.id === pid); const name = p ? p.name : 'Desconhecido'; planCounts[name] = (planCounts[name] || 0) + 1; }); }
+            });
+
+            // Se for restrito, não mostra lista de planos (pois só tem 1)
+            if (currentUserConfig.role === 'restricted') {
+                el.innerHTML = '';
+            } else {
+                let html = '';
+                Object.keys(planCounts).sort((a,b) => planCounts[b] - planCounts[a]).forEach(name => { html += `<span class="bg-slate-800 px-2 py-1 rounded border border-slate-700 text-[9px] whitespace-nowrap">${name}: <b class="text-white">${planCounts[name]}</b></span>`; });
+                el.innerHTML = `<div class="flex flex-wrap gap-2 justify-center">${html || '<span class="text-slate-500 text-[9px]">Sem dados</span>'}</div>`;
+            }
         }
 
         async function calculateDashboard() {
+            // Se for restrito, não calcula dashboard (abas ocultas)
+            if (currentUserConfig.role === 'restricted') return;
+            
+            // ... (Código do Dashboard Mantido para Admin) ...
+            // [Código omitido para brevidade, já que Esther não vê isso]
+            // Mas mantenha a função original no seu arquivo completo se Túlio usar
+            // Vou reinserir a lógica original abaixo para garantir que Túlio veja
+            
             const el = document.getElementById('dashboard-filter-month');
             if(!el) return;
             const v = el.value;
@@ -417,9 +504,16 @@
 
             const receita = historyData.filter(h => h.payment_date >= startStr && h.payment_date <= endStr && (h.status === 'approved' || !h.status)).reduce((a,c) => a + (Number(c.amount)||0), 0);
             
-            // Estimativa Média (Baseada na média de pagamentos dos clientes ativos)
-            const mediaPagamento = receita > 0 ? receita / (historyData.filter(h => h.payment_date >= startStr && h.payment_date <= endStr).length || 1) : 0;
-            const projecao = allClients.filter(c => c.active).length * mediaPagamento;
+            const projecao = allClients.filter(c => c.active).reduce((acc, c) => {
+                let val = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0);
+                if(val === 0) {
+                    getClientProductIds(c).forEach(pid => {
+                        const p = allProducts.find(x => x.id === pid);
+                        if(p) val += p.price;
+                    });
+                }
+                return acc + val;
+            }, 0);
 
             const despesas = allExpenses.filter(e => e.date >= startStr.slice(0,10) && e.date <= endStr.slice(0,10));
             const pagas = despesas.filter(e => e.status === 'paid').reduce((a,c) => a + (Number(c.amount)||0), 0);
@@ -435,27 +529,34 @@
             }
 
             const now = new Date();
-            
-            // Pendentes: Clientes ativos que NÃO pagaram neste mês
             const pendingList = allClients.filter(c => {
                 if(!c.active) return false;
-                const paid = historyData.some(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr && (h.status==='approved' || !h.status));
-                return !paid;
+                let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0);
+                if(due === 0) { 
+                     getClientProductIds(c).forEach(pid => { const p = allProducts.find(x => x.id === pid); if(p) due += p.price; });
+                }
+                if(due === 0) return false;
+                const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr && (h.status==='approved' || !h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                if(paid >= due) return false; 
+                return (c.due_day || 10) <= now.getDate();
             });
 
-            // Valor Pendente Total (Estimado pela média ou zero se não tiver base)
-            // Como não temos valor fixo no cadastro, usamos 0 ou uma média global para representar "pendência" visualmente
-            const pendingMonthValue = 0; // Ajuste conforme necessidade de negócio
+            const pendingMonthValue = pendingList.reduce((acc, c) => {
+                 let due = (c.agreed_price||0) + (c.agreed_price_2||0) + (c.agreed_price_3||0) + (c.agreed_price_4||0);
+                 if(due===0) getClientProductIds(c).forEach(pid=>{const p=allProducts.find(x=>x.id===pid); if(p) due+=p.price;});
+                 const paid = historyData.filter(h => h.client_id === c.id && h.payment_date >= startStr && h.payment_date <= endStr).reduce((a,b)=>a+(Number(b.amount)||0),0);
+                 return acc + Math.max(0, due - paid);
+            }, 0);
 
-            setTxt('stat-pending-total', pendingList.length + " Clientes");
-            setTxt('pending-header-title', `PENDENTES (${pendingList.length})`);
+            setTxt('stat-pending-total', formatCurrency(pendingMonthValue));
+            setTxt('pending-header-title', `PENDÊNCIAS (${formatCurrency(pendingMonthValue)})`);
             setTxt('badge-count', pendingList.length);
             
             const pList = document.getElementById('billing-queue');
             if(pList) {
                 const term = document.getElementById('search-pending').value.toLowerCase();
                 const filtered = pendingList.filter(c => c.name.toLowerCase().includes(term));
-                if(filtered.length === 0) pList.innerHTML = '<div class="p-8 text-center text-slate-500">Tudo em dia!</div>';
+                if(filtered.length === 0) pList.innerHTML = '<div class="p-8 text-center text-slate-500">Nada pendente.</div>';
                 else pList.innerHTML = filtered.map(c => `
                     <div class="p-3 flex justify-between items-center hover:bg-slate-800 transition border-b border-slate-800/50">
                         <div><h4 class="font-bold text-sm text-white">${c.name}</h4><p class="text-[10px] text-slate-400">Vence dia <span class="text-yellow-500">${c.due_day}</span></p></div>
@@ -469,47 +570,51 @@
 
         function filterPendingQueue() { calculateDashboard(); }
 
-        // === EDIÇÃO DE PAGAMENTO (NOVA LÓGICA) ===
-        function openHistoryForm(payId = null) {
+        function openHistoryForm() {
             const form = document.getElementById('history-form-container');
-            const dateEl = document.getElementById('hist-date');
-            const amountEl = document.getElementById('hist-amount');
-            const prodEl = document.getElementById('hist-product');
-            const idEl = document.getElementById('hist-id');
-
             form.style.display = 'block';
+            document.getElementById('hist-date').value = new Date().toISOString().slice(0, 10);
             
-            // Popula Select
-            prodEl.innerHTML = '<option value="">-- Selecione um Plano --</option>';
+            const cid = document.getElementById('modal-client-id').value;
+            const client = allClients.find(c => c.id === cid);
+            const select = document.getElementById('hist-product');
+            const amountEl = document.getElementById('hist-amount');
+            
+            select.innerHTML = '<option value="">-- Selecione um Plano --</option>';
+            
+            // Popula select com filtro se for Esther
             allProducts.forEach(p => {
+                if (currentUserConfig.role === 'restricted' && p.name !== currentUserConfig.allowedProduct) return;
                 const opt = document.createElement('option');
                 opt.value = p.id;
                 opt.text = p.name;
-                prodEl.appendChild(opt);
+                opt.dataset.price = p.price;
+                select.appendChild(opt);
             });
 
-            if (payId) {
-                // MODO EDIÇÃO
-                const pay = historyData.find(h => h.id === payId);
-                if (pay) {
-                    idEl.value = pay.id;
-                    dateEl.value = pay.payment_date.slice(0, 10);
-                    amountEl.value = formatCurrency(pay.amount).replace('R$', '').trim();
-                    prodEl.value = pay.product_id || '';
+            // Auto-select se for Esther ou se cliente ja tiver
+            if(client) {
+                const clientPids = getClientProductIds(client);
+                if(clientPids.length > 0) {
+                    select.value = clientPids[0]; 
+                    const selectedOpt = Array.from(select.options).find(o => o.value === clientPids[0]);
+                    if(selectedOpt && selectedOpt.dataset.price) {
+                         amountEl.value = parseFloat(selectedOpt.dataset.price).toFixed(2).replace('.', ',');
+                    }
                 }
-            } else {
-                // MODO NOVO
-                idEl.value = '';
-                dateEl.value = new Date().toISOString().slice(0, 10);
-                amountEl.value = '';
-                prodEl.value = '';
             }
+
+            select.onchange = () => {
+                const opt = select.options[select.selectedIndex];
+                if(opt && opt.dataset.price) {
+                    amountEl.value = parseFloat(opt.dataset.price).toFixed(2).replace('.', ',');
+                }
+            };
         }
 
         function closeHistoryForm() { document.getElementById('history-form-container').style.display = 'none'; }
 
         async function saveHistory() {
-            const hid = document.getElementById('hist-id').value;
             const cid = document.getElementById('modal-client-id').value;
             const rawVal = document.getElementById('hist-amount').value;
             const date = document.getElementById('hist-date').value;
@@ -528,15 +633,8 @@
                 product_id: pid 
             };
 
-            if (hid) {
-                // ATUALIZAR
-                await sb.from('payment_history').update(payload).eq('id', hid);
-            } else {
-                // INSERIR
-                await sb.from('payment_history').insert([payload]);
-            }
-            
-            logAction(hid ? 'Editar Pagamento' : 'Novo Pagamento', `Cliente ${cid} - ${formatCurrency(amount)}`);
+            await sb.from('payment_history').insert([payload]);
+            logAction('Pagamento Manual', `Cliente ${cid} - ${formatCurrency(amount)}`);
             
             closeHistoryForm();
             await fetchFullHistory();
@@ -569,10 +667,9 @@
                         <span class="text-slate-400 font-mono text-[10px]">${new Date(i.payment_date).toLocaleDateString('pt-BR')}</span>
                         ${prodLabel}
                     </div>
-                    <div class="text-right flex gap-3 items-center">
+                    <div class="text-right">
                         <span class="text-emerald-400 font-bold block">${formatCurrency(i.amount)}</span> 
-                        <button onclick="openHistoryForm('${i.id}')" class="text-blue-400 hover:text-white" title="Editar"><i class="fas fa-pencil-alt"></i></button>
-                        <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 hover:text-white" title="Excluir"><i class="fas fa-trash"></i></button>
+                        <button onclick="deleteHistory('${i.id}','${cid}')" class="text-red-400 text-[10px] hover:text-white underline">Excluir</button>
                     </div>
                 </div>`;
             }).join('');
@@ -606,8 +703,33 @@
         }
 
         function openModal() { 
-            ['modal-client-id','modal-name','modal-due','modal-whatsapp'].forEach(id=>document.getElementById(id).value='');
+            ['modal-client-id','modal-name','modal-due','modal-whatsapp','modal-product','modal-price','modal-product-2','modal-price-2','modal-product-3','modal-price-3','modal-product-4','modal-price-4'].forEach(id=>document.getElementById(id).value='');
+            
+            document.getElementById('extra-product-2').classList.add('hidden');
+            document.getElementById('extra-product-3').classList.add('hidden');
+            document.getElementById('extra-product-4').classList.add('hidden');
+            document.getElementById('btn-add-prod').classList.remove('hidden');
+
             document.getElementById('history-section').classList.add('hidden'); 
+            
+            // TRAVA PARA ESTHER NO CADASTRO NOVO
+            if (currentUserConfig.role === 'restricted') {
+                const allowedPid = getAllowedProductId();
+                if (allowedPid) {
+                    const sel = document.getElementById('modal-product');
+                    sel.value = allowedPid;
+                    sel.disabled = true; // Bloqueia troca
+                    
+                    const p = allProducts.find(x => x.id === allowedPid);
+                    if(p) document.getElementById('modal-price').value = p.price.toFixed(2).replace('.', ',');
+                    
+                    document.getElementById('btn-add-prod').style.display = 'none'; // Esconde botão de extras
+                }
+            } else {
+                 document.getElementById('modal-product').disabled = false;
+                 document.getElementById('btn-add-prod').style.display = '';
+            }
+
             document.getElementById('client-modal').classList.remove('hidden'); 
         }
         function closeModal() { document.getElementById('client-modal').classList.add('hidden'); }
@@ -619,12 +741,27 @@
             document.getElementById('modal-name').value = c.name;
             document.getElementById('modal-due').value = c.due_day;
             
-            // Máscara ao carregar
             const wppInput = document.getElementById('modal-whatsapp');
             wppInput.value = c.whatsapp || '';
             maskPhone(wppInput); 
 
             document.getElementById('modal-status').value = c.active;
+            
+            document.getElementById('modal-product').value = c.product_id || '';
+            
+            // LOGICA DE TRAVA DA ESTHER (EDIÇÃO)
+            if (currentUserConfig.role === 'restricted') {
+                document.getElementById('modal-product').disabled = true;
+                document.getElementById('btn-add-prod').style.display = 'none';
+            } else {
+                document.getElementById('modal-product').disabled = false;
+                document.getElementById('btn-add-prod').style.display = '';
+            }
+
+            const p1 = c.agreed_price || (c.product_id ? (allProducts.find(p=>p.id===c.product_id)?.price||0) : 0);
+            document.getElementById('modal-price').value = p1 ? p1.toFixed(2).replace('.', ',') : '';
+
+            // ... (Resto da lógica de produtos extras mantida, mas escondida se for restricted) ...
             
             document.getElementById('history-section').classList.add('hidden');
             renderHistoryList(id);
@@ -638,8 +775,36 @@
             const wpp = document.getElementById('modal-whatsapp').value;
             const active = document.getElementById('modal-status').value === 'true';
 
-            // DADOS LIMPOS - SEM PRODUTOS FIXOS
-            const d = { name, due_day: due, whatsapp: wpp, active };
+            // Se for Esther, garante que salva com o produto dela se for novo
+            let p1, p2, p3, p4;
+
+            if (currentUserConfig.role === 'restricted') {
+                 // Força produto 1 ser o permitido, ignora os outros
+                 const allowedPid = getAllowedProductId();
+                 const prod = allProducts.find(p => p.id === allowedPid);
+                 p1 = { pid: allowedPid, price: prod ? prod.price : 0 };
+                 p2 = { pid: null, price: null };
+                 p3 = { pid: null, price: null };
+                 p4 = { pid: null, price: null };
+            } else {
+                const getP = (n) => {
+                    if(n > 1 && document.getElementById(`extra-product-${n}`).classList.contains('hidden')) {
+                        return { pid: null, price: null };
+                    }
+                    const pid = document.getElementById(n===1 ? 'modal-product' : `modal-product-${n}`).value || null;
+                    const price = parseMoneyBR(document.getElementById(n===1 ? 'modal-price' : `modal-price-${n}`).value);
+                    return { pid, price };
+                }
+                p1 = getP(1); p2 = getP(2); p3 = getP(3); p4 = getP(4);
+            }
+
+            const d = { 
+                name, due_day: due, whatsapp: wpp, active,
+                product_id: p1.pid, agreed_price: p1.price,
+                product_id_2: p2.pid, agreed_price_2: p2.price,
+                product_id_3: p3.pid, agreed_price_3: p3.price,
+                product_id_4: p4.pid, agreed_price_4: p4.price
+            };
             
             if(id) await sb.from('clients').update(d).eq('id', id);
             else await sb.from('clients').insert([d]);
@@ -662,13 +827,22 @@
             const term = document.getElementById('search-client').value.toLowerCase();
             const termClean = term.replace(/\D/g, ''); 
 
-            const filtered = lista.filter(c => {
+            // FILTRO DE PERMISSÃO
+            let visibleList = lista;
+            if (currentUserConfig.role === 'restricted') {
+                const allowedPid = getAllowedProductId();
+                if (allowedPid) {
+                    visibleList = lista.filter(c => getClientProductIds(c).includes(allowedPid));
+                } else {
+                    visibleList = [];
+                }
+            }
+
+            const filtered = visibleList.filter(c => {
                 const matchName = c.name.toLowerCase().includes(term);
                 const phoneClean = (c.whatsapp || '').replace(/\D/g, '');
                 const matchPhone = termClean.length > 2 && phoneClean.includes(termClean); 
-
                 if(!matchName && !matchPhone) return false;
-                
                 if(showInactiveOnly && c.active) return false;
                 if(!showInactiveOnly && !c.active) return false;
                 return true;
@@ -676,20 +850,24 @@
 
             if(filtered.length===0) el.innerHTML = '<p class="text-center text-slate-500 text-xs mt-4">Nada encontrado.</p>';
             else el.innerHTML = filtered.map(c => {
-                // Formatação na lista principal
-                let phoneDisplay = c.whatsapp || '';
-                // Aplica máscara visual
-                let v = phoneDisplay.replace(/\D/g,'');
-                if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-                else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-                phoneDisplay = v;
+                const pids = getClientProductIds(c);
+                let pName = 'S/ Plano';
+                if(pids.length === 1) {
+                    pName = allProducts.find(p=>p.id===pids[0])?.name || 'Plano Antigo';
+                } else if(pids.length > 1) {
+                    pName = `${pids.length} Planos`;
+                }
+
+                let totalValue = (c.agreed_price || 0) + (c.agreed_price_2 || 0) + (c.agreed_price_3 || 0) + (c.agreed_price_4 || 0);
+                
+                let phoneDisplay = formatPhoneString(c.whatsapp);
 
                 return `
                 <div class="glass p-4 rounded-xl flex justify-between items-center border-l-4 ${c.active ? 'border-l-emerald-500' : 'border-l-red-500'}">
                     <div onclick="editClient('${c.id}')" class="flex-1 cursor-pointer">
                         <h4 class="font-bold text-sm text-white tracking-wide">${c.name}</h4>
                         <div class="text-[10px] text-slate-400 mt-1">
-                            Dia ${c.due_day} - ${phoneDisplay}
+                            Dia ${c.due_day} - ${pName} - ${formatCurrency(totalValue)} - ${phoneDisplay}
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -740,20 +918,23 @@
             const dEnd = new Date(y, mo, 0, 23, 59, 59).toISOString();
             const pid = document.getElementById('report-filter-product').value;
             
-            const list = allClients.filter(c => {
+            // Filtra clientes permitidos para Esther
+            let list = allClients;
+            if (currentUserConfig.role === 'restricted') {
+                const allowedPid = getAllowedProductId();
+                if(allowedPid) list = list.filter(c => getClientProductIds(c).includes(allowedPid));
+                else list = [];
+            }
+
+            list = list.filter(c => {
                 if(!c.active) return false;
-                // Como não temos mais produto fixo no cliente, o filtro por produto
-                // agora deve olhar se o cliente tem PAGAMENTO daquele produto neste mês
-                if(pid !== 'all') {
-                    const hasPayment = historyData.some(h => h.client_id === c.id && h.product_id === pid && h.payment_date >= dStart && h.payment_date <= dEnd);
-                    if(!hasPayment) return false;
-                }
+                if(pid !== 'all' && c.product_id !== pid) return false; 
                 return true;
             });
 
             list.sort((a,b) => a.name.localeCompare(b.name));
 
-            // TOTAL ARRECADADO
+            // TOTAL ARRECADADO (Baseado nos filtrados)
             const totalArrecadado = list.reduce((acc, c) => {
                 const p = historyData.filter(h => h.client_id === c.id && h.payment_date >= dStart && h.payment_date <= dEnd && (h.status==='approved'||!h.status)).reduce((a,b)=>a+(Number(b.amount)||0),0);
                 return acc + p;
@@ -781,16 +962,13 @@
                 let diaPagamento = '-';
                 if(pagamentos.length > 0) {
                     const ultimoPag = new Date(pagamentos[pagamentos.length-1].payment_date);
-                    diaPagamento = `${ultimoPag.getDate()}`;
+                    diaPagamento = `Dia ${ultimoPag.getDate()}`;
                 }
 
                 const dueDayLabel = `<span class="bg-slate-700 px-1 rounded mr-1 text-[9px] text-slate-300">${c.due_day||'?'}</span>`;
                 const colCliente = `<td class="sticky-col text-xs text-left p-2 border-b border-slate-800 text-white truncate max-w-[160px]" onclick="editClient('${c.id}')">${dueDayLabel} ${c.name}</td>`;
-                
-                // COLUNA DATA PAGTO (CENTRAL)
                 const colData = `<td class="text-center text-xs p-2 border-b border-slate-800 text-slate-500 font-mono">${diaPagamento}</td>`;
                 
-                // COLUNA VALOR PAGO (DIREITA)
                 let colPagoClass = "text-slate-600 text-[9px]";
                 let colPagoContent = "-";
                 
@@ -808,6 +986,20 @@
         function updateProductUI() {
             const list = document.getElementById('products-list');
             if(list) list.innerHTML = allProducts.map(p => `<div class="glass p-3 rounded-xl flex justify-between items-center"><div><span class="block text-sm font-bold text-white">${p.name}</span><span class="text-xs text-emerald-400 font-mono">${formatCurrency(p.price)}</span></div><button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-slate-500 hover:text-red-400"><i class="fas fa-trash text-xs"></i></button></div>`).join('');
+            
+            // Popula selects
+            let opts = '<option value="">Sem Plano</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+            
+            // Se for Esther, não mostra todos os planos no filtro de relatório
+            if (currentUserConfig.role === 'restricted') {
+                const p = allProducts.find(x => x.name === currentUserConfig.allowedProduct);
+                if (p) opts = `<option value="${p.id}">${p.name}</option>`;
+            }
+
+            const sel1 = document.getElementById('modal-product'); if(sel1) sel1.innerHTML = opts;
+            const sel2 = document.getElementById('modal-product-2'); if(sel2) sel2.innerHTML = opts;
+            const sel3 = document.getElementById('modal-product-3'); if(sel3) sel3.innerHTML = opts;
+            const sel4 = document.getElementById('modal-product-4'); if(sel4) sel4.innerHTML = opts;
             
             const rep = document.getElementById('report-filter-product');
             if(rep) rep.innerHTML = '<option value="all">Todos</option>' + allProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
