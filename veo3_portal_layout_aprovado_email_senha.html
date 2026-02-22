@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VEO3 Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080C14;
+    --surface: #0E1420;
+    --surface2: #131A28;
+    --surface3: #1A2236;
+    --border: rgba(255,255,255,0.07);
+    --border-glow: rgba(99,179,237,0.2);
+    --text: #EEF2FF;
+    --muted: #6B7A99;
+    --accent: #4F8EF7;
+    --accent2: #63B3ED;
+    --green: #34D399;
+    --red: #F87171;
+    --amber: #FBBF24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -150px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 400px;
+    background: radial-gradient(ellipse, rgba(79,142,247,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    padding: 22px 18px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark{
+    width: 44px; height: 44px; border-radius: 13px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+}
+.logo-mark img{
+    width:100%; height:100%;
+    object-fit: cover;
+    display:block;
+}
+  .header-brand { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
+  .header-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  
+  .header-hello{
+    font-size:0.75rem;
+    color: rgba(238,242,255,0.75);
+    margin-bottom:4px;
+    letter-spacing:0.04em;
+  }
+.status-pill::before {
+    content: ''; width: 7px; height: 7px;
+    background: var(--green); border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 2.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+  /* GREETING */
+  .greeting { position: relative; z-index: 10; padding: 28px 20px 0; }
+  .greeting-hello { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+  .greeting-name {
+    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1;
+    background: linear-gradient(135deg, #EEF2FF 0%, #93C5FD 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* MAIN */
+  main { position: relative; z-index: 10; padding: 12px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* CARD */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; position: relative; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)} }
+  .card { animation: slideUp 0.5s ease both; }
+
+  /* MINI STATS */
+  .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mini-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px;
+    animation: slideUp 0.45s ease both;
+  }
+  .mini-stat:nth-child(2) { animation-delay: 0.07s; }
+  .mini-stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 500; }
+  .mini-stat-value { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; line-height: 1; margin-bottom: 2px; }
+  .mini-stat-sub { font-size: 0.7rem; color: var(--muted); }
+
+  /* CYCLE CARD */
+  .cycle-card {
+    background: linear-gradient(145deg, #0D1829, #091018);
+    border-color: rgba(79,142,247,0.15);
+    padding: 18px;
+    margin-top: 14px;
+  }
+  .cycle-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,179,237,0.5), transparent);
+  }
+  .cycle-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+  
+  .cycle-top-left{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap: 12px;
+    width: 100%;
+  }
+  .cycle-hello{
+    font-family:'Inter', sans-serif;
+    font-size: 0.86rem;
+    color: rgba(238,242,255,0.78);
+    white-space: nowrap;
+  }
+  .cycle-hello strong{ color: var(--text); font-weight: 700; }
+
+.cycle-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; font-weight: 500; }
+  .cycle-dates { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
+  .cycle-dates span { color: var(--muted); font-weight: 400; }
+  .days-badge {
+    background: rgba(251,191,36,0.1);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 10px;
+    padding: 7px 12px;
+    text-align: center;
+    margin-top: -6px;
+  }
+  .days-badge .num { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--amber); line-height: 1; display: block; }
+  .days-badge .lbl { font-size: 0.65rem; color: rgba(251,191,36,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
+  .progress-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
+  .progress-track { height: 4px; background: var(--surface3); border-radius: 100px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; width: 27%;
+    background: linear-gradient(90deg, #4F8EF7, #7C3AED);
+    border-radius: 100px; position: relative;
+    box-shadow: 0 0 10px rgba(79,142,247,0.6);
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; right: -3px; top: -2px;
+    width: 8px; height: 8px; background: #fff; border-radius: 50%;
+    box-shadow: 0 0 8px rgba(79,142,247,0.8);
+  }
+
+  /* CRED CARD */
+  .cred-card { padding: 22px; animation-delay: 0.16s; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .card-header-left { display: flex; align-items: center; gap: 10px; }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--surface3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; }
+  .access-badge {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 10px;
+    font-size: 0.7rem; color: var(--muted); font-weight: 500;
+  }
+  .cred-row {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 13px; padding: 14px 16px; margin-bottom: 4px;
+  }
+  .cred-field-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+  .cred-field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .cred-value { font-size: 0.88rem; font-weight: 500; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cred-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .btn-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface3);
+    color: var(--muted); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; font-size: 0.8rem;
+  }
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
+  .btn-icon:active { transform: scale(0.92); }
+  .btn-reveal {
+    height: 34px; padding: 0 14px; border-radius: 9px; border: none;
+    background: linear-gradient(135deg, #2563EB, #7C3AED); color: #fff;
+    font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35); white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-reveal:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
+  .btn-reveal:active { transform: scale(0.95); }
+  .cred-hint {
+    margin-top: 12px; padding: 10px 14px;
+    background: rgba(79,142,247,0.05); border: 1px solid rgba(79,142,247,0.1);
+    border-radius: 10px; font-size: 0.72rem; color: var(--muted); line-height: 1.55;
+  }
+  .cred-hint strong { color: var(--accent2); font-weight: 600; }
+  .cred-bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .btn-action {
+    height: 42px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 7px; transition: all 0.2s; font-family: 'Inter', sans-serif;
+  }
+  .btn-action:hover { border-color: rgba(79,142,247,0.3); color: var(--accent2); }
+  .btn-action:active { transform: scale(0.97); }
+  .btn-action.danger { color: var(--red); border-color: rgba(248,113,113,0.15); background: rgba(248,113,113,0.04); }
+  .btn-action.danger:hover { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+  .dots { letter-spacing: 3px; font-size: 0.75rem; color: var(--muted); }
+
+  /* MESSAGES CARD */
+  .msg-card { padding: 20px 22px; animation-delay: 0.22s; }
+  .msg-item:hover { background: var(--surface2); }
+  .msg-text strong { color: var(--text); font-weight: 600; }
+
+  /* BOTTOM NAV */
+  .nav-item:hover { background: var(--surface3); }
+  .nav-item.active .nav-icon, .nav-item.active /* TOAST */
+  .toast {
+    position: fixed; bottom: 108px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--surface); border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 12px; padding: 10px 20px;
+    font-size: 0.8rem; color: var(--green); font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    opacity: 0; transition: all 0.3s ease; pointer-events: none; white-space: nowrap; z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* TIMER */
+  .reveal-timer {
+    display: none; font-size: 0.7rem; color: var(--accent);
+    font-weight: 600; font-family: 'Syne', sans-serif;
+    background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 6px; padding: 2px 7px;
+  }
+
+  /* ADMIN BANNER (rotativo) */
+  .banner-wrap{ margin-top: 6px; display:grid; gap: 10px; }
+  .banner{
+    display:flex;
+    gap: 12px;
+    align-items:flex-start;
+    padding: 14px 14px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.16);
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow:hidden;
+    position:relative;
+  }
+  .banner-emoji{
+    width: 38px; height: 38px;
+    border-radius: 14px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    flex: 0 0 auto;
+    font-size: 1.1rem;
+  }
+  .banner-text{
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: rgba(238,242,255,0.86);
+  }
+  .banner-text strong{ color: var(--text); font-weight: 700; }
+  .banner.out{
+    animation: bannerOut .32s ease forwards;
+  }
+  .banner.in{
+    animation: bannerIn .36s ease forwards;
+  }
+  @keyframes bannerOut{
+    from{ opacity:1; transform: translateY(0); }
+    to{ opacity:0; transform: translateY(-8px); }
+  }
+  @keyframes bannerIn{
+    from{ opacity:0; transform: translateY(10px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .banner-dots{
+    display:flex;
+    justify-content:center;
+    gap: 8px;
+    padding-bottom: 2px;
+    opacity:.85;
+  }
+  .banner-dots span{
+    width: 6px; height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.24);
+  }
+  .banner-dots span.on{
+    background: rgba(99,179,237,0.95);
+    box-shadow: 0 0 0 6px rgba(99,179,237,0.12);
+  }
+
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="
+  position:fixed;
+  inset:0;
+  background:#080C14;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+">
+  <div style="
+    width:90%;
+    max-width:380px;
+    background:#0E1420;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:22px;
+    padding:40px 28px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  ">
+    <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg"
+         style="width:90px;height:90px;border-radius:20px;margin-bottom:20px;object-fit:cover;">
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;margin-bottom:6px;">BoxPower</h2>
+    <p style="color:#6B7A99;font-size:0.85rem;margin-bottom:30px;">Acesso do Cliente</p>
+
+    
+    <input type="email" id="credentialEmail" placeholder="Digite seu e-mail"
+      style="
+        width:100%;
+        height:46px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.1);
+        background:#131A28;
+        color:#EEF2FF;
+        padding:0 14px;
+        margin-bottom:12px;
+        font-size:0.9rem;
+      ">
+<input type="password" id="loginPass" placeholder="Digite sua senha"
+      style="
+        width:100%;
+        height:46px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.1);
+        background:#131A28;
+        color:#EEF2FF;
+        padding:0 14px;
+        margin-bottom:18px;
+        font-size:0.9rem;
+      ">
+
+    <button onclick="login()"
+      style="
+        width:100%;
+        height:46px;
+        border:none;
+        border-radius:14px;
+        background:linear-gradient(135deg,#2563EB,#7C3AED);
+        color:#fff;
+        font-weight:600;
+        font-size:0.9rem;
+        cursor:pointer;
+      ">
+      ENTRAR
+    </button>
+    <div id="loginMsg" style="margin-top:12px;color:rgba(238,242,255,0.70);font-size:0.85rem;line-height:1.35;"></div>
+  </div>
+</div>
+
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark"><img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" alt="BoxPower"></div>
+    <div>
+      <div class="header-hello">Olá, Tulio 👋</div>
+      <div class="header-brand">BoxPower</div>
+      <div class="header-sub">VEO3 Shared</div>
+    </div>
+  </div>
+<div class="card cycle-card">
+    <div class="cycle-top">
+      <div class="cycle-top-left">
+        </header>
+
+<main>
+
+  </div>
+      <div class="days-badge">
+        <span class="num">22</span>
+        <span class="lbl">dias</span>
+      </div>
+    </div>
+    <div>
+      <div class="progress-row">
+        <span>Início: 15/02</span>
+        <span>Fim: 15/03</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREDENTIALS -->
+  <div class="card cred-card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-icon">🔐</div>
+        <div class="card-title">Credenciais do VEO3 ilimitado</div>
+      </div>
+      
+    </div>
+
+    <div class="cred-row">
+      <div class="cred-field-label">Email</div>
+      <div class="cred-field-row">
+        <div class="cred-value" id="email-val">tuliofelipexk@gmail.com</div>
+        <div class="cred-actions">
+          <button class="btn-icon" onclick="copyText('email-val','Email copiado!')" title="Copiar">⧉</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cred-row">
+      <div class="cred-field-label">Senha</div>
+      <div class="cred-field-row">
+        <div class="cred-value">
+          <span class="dots" id="dots-view">• • • • • • • • • •</span>
+          <span id="pass-val" style="display:none;">Minha@Senha123</span>
+        </div>
+        <div class="cred-actions">
+          <span class="reveal-timer" id="timer-lbl"></span>
+          <button class="btn-icon" id="copy-pass" onclick="copyText('pass-val','Senha copiada!')" style="display:none;" title="Copiar">⧉</button>
+          <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()">👁 Liberar</button>
+        </div>
+      </div>
+    </div>
+
+    
+
+    
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="card msg-card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Mensagens da Administração</div>
+      </div>
+    </div>
+    
+    <div class="banner-wrap">
+      <div class="banner" id="adminBanner">
+        <div class="banner-emoji" id="bannerEmoji">📌</div>
+        <div class="banner-text" id="bannerText"><strong>Atualização.</strong> O portal está em constante evolução.</div>
+      </div>
+      <div class="banner-dots" id="bannerDots" aria-hidden="true"></div>
+    </div>
+
+  </div>
+
+</main>
+
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://epwmoicgvuprzkcpxjoy.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function copyText(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  showToast('✓ ' + msg);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+let revealTimeout = null;
+function revealPassword(){ fetchAndRevealPassword(); }
+
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+
+(function(){
+  const inlineEl = document.getElementById('clientNameInline');
+  if(inlineEl){ inlineEl.textContent = "Tulio"; }
+})();
+
+
+/* Banner rotativo - Mensagens da Administração */
+const adminMessages = [
+  { emoji: "📌", html: "<strong>Atualização.</strong> O portal está em constante evolução. Em breve teremos tutoriais e histórico." },
+  { emoji: "💡", html: "<strong>Dica.</strong> Copie a senha com um clique para agilizar o login no VEO3." },
+  { emoji: "🛡️", html: "<strong>Segurança.</strong> A senha fica oculta por padrão e libera por tempo limitado." }
+];
+
+(function initAdminBanner(){
+  const banner = document.getElementById("adminBanner");
+  const emojiEl = document.getElementById("bannerEmoji");
+  const textEl = document.getElementById("bannerText");
+  const dotsEl = document.getElementById("bannerDots");
+  if(!banner || !emojiEl || !textEl || !dotsEl) return;
+
+  let i = 0;
+  dotsEl.innerHTML = adminMessages.map((_,k)=>`<span class="${k===0?'on':''}"></span>`).join("");
+  const dots = Array.from(dotsEl.querySelectorAll("span"));
+
+  function render(idx){
+    const m = adminMessages[idx];
+    emojiEl.textContent = m.emoji;
+    textEl.innerHTML = m.html;
+    dots.forEach((d,k)=> d.classList.toggle("on", k===idx));
+  }
+
+  function next(){
+    banner.classList.remove("in");
+    banner.classList.add("out");
+    setTimeout(()=>{
+      i = (i+1) % adminMessages.length;
+      render(i);
+      banner.classList.remove("out");
+      banner.classList.add("in");
+    }, 320);
+  }
+
+  render(i);
+  banner.classList.add("in");
+  setInterval(next, 4200);
+})();
+
+
+
+async function login(){
+  const email = (document.getElementById("loginEmail")?.value || "").trim().toLowerCase();
+  const pass  = (document.getElementById("loginPass")?.value || "");
+  const msgEl = document.getElementById("loginMsg");
+  if(msgEl) msgEl.textContent = "";
+
+  if(!email || !pass){
+    if(msgEl) msgEl.textContent = "Preencha e-mail e senha.";
+    return;
+  }
+
+  // Login Supabase
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){
+    if(msgEl) msgEl.textContent = "Falha no login: " + (error.message || "verifique seus dados");
+    return;
+  }
+
+  // Vincula auth.user ao client_id
+  try { await sb.rpc("link_portal_user"); } catch(e){}
+
+  // Atualiza saudação
+  const prefix = email.split("@")[0] || "Cliente";
+  const hello = document.querySelector(".header-hello");
+  if(hello) hello.textContent = "Olá, " + (prefix.charAt(0).toUpperCase()+prefix.slice(1)) + " 👋";
+
+  // Esconde login screen
+  const ls = document.getElementById("loginScreen");
+  if(ls) ls.style.display = "none";
+
+  // Carrega credencial (não libera senha automaticamente)
+  await refreshCredentialPreview();
+}
+
+</script>
+</body>
+</html>
