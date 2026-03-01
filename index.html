@@ -105,7 +105,7 @@
                 <input type="hidden" id="modal-client-id">
                 <div class="space-y-3">
                     <input type="text" id="modal-name" placeholder="Nome" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white">
-                    <input type="text" id="modal-whatsapp" maxlength="17" oninput="maskPhone(this)" onkeyup="maskPhone(this)" placeholder="(DD) 9XXXX-XXXX" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
+                    <input type="text" id="modal-whatsapp" maxlength="25" onblur="maskPhone(this)" placeholder="(DD) 9XXXX-XXXX" class="w-full bg-slate-800 rounded-lg p-3 border border-slate-700 outline-none text-white font-mono tracking-wider">
 
                     <div id="product-rows-container" class="space-y-2">
                         <div class="flex gap-2 items-center">
@@ -202,10 +202,51 @@
             return months[0];
         }
 
-        function formatPhoneString(v) { if (!v) return ''; v = v.replace(/\\D/g, ''); if (v.length > 11 && v.startsWith('55')) v = v.substring(2); v = v.substring(0, 11); if (v.length >= 3 && v[2] !== '9') v = v.substring(0, 2) + '9' + v.substring(2); if (v.length > 11) v = v.substring(0, 11); if (v.length > 10) return v.replace(/^(\\d{2})(\\d{5})(\\d{4}).*/, '($1) $2-$3'); if (v.length > 6) return v.replace(/^(\\d{2})(\\d{4})(\\d{0,4}).*/, '($1) $2-$3'); if (v.length > 2) return v.replace(/^(\\d{2})(\\d{0,5}).*/, '($1) $2'); return v; }
-        function maskPhone(el) { el.value = formatPhoneString(el.value); }
+        
+        function formatPhoneString(v) {
+            if (!v) return '';
+            const raw = String(v).trim();
+            const startsPlus = raw.startsWith('+');
+            let digits = raw.replace(/\D/g, '');
+            if (!digits) return '';
 
-        function clearSearch() { document.getElementById('search-client').value = ''; filterClients(); }
+            // Se veio com + e NÃO é Brasil, preserva como internacional sem formatar (evita quebrar números)
+            if (startsPlus && !digits.startsWith('55')) {
+                return '+' + digits;
+            }
+
+            // Brasil: aceita com +55/55 ou sem DDI
+            if (digits.startsWith('55') && digits.length >= 12) {
+                digits = digits.slice(2);
+            }
+
+            // Limita para DDD + número (11 dígitos no máximo)
+            digits = digits.slice(0, 11);
+
+            // Se ainda está curto, devolve com +55 e o que tiver (para não "travar" edição)
+            if (digits.length < 3) return '+55 ' + digits;
+            if (digits.length < 10) return '+55 ' + digits;
+
+            const ddd = digits.slice(0, 2);
+            let rest = digits.slice(2);
+
+            // 11 dígitos: 9XXXX-XXXX | 10 dígitos: XXXX-XXXX
+            let formatted = rest;
+            if (rest.length >= 9) {
+                formatted = rest.slice(0, 5) + '-' + rest.slice(5, 9);
+            } else if (rest.length >= 8) {
+                formatted = rest.slice(0, 4) + '-' + rest.slice(4, 8);
+            }
+
+            return `+55 (${ddd}) ${formatted}`;
+        }
+
+        function maskPhone(el) { 
+            if (!el) return;
+            el.value = formatPhoneString(el.value); 
+        }
+
+function clearSearch() { document.getElementById('search-client').value = ''; filterClients(); }
 
         function addNextRow() { if(document.getElementById('row-prod-2').classList.contains('hidden')) document.getElementById('row-prod-2').classList.remove('hidden'); else if(document.getElementById('row-prod-3').classList.contains('hidden')) document.getElementById('row-prod-3').classList.remove('hidden'); else if(document.getElementById('row-prod-4').classList.contains('hidden')) { document.getElementById('row-prod-4').classList.remove('hidden'); document.getElementById('btn-add-row').classList.add('hidden'); } }
         function clearRow(n) { const s = n === 1 ? '' : '-' + n; document.getElementById(`modal-product${s}`).value = ''; document.getElementById(`modal-price${s}`).value = ''; document.getElementById(`modal-due${s}`).value = ''; if(n > 1) document.getElementById(`row-prod-${n}`).classList.add('hidden'); document.getElementById('btn-add-row').classList.remove('hidden'); }
