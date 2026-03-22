@@ -291,8 +291,8 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             if(i) i.classList.add('fa-spin');
 
             try {
-                // 1. Fetch Assignments & Credentials for grouping
-                const { data: creds, error: credErr } = await sb.from('veo3_credentials').select('id, veo_email, updated_at');
+                // 1. Fetch Assignments & Credentials for grouping (Only active credentials)
+                const { data: creds, error: credErr } = await sb.from('veo3_credentials').select('id, veo_email, updated_at').eq('active', true);
                 if(credErr) console.error("Creds Fetch Error:", credErr);
                 const { data: assigns } = await sb.from('veo3_assignments').select('user_id, credential_id');
                 
