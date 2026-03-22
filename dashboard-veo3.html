@@ -323,14 +323,14 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                 // Get freshest snapshots (Current Energy)
                 const { data: recentSnaps, error: snapErr } = await sb.from('veo3_credit_snapshots')
                     .select('*')
-                    .order('created_at', { ascending: false })
+                    .order('captured_at', { ascending: false })
                     .limit(100);
                 
                 // Get oldest snapshots within window (For Drop Delta)
                 const { data: oldSnaps } = await sb.from('veo3_credit_snapshots')
                     .select('*')
-                    .gte('created_at', isoPast)
-                    .order('created_at', { ascending: true })
+                    .gte('captured_at', isoPast)
+                    .order('captured_at', { ascending: true })
                     .limit(100);
 
                 if (snapErr) console.warn("Erro ao buscar snapshots:", snapErr.message);
@@ -432,7 +432,7 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                             badge.innerText = "ULTRA ON";
                         }
                         
-                        const syncDate = new Date(snap.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                        const syncDate = new Date(snap.captured_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
                         document.getElementById(`foot-${prefix}`).innerHTML = `<span class="text-emerald-500/70">LAST SYNC ${syncDate} | ${daysActive}D</span>`;
                         document.getElementById(`foot-${prefix}`).classList.remove('hidden');
                         document.getElementById(`btn-map-${prefix}`).classList.add('hidden');
