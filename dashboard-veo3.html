@@ -292,7 +292,8 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
 
             try {
                 // 1. Fetch Assignments & Credentials for grouping
-                const { data: creds } = await sb.from('veo3_credentials').select('id, veo_email, created_at');
+                const { data: creds, error: credErr } = await sb.from('veo3_credentials').select('id, veo_email, updated_at');
+                if(credErr) console.error("Creds Fetch Error:", credErr);
                 const { data: assigns } = await sb.from('veo3_assignments').select('user_id, credential_id');
                 
                 globalCredentials = creds || [];
@@ -386,7 +387,7 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                 
                 if (cred) {
                     groupCount = globalAssignments.filter(a => a.credential_id === cred.id).length;
-                    daysActive = getDaysDiff(cred.created_at);
+                    daysActive = getDaysDiff(cred.updated_at);
                     const e = cred.veo_email ? cred.veo_email.trim().toLowerCase() : '';
                     if (e) snap = currentMap.get(e);
                 }
