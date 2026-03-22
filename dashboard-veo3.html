@@ -276,7 +276,11 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                         <div id="bar-${prefix}" class="battery-fill" style="width: 0%;"></div>
                     </div>
                     
-                    <div class="mt-2 text-[8px] text-center text-slate-600 font-mono tracking-widest" id="foot-${prefix}">AGUARDANDO SYNC</div>
+                    <div class="mt-3 flex justify-center">
+                        <button id="btn-map-${prefix}" class="text-[9px] bg-slate-800 hover:bg-emerald-600 text-white px-3 py-1 rounded transition-colors border border-slate-600"><i class="fas fa-link mr-1"></i> Vincular Email</button>
+                    </div>
+                    
+                    <div class="mt-2 text-[8px] text-center text-slate-600 font-mono tracking-widest hidden" id="foot-${prefix}">AGUARDANDO SYNC</div>
                 </div>`;
             }
             container.innerHTML = html;
@@ -352,20 +356,20 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             let activeCount = 0;
             let globalEnergy = 0;
 
-            // Map freshest snapshots by source prefix
+            // Map freshest snapshots by user_email
             const currentMap = new Map();
             recentSnaps.forEach(s => {
-                if(!s.source) return;
-                const p = s.source.trim().toUpperCase();
-                if(!currentMap.has(p)) currentMap.set(p, s);
+                if(!s.user_email) return;
+                const e = s.user_email.trim().toLowerCase();
+                if(!currentMap.has(e)) currentMap.set(e, s);
             });
 
-            // Map oldest snapshots by source prefix
+            // Map oldest snapshots by user_email
             const oldMap = new Map();
             oldSnaps.forEach(s => {
-                if(!s.source) return;
-                const p = s.source.trim().toUpperCase();
-                if(!oldMap.has(p)) oldMap.set(p, s);
+                if(!s.user_email) return;
+                const e = s.user_email.trim().toLowerCase();
+                if(!oldMap.has(e)) oldMap.set(e, s);
             });
 
             for(let i=1; i<=10; i++) {
@@ -373,18 +377,18 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                 const card = document.getElementById(`slot-card-${prefix}`);
                 if(!card) continue;
 
-                // 1. Snapshot Info
-                const snap = currentMap.get(prefix);
-                
-                // 2. Mapped Credential Info
+                // Mapped Credential Info
                 const credId = slotMappings[prefix];
                 const cred = globalCredentials.find(c => c.id === Number(credId));
                 let groupCount = 0;
                 let daysActive = '?';
+                let snap = null;
                 
                 if (cred) {
                     groupCount = globalAssignments.filter(a => a.credential_id === cred.id).length;
                     daysActive = getDaysDiff(cred.created_at);
+                    const e = cred.veo_email ? cred.veo_email.trim().toLowerCase() : '';
+                    if (e) snap = currentMap.get(e);
                 }
 
                 if(snap || cred) {
@@ -397,7 +401,7 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                         globalEnergy += currentCredits;
 
                         // Calculate Drop
-                        const oldSnap = oldMap.get(prefix);
+                        const oldSnap = oldMap.get(cred ? cred.veo_email.trim().toLowerCase() : '');
                         const oldCredits = oldSnap ? Number(oldSnap.credits || currentCredits) : currentCredits;
                         const drop = oldCredits - currentCredits;
                         const dropEl = document.getElementById(`drop-${prefix}`);
@@ -429,10 +433,14 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                         
                         const syncDate = new Date(snap.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
                         document.getElementById(`foot-${prefix}`).innerHTML = `<span class="text-emerald-500/70">LAST SYNC ${syncDate} | ${daysActive}D</span>`;
+                        document.getElementById(`foot-${prefix}`).classList.remove('hidden');
+                        document.getElementById(`btn-map-${prefix}`).classList.add('hidden');
                     } else {
                         // Credential is mapped but Extension hasn't posted a snapshot yet
                         document.getElementById(`credits-${prefix}`).innerText = "NO DATA";
                         document.getElementById(`foot-${prefix}`).innerText = `MAPPED | ${daysActive}D`;
+                        document.getElementById(`foot-${prefix}`).classList.remove('hidden');
+                        document.getElementById(`btn-map-${prefix}`).classList.add('hidden');
                     }
 
                     document.getElementById(`group-${prefix}`).innerHTML = `<i class="fas fa-users text-blue-500 mr-0.5"></i> <span class="text-white">${groupCount}</span>`;
@@ -444,6 +452,8 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                     document.getElementById(`credits-${prefix}`).className = "text-xl font-black title-font text-slate-600 mb-1";
                     document.getElementById(`bar-${prefix}`).style.width = "0%";
                     document.getElementById(`foot-${prefix}`).innerText = "UNMAPPED";
+                    document.getElementById(`foot-${prefix}`).classList.add('hidden');
+                    document.getElementById(`btn-map-${prefix}`).classList.remove('hidden');
                     document.getElementById(`drop-${prefix}`).innerText = "- 0 un";
                     document.getElementById(`group-${prefix}`).innerHTML = `<i class="fas fa-users"></i> 0`;
                 }
