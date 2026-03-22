@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap');
@@ -140,12 +141,19 @@
             </div>
             <i class="fas fa-globe text-blue-500/30 text-3xl"></i>
         </div>
-        <div class="glass-panel rounded-xl p-3 flex-1 flex justify-between items-center border border-emerald-900/40">
-            <div>
+        <div class="glass-panel rounded-xl p-3 flex-1 flex flex-col justify-between border border-emerald-900/40 relative overflow-hidden">
+            <div class="z-10 relative">
                 <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest title-font mb-1">Capacidade Energética</p>
-                <h3 id="stat-global-energy" class="text-2xl font-bold title-font text-emerald-400">0 <span class="text-emerald-700 text-xs ml-1 font-sans font-normal">créditos</span></h3>
+                <div class="flex justify-between items-center">
+                    <h3 id="stat-global-energy" class="text-2xl font-bold title-font text-emerald-400">0<span class="text-emerald-700 text-xs ml-1 font-sans font-normal">créditos</span></h3>
+                    <i class="fas fa-bolt text-yellow-500/30 text-3xl"></i>
+                </div>
             </div>
-            <i class="fas fa-bolt text-yellow-500/30 text-3xl"></i>
+            <!-- Global Battery Progress Bar -->
+            <div class="absolute bottom-0 left-0 h-1.5 w-full bg-slate-900">
+                <div id="stat-global-bar" class="h-full bg-gradient-to-r from-emerald-600 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
+            </div>
+            <div class="absolute -bottom-2 right-2 text-[8px] font-mono text-emerald-900/60 z-0">MAX 200.000</div>
         </div>
     </div>
 
@@ -155,8 +163,16 @@
         <!-- Left: Energy Slots -->
         <div class="lg:w-2/3 flex flex-col gap-3">
             <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest title-font flex items-center gap-2"><i class="fas fa-microchip text-emerald-500"></i> Matrizes VEO3</h3>
-            <div id="slots-container" class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div id="slots-container" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <!-- Javascript will inject 10 slots here -->
+            </div>
+
+            <!-- Evolução de Clientes Chart -->
+            <div class="glass-panel rounded-2xl p-4 mt-2 border border-blue-900/30 flex-1">
+                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest title-font flex items-center gap-2 mb-3"><i class="fas fa-chart-line"></i> Evolução da População</h3>
+                <div class="w-full h-44 relative">
+                    <canvas id="growthChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -260,20 +276,30 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             for(let i=1; i<=10; i++) {
                 const prefix = `VEO3-${String(i).padStart(2, '0')}`;
                 html += `
-                <div id="slot-card-${prefix}" class="glass-panel p-3 rounded-xl border border-slate-800 slot-inactive slot-card cursor-pointer" onclick="openMapModal('${prefix}')" title="Clique para vincular credencial">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] font-bold title-font text-slate-500 uppercase tracking-widest">${prefix}</span>
-                        <span id="badge-ultra-${prefix}" class="text-[8px] px-1.5 py-0.5 rounded border border-slate-700 text-slate-500 font-bold hidden">INATIVO</span>
+                <div id="slot-card-${prefix}" class="glass-panel p-3 rounded-xl border border-slate-800 slot-inactive slot-card cursor-pointer flex flex-col justify-between" onclick="openMapModal('${prefix}')" title="Clique para vincular credencial">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span id="prefix-label-${prefix}" class="text-[10px] font-bold title-font text-slate-500 uppercase tracking-widest truncate max-w-[70%]">${prefix}</span>
+                            <span id="badge-ultra-${prefix}" class="text-[8px] px-1.5 py-0.5 rounded border border-slate-700 text-slate-500 font-bold hidden shrink-0">INATIVO</span>
+                        </div>
+                        
+                        <h3 id="credits-${prefix}" class="text-xl font-black title-font text-slate-600 mb-2">------</h3>
                     </div>
                     
-                    <h3 id="credits-${prefix}" class="text-xl font-black title-font text-slate-600 mb-1">------</h3>
-                    <div class="flex justify-between text-[9px] text-slate-500 mb-2 font-mono">
-                        <span id="drop-${prefix}">- 0 un</span>
-                        <span id="group-${prefix}"><i class="fas fa-users"></i> 0</span>
-                    </div>
-                    
-                    <div class="battery-container">
-                        <div id="bar-${prefix}" class="battery-fill" style="width: 0%;"></div>
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-500 mb-3 font-mono">
+                            <span id="drop-${prefix}" class="bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">- 0 un</span>
+                            <span id="group-${prefix}" class="bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800"><i class="fas fa-users text-[10px]"></i> 0</span>
+                        </div>
+                        
+                        <div id="slot-analytics-${prefix}" class="flex justify-between text-[8px] mb-2 hidden font-sans">
+                            <span class="text-emerald-500/80" title="Acessos Recentes"><i class="fas fa-sign-in-alt"></i> <span id="slot-active-${prefix}">0</span></span>
+                            <span class="text-slate-500/80" title="Inativos"><i class="fas fa-bed"></i> <span id="slot-inactive-${prefix}">0</span></span>
+                        </div>
+
+                        <div class="battery-container">
+                            <div id="bar-${prefix}" class="battery-fill" style="width: 0%;"></div>
+                        </div>
                     </div>
                     
                     <div class="mt-3 flex justify-center">
@@ -337,6 +363,11 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
 
                 await updateSlots(recentSnaps || [], oldSnaps || []);
                 await updateAnalytics(isoPast);
+                
+                // 3. Render Evolution Chart if unrendered
+                if(!window.growthChartInstance) {
+                    await renderGrowthChart();
+                }
 
             } catch(e) {
                 console.error("Erro geral no fetchData:", e);
@@ -352,6 +383,8 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             const diffTime = Math.abs(now - start);
             return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
+
+        let lastAccessMapGlobal = {};
 
         async function updateSlots(recentSnaps, oldSnaps) {
             let activeCount = 0;
@@ -408,8 +441,10 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                         const dropEl = document.getElementById(`drop-${prefix}`);
                         if(drop > 0) {
                             dropEl.innerHTML = `<span class="text-red-400 font-bold">-${drop} un</span>`;
+                            dropEl.className = "bg-red-900/20 px-1.5 py-0.5 rounded border border-red-800/50";
                         } else {
                             dropEl.innerHTML = `<span class="text-slate-500">= 0 un</span>`;
+                            dropEl.className = "bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800";
                         }
 
                         // Energy Bar
@@ -444,24 +479,61 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
                         document.getElementById(`btn-map-${prefix}`).classList.add('hidden');
                     }
 
-                    document.getElementById(`group-${prefix}`).innerHTML = `<i class="fas fa-users text-blue-500 mr-0.5"></i> <span class="text-white">${groupCount}</span>`;
+                    // Format explicit mapped name prefix
+                    if (cred && cred.veo_email) {
+                        const shortName = cred.veo_email.split('@')[0];
+                        document.getElementById(`prefix-label-${prefix}`).innerText = shortName;
+                        document.getElementById(`prefix-label-${prefix}`).classList.add('text-emerald-400');
+                    }
+
+                    // Group styling
+                    const groupEl = document.getElementById(`group-${prefix}`);
+                    groupEl.innerHTML = `<i class="fas fa-users text-blue-500 mr-0.5 text-[10px]"></i> <span class="text-white font-bold">${groupCount}</span>`;
+                    groupEl.className = "bg-blue-900/20 px-1.5 py-0.5 rounded border border-blue-800/50";
+
+                    // Analytics per slot (based on assignments & lastAccessMapGlobal populated in updateAnalytics)
+                    if (Object.keys(lastAccessMapGlobal).length > 0) {
+                        const slotUsers = globalAssignments.filter(a => a.credential_id === cred.id).map(a => a.user_id);
+                        let ac=0, inac=0;
+                        const nowTime = new Date().getTime();
+                        slotUsers.forEach(uid => {
+                            const last = lastAccessMapGlobal[uid];
+                            if (!last) inac++;
+                            else {
+                                const diffDays = Math.floor((nowTime - last) / (1000 * 60 * 60 * 24));
+                                if(diffDays >= 3) inac++; else ac++;
+                            }
+                        });
+                        document.getElementById(`slot-analytics-${prefix}`).classList.remove('hidden');
+                        document.getElementById(`slot-active-${prefix}`).innerText = `${ac} In`;
+                        document.getElementById(`slot-inactive-${prefix}`).innerText = `${inac} Out`;
+                    }
 
                 } else {
-                    card.className = "glass-panel p-3 rounded-xl border border-slate-800 slot-inactive slot-card cursor-pointer";
+                    card.className = "glass-panel p-3 rounded-xl border border-slate-800 slot-inactive slot-card cursor-pointer flex flex-col justify-between";
+                    document.getElementById(`prefix-label-${prefix}`).innerText = prefix;
+                    document.getElementById(`prefix-label-${prefix}`).classList.remove('text-emerald-400');
                     document.getElementById(`badge-ultra-${prefix}`).classList.add('hidden');
+                    document.getElementById(`slot-analytics-${prefix}`).classList.add('hidden');
                     document.getElementById(`credits-${prefix}`).innerText = "------";
-                    document.getElementById(`credits-${prefix}`).className = "text-xl font-black title-font text-slate-600 mb-1";
+                    document.getElementById(`credits-${prefix}`).className = "text-xl font-black title-font text-slate-600 mb-2";
                     document.getElementById(`bar-${prefix}`).style.width = "0%";
                     document.getElementById(`foot-${prefix}`).innerText = "UNMAPPED";
                     document.getElementById(`foot-${prefix}`).classList.add('hidden');
                     document.getElementById(`btn-map-${prefix}`).classList.remove('hidden');
-                    document.getElementById(`drop-${prefix}`).innerText = "- 0 un";
-                    document.getElementById(`group-${prefix}`).innerHTML = `<i class="fas fa-users"></i> 0`;
+                    document.getElementById(`drop-${prefix}`).innerHTML = `<span class="text-slate-500">- 0 un</span>`;
+                    document.getElementById(`drop-${prefix}`).className = "bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800";
+                    document.getElementById(`group-${prefix}`).innerHTML = `<i class="fas fa-users text-[10px]"></i> 0`;
+                    document.getElementById(`group-${prefix}`).className = "bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800";
                 }
             }
 
             document.getElementById('stat-active-slots').innerHTML = `${activeCount}<span class="text-slate-600 text-xs ml-1 font-sans font-normal">/ 10</span>`;
-            document.getElementById('stat-global-energy').innerHTML = `${globalEnergy.toLocaleString('pt-BR')} <span class="text-emerald-700 text-xs ml-1 font-sans font-normal">créditos</span>`;
+            document.getElementById('stat-global-energy').innerHTML = `${globalEnergy.toLocaleString('pt-BR')} <span class="text-emerald-700 text-[10px] ml-1 font-sans font-normal uppercase">créditos</span>`;
+            
+            const maxCap = 200000;
+            const capPct = Math.min((globalEnergy / maxCap) * 100, 100);
+            document.getElementById('stat-global-bar').style.width = `${capPct}%`;
         }
 
         async function updateAnalytics(isoPast) {
@@ -484,15 +556,15 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
 
             // Frequency Map
             const freqMap = {};
-            const lastAccessMap = {};
+            lastAccessMapGlobal = {};
             
             logs.forEach(l => {
                 if(!l.user_id) return;
                 freqMap[l.user_id] = (freqMap[l.user_id] || 0) + 1;
                 
                 const lTime = new Date(l.created_at).getTime();
-                if(!lastAccessMap[l.user_id] || lTime > lastAccessMap[l.user_id]) {
-                    lastAccessMap[l.user_id] = lTime;
+                if(!lastAccessMapGlobal[l.user_id] || lTime > lastAccessMapGlobal[l.user_id]) {
+                    lastAccessMapGlobal[l.user_id] = lTime;
                 }
             });
 
@@ -529,7 +601,7 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             
             const nowTime = new Date().getTime();
             allAssignedUsers.forEach(uid => {
-                const last = lastAccessMap[uid];
+                const last = lastAccessMapGlobal[uid];
                 if (!last) {
                     // Never accessed in this window
                     absentees.push({ uid, days: 'Ausente' });
@@ -591,6 +663,88 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
             localStorage.setItem('veo3_slot_mappings', JSON.stringify(slotMappings));
             document.getElementById('map-modal').classList.add('hidden');
             fetchData();
+        }
+
+        async function renderGrowthChart() {
+            try {
+                // Fetch creation dates to plot cumulative growth
+                const { data: users, error } = await sb.from('portal_users')
+                    .select('created_at')
+                    .order('created_at', { ascending: true });
+                
+                if(error || !users || users.length === 0) return;
+
+                // Group by simple date YYYY-MM-DD
+                const dateCounts = {};
+                users.forEach(u => {
+                    const d = new Date(u.created_at).toISOString().split('T')[0];
+                    dateCounts[d] = (dateCounts[d] || 0) + 1;
+                });
+
+                // Generate cumulative dataset
+                const dates = Object.keys(dateCounts).sort();
+                const labels = [];
+                const data = [];
+                let cumulative = 0;
+
+                dates.forEach(d => {
+                    cumulative += dateCounts[d];
+                    // Format to DD/MM
+                    const parts = d.split('-');
+                    labels.push(`${parts[2]}/${parts[1]}`);
+                    data.push(cumulative);
+                });
+
+                const ctx = document.getElementById('growthChart').getContext('2d');
+                window.growthChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total de Clientes',
+                            data: data,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#059669',
+                            pointBorderColor: '#fff',
+                            pointRadius: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { 
+                                mode: 'index', 
+                                intersect: false,
+                                backgroundColor: 'rgba(15, 20, 25, 0.9)',
+                                titleColor: '#10b981',
+                                bodyColor: '#f1f5f9',
+                                borderColor: 'rgba(16,185,129,0.3)',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 10 },
+                                beginAtZero: true
+                            }
+                        },
+                        interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                    }
+                });
+            } catch (err) {
+                console.error("Chart Error:", err);
+            }
         }
     </script>
 </body>
