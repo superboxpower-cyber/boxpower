@@ -116,7 +116,13 @@
         </div>
         <div class="flex gap-3 items-center">
             <select id="time-filter" onchange="fetchData()" class="bg-black/50 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg py-1.5 px-3 outline-none cursor-pointer title-font font-bold">
-                <option value="24h">Últimas 24h</option>
+                <option value="30m">Últimos 30 minutos</option>
+                <option value="1h">Última 1 hora</option>
+                <option value="2h">Últimas 2 horas</option>
+                <option value="4h">Últimas 4 horas</option>
+                <option value="8h">Últimas 8 horas</option>
+                <option value="12h">Últimas 12 horas</option>
+                <option value="24h" selected>Últimas 24h</option>
                 <option value="7d">Últimos 7 dias</option>
                 <option value="30d">Últimos 30 dias</option>
             </select>
@@ -338,12 +344,17 @@ CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO 
 
                 // 2. Fetch Snapshots for Energy
                 const timeFilter = document.getElementById('time-filter').value;
-                let daysBack = 1;
-                if(timeFilter === '7d') daysBack = 7;
-                else if(timeFilter === '30d') daysBack = 30;
-
                 const pastDate = new Date();
-                pastDate.setDate(pastDate.getDate() - daysBack);
+                
+                if (timeFilter.endsWith('m')) {
+                    pastDate.setMinutes(pastDate.getMinutes() - parseInt(timeFilter));
+                } else if (timeFilter.endsWith('h')) {
+                    pastDate.setHours(pastDate.getHours() - parseInt(timeFilter));
+                } else if (timeFilter.endsWith('d')) {
+                    pastDate.setDate(pastDate.getDate() - parseInt(timeFilter));
+                } else {
+                    pastDate.setDate(pastDate.getDate() - 1); // fallback to 24h
+                }
                 const isoPast = pastDate.toISOString();
 
                 // Get freshest snapshots (Current Energy)
