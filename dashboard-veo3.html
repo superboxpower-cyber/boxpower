@@ -217,8 +217,8 @@
             <div class="bg-black/60 p-4 rounded-xl border border-slate-700 mb-4 overflow-x-auto">
                 <pre class="text-xs font-mono text-emerald-400 select-all"><code>-- Copie e execute este código no SQL Editor do Supabase:
 
-CREATE TABLE public.portal_access_logs (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS public.portal_access_logs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
     credential_id BIGINT REFERENCES veo3_credentials(id) ON DELETE SET NULL,
@@ -226,12 +226,28 @@ CREATE TABLE public.portal_access_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Garantir permissões básicas para o PostgREST enxergar a tabela (Evita erro PGRST205)
+GRANT ALL ON TABLE public.portal_access_logs TO anon;
+GRANT ALL ON TABLE public.portal_access_logs TO authenticated;
+GRANT ALL ON TABLE public.portal_access_logs TO service_role;
+
 -- Habilitar RLS
 ALTER TABLE public.portal_access_logs ENABLE ROW LEVEL SECURITY;
 
--- Políticas de Insert (Para a API)
-CREATE POLICY "Permitir Insert log anon" ON public.portal_access_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
-CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO anon, authenticated USING (true);</code></pre>
+-- Políticas de Insert/Select (Tolerantes se já existirem)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_policies WHERE policyname = 'Permitir Insert log anon' AND tablename = 'portal_access_logs') THEN
+        CREATE POLICY "Permitir Insert log anon" ON public.portal_access_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT FROM pg_policies WHERE policyname = 'Permitir Select logs' AND tablename = 'portal_access_logs') THEN
+        CREATE POLICY "Permitir Select logs" ON public.portal_access_logs FOR SELECT TO anon, authenticated USING (true);
+    END IF;
+END
+$$;
+
+-- ATUALIZAR CACHE DA API (Muito Importante!)
+NOTIFY pgrst, 'reload schema';</code></pre>
             </div>
             
             <div class="flex justify-end gap-3">
